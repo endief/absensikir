@@ -1,0 +1,1061 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen Online - Kelompok Ilmiah Remaja Smansala</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0277bd;
+            --primary-dark: #01579b;
+            --success-color: #4caf50;
+            --success-dark: #388e3c;
+            --danger-color: #f44336;
+            --danger-dark: #d32f2f;
+            --text-light: #222;
+            --text-dark: #f0f0f0;
+            --bg-light: #eaf3ff;
+            --bg-dark: radial-gradient(circle at bottom right, #1a001f 0%, #000 80%);
+            --card-light: #fff;
+            --card-dark: rgba(20, 20, 20, 0.7);
+        }
+    
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 100%);
+            color: var(--primary-dark);
+            margin: 0;
+            padding: 20px;
+            animation: fadeIn 1s ease-in;
+            transition: all 0.5s ease;
+        }
+        
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            animation: slideIn 1.2s ease-out;
+            font-weight: 700;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .role-selection {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--card-light);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            text-align: center;
+            animation: zoomIn 1.5s ease-out;
+        }
+        
+        body.dark-mode .role-selection {
+            background-color: var(--card-dark);
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
+            border: 1px solid rgba(255, 20, 147, 0.2);
+        }
+        
+        .role-selection button {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .role-selection button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--card-light);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            animation: zoomIn 1.5s ease-out;
+            display: none;
+        }
+        
+        body.dark-mode form {
+            background-color: var(--card-dark);
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
+            border: 1px solid rgba(255, 20, 147, 0.2);
+        }
+        
+        .admin-panel {
+            max-width: 600px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, var(--card-light), #f1c40f, var(--primary-color));
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: none;
+            color: var(--primary-dark);
+        }
+        
+        body.dark-mode .admin-panel {
+            background: linear-gradient(135deg, var(--card-dark), #f1c40f, var(--primary-color));
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
+            border: 1px solid rgba(255, 20, 147, 0.2);
+        }
+        
+        .admin-panel h2 {
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .admin-panel button {
+            background: linear-gradient(45deg, var(--danger-color), var(--danger-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .admin-panel button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .admin-panel #download-btn {
+            background: linear-gradient(45deg, var(--success-color), var(--success-dark));
+        }
+        
+        .admin-panel #download-btn:hover {
+            background: linear-gradient(45deg, var(--success-dark), #2e7d32);
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        input[type="text"], input[type="password"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--card-light);
+            color: var(--text-light);
+        }
+        
+        body.dark-mode input[type="text"], 
+        body.dark-mode input[type="password"], 
+        body.dark-mode input[type="date"], 
+        body.dark-mode select, 
+        body.dark-mode textarea {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-dark);
+            border-color: rgba(255, 20, 147, 0.5);
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 8px rgba(2, 119, 189, 0.3);
+            transform: scale(1.02);
+        }
+        
+        input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            transition: all 0.2s ease;
+        }
+        
+        input[type="radio"]:hover {
+            transform: scale(1.3);
+        }
+        
+        .radio-group {
+            margin-bottom: 20px;
+        }
+        
+        .radio-option {
+            display: inline-block;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-option:hover {
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        #keterangan-container {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        button {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        #absensi-list {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: var(--card-light);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: none;
+        }
+        
+        body.dark-mode #absensi-list {
+            background-color: var(--card-dark);
+            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
+            border: 1px solid rgba(255, 20, 147, 0.2);
+        }
+        
+        #absensi-list h2 {
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        #absensi-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        #absensi-list li {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delete-btn {
+            background: linear-gradient(45deg, var(--danger-color), var(--danger-dark));
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .delete-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        #download-btn {
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(45deg, var(--success-color), var(--success-dark));
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        #download-btn:hover {
+            background: linear-gradient(45deg, var(--success-dark), #2e7d32);
+        }
+        
+        .rekap-container {
+            background: rgba(0, 123, 255, 0.08);
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        body.dark-mode .rekap-container {
+            background: linear-gradient(90deg, rgba(255,0,128,0.2), rgba(0,0,0,0.3));
+            color: var(--text-dark);
+        }
+        
+        /* Overlay untuk notifikasi login */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.2);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        
+        .login-popup {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.5s ease;
+        }
+        
+        body.dark-mode .login-popup {
+            background: rgba(30, 30, 30, 0.9);
+            color: var(--text-dark);
+        }
+        
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .login-popup.success {
+            border: 3px solid var(--success-color);
+            color: #2e7d32;
+        }
+        
+        .login-popup.error {
+            border: 3px solid var(--danger-color);
+            color: #c62828;
+        }
+        
+        .login-popup .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .login-popup.success .icon {
+            color: var(--success-color);
+            animation: checkmark 0.5s ease forwards;
+        }
+        
+        .login-popup.error .icon {
+            color: var(--danger-color);
+            animation: crossmark 0.5s ease forwards;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        
+        @keyframes crossmark {
+            0% { transform: scale(0.5) rotate(20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        
+        /* Efek stabilo merah untuk izin */
+        .absen-izin {
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.05) 100%);
+            border-left: 5px solid var(--danger-color);
+            border-radius: 6px;
+            padding-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .absen-izin:hover {
+            background: linear-gradient(90deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0.1) 100%);
+            transform: translateX(3px);
+        }
+        
+        /* Efek stabilo biru untuk hadir */
+        .absen-hadir {
+            background: linear-gradient(90deg, rgba(2, 119, 189, 0.15) 0%, rgba(2, 119, 189, 0.05) 100%);
+            border-left: 5px solid var(--primary-color);
+            border-radius: 6px;
+            padding-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .absen-hadir:hover {
+            background: linear-gradient(90deg, rgba(2, 119, 189, 0.25) 0%, rgba(2, 119, 189, 0.1) 100%);
+            transform: translateX(3px);
+        }
+        
+        /* Mode toggle button */
+        .mode-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #007bff, #00bfff);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        
+        .mode-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
+        }
+        
+        body.dark-mode .mode-btn {
+            background: linear-gradient(135deg, #ff1493, #9b30ff);
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
+        }
+        
+        /* Efek Warna Neon Pink / Ungu di Elemen Aktif */
+        body.dark-mode .active,
+        body.dark-mode button:hover,
+        body.dark-mode .mode-btn {
+            background: linear-gradient(135deg, #ff1493, #9b30ff);
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
+        }
+        
+        /* Highlight elemen saat hover (biar keren) */
+        body.dark-mode tr:hover,
+        body.dark-mode .menu-item:hover {
+            background: rgba(255, 20, 147, 0.1);
+            transition: 0.3s;
+        }
+        
+        /* Custom confirm popup */
+        #customConfirm {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        #customConfirm > div {
+            background: rgba(255,255,255,0.85);
+            border-radius: 16px;
+            padding: 24px 30px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        
+        body.dark-mode #customConfirm > div {
+            background: rgba(30, 30, 30, 0.9);
+            color: var(--text-dark);
+        }
+        
+        #confirmText {
+            font-size: 17px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+        
+        body.dark-mode #confirmText {
+            color: var(--text-dark);
+        }
+        
+        #confirmYes {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-right: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        #confirmNo {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    
+<button id="modeToggle" class="mode-btn">🌙</button>
+
+    <h1>ABSEN ONLINE KELOMPOK ILMIAH REMAJA</h1>
+    
+    <div class="role-selection" id="role-selection">
+        <h2></h2>
+        <button id="anggota-btn">Absensi</button>
+        <button id="admin-btn">Admin</button>
+    </div>
+
+    <form id="login-form">
+        <label for="admin-nama">Nama Admin:</label>
+        <input type="text" id="admin-nama" name="admin-nama" required>
+
+        <label for="admin-password">Password:</label>
+        <input type="password" id="admin-password" name="admin-password" required>
+
+        <button type="submit">Login</button>
+        <button type="button" id="back-to-role">Kembali</button>
+    </form>
+
+    <div class="admin-panel" id="admin-panel">
+        <h2>Admin</h2>
+        <button id="reset-absensi">Reset Absensi</button>
+        <button id="download-btn">Unduh sebagai Excel (CSV)</button>
+        <button id="logout-btn">Logout</button>
+    </div>
+
+    <form id="absensi-form">
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" required>
+
+        <label for="kelas">Kelas:</label>
+        <input type="text" id="kelas" name="kelas" required>
+
+        <label for="tanggal">Tanggal:</label>
+        <input type="date" id="tanggal" name="tanggal" required>
+
+        <label>Kehadiran:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="hadir" name="kehadiran" value="Hadir" checked>
+                <label for="hadir">Hadir</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="izin" name="kehadiran" value="Izin">
+                <label for="izin">Izin</label>
+            </div>
+        </div>
+
+        <div id="keterangan-container">
+            <label for="keterangan">Alasan Izin:</label>
+            <textarea id="keterangan" name="keterangan" rows="4" placeholder="Jelaskan alasan izin..."></textarea>
+        </div>
+
+        <button type="submit">Kirim</button>
+        <button type="button" id="back-to-role-absen">Kembali</button>
+    </form>
+
+    <div id="absensi-list">
+        <h2>Daftar Absensi</h2>
+        <div id="rekapAbsensi" class="rekap-container">
+            <p><strong>👥 Rekap Kehadiran:</strong></p>
+            <p>Hadir: <span id="countHadir">0</span> | 
+               Izin: <span id="countIzin">0</span> | 
+               Total: <span id="countTotal">0</span></p>
+        </div>
+        <ul id="absensi-ul"></ul>
+    </div>
+
+    <!-- Overlay UI -->
+    <div id="login-overlay">
+        <div id="login-popup" class="login-popup">
+            <div class="icon">✓</div>
+            <h3 id="login-message">Login Berhasil</h3>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Popup -->
+    <div id="customConfirm">
+        <div>
+            <p id="confirmText">Apakah Anda yakin ingin mereset semua data absensi?</p>
+            <button id="confirmYes">Oke</button>
+            <button id="confirmNo">Tidak</button>
+        </div>
+    </div>
+
+    <script>
+        let absensiData = JSON.parse(localStorage.getItem('absensiData')) || [];
+        let isAdmin = false;
+        const DISCORD_WEBHOOK_URL = 'https://canary.discord.com/api/webhooks/1432263956038160424/m1PjbvI54DkQjBEAPi27dOZn70vzkbg1Zp9oInhk3NEAuCNRvBg0Qv3I8IEo9u7gqhR7';
+
+        const roleSelection = document.getElementById('role-selection');
+        const loginForm = document.getElementById('login-form');
+        const absensiForm = document.getElementById('absensi-form');
+        const adminPanel = document.getElementById('admin-panel');
+        const radioHadir = document.getElementById('hadir');
+        const radioIzin = document.getElementById('izin');
+        const keteranganContainer = document.getElementById('keterangan-container');
+        const absensiUl = document.getElementById('absensi-ul');
+        const loginOverlay = document.getElementById('login-overlay');
+        const loginPopup = document.getElementById('login-popup');
+        const loginMessage = document.getElementById('login-message');
+
+        // Event listeners untuk pemilihan role
+        document.getElementById('anggota-btn').addEventListener('click', () => {
+            roleSelection.style.display = 'none';
+            absensiForm.style.display = 'block';
+            // Sembunyikan daftar absensi untuk anggota
+            document.getElementById('absensi-list').style.display = 'none';
+        });
+
+        document.getElementById('admin-btn').addEventListener('click', () => {
+            roleSelection.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        // Kembali ke pemilihan role
+        document.getElementById('back-to-role').addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            roleSelection.style.display = 'block';
+            loginForm.reset();
+        });
+
+        document.getElementById('back-to-role-absen').addEventListener('click', () => {
+            absensiForm.style.display = 'none';
+            document.getElementById('absensi-list').style.display = 'none';
+            roleSelection.style.display = 'block';
+            absensiForm.reset();
+            toggleKeterangan();
+        });
+
+        // Handle login admin
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nama = document.getElementById('admin-nama').value;
+            const password = document.getElementById('admin-password').value;
+
+            // Daftar admin
+            const admins = [
+                { nama: 'Nabil', password: '321' },
+                { nama: 'Al Ghazali', password: 'ketuakir2526' }
+            ];
+
+            const adminValid = admins.find(admin => admin.nama === nama && admin.password === password);
+
+            if (adminValid) {
+                // Tampilkan UI berhasil
+                loginPopup.classList.remove('error');
+                loginPopup.classList.add('success');
+                loginPopup.querySelector('.icon').textContent = '✓';
+                loginMessage.textContent = 'Login Berhasil';
+                loginOverlay.style.display = 'flex';
+
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                    isAdmin = true;
+                    loginForm.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    document.getElementById('absensi-list').style.display = 'block';
+                    renderAbsensi(); // Render ulang dengan tombol hapus
+                }, 1200);
+            } else {
+                // Tampilkan UI gagal
+                loginPopup.classList.remove('success');
+                loginPopup.classList.add('error');
+                loginPopup.querySelector('.icon').textContent = '✗';
+                loginMessage.textContent = 'Nama atau Password Anda Salah';
+                loginOverlay.style.display = 'flex';
+
+                setTimeout(() => {
+                    loginOverlay.style.display = 'none';
+                }, 1500);
+            }
+        });
+
+        // Logout admin
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            isAdmin = false;
+            adminPanel.style.display = 'none';
+            document.getElementById('absensi-list').style.display = 'none';
+            roleSelection.style.display = 'block';
+        });
+        
+        function toggleKeterangan() {
+            if (radioIzin.checked) {
+                keteranganContainer.style.display = 'block';
+            } else {
+                keteranganContainer.style.display = 'none';
+            }
+        }
+
+        radioHadir.addEventListener('change', toggleKeterangan);
+        radioIzin.addEventListener('change', toggleKeterangan);
+
+        // Inisialisasi
+        toggleKeterangan();
+        renderAbsensi();
+
+        // Ripple effect pada button
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const button = e.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${e.clientX - button.offsetLeft - radius}px`;
+                circle.style.top = `${e.clientY - button.offsetTop - radius}px`;
+                circle.classList.add('ripple');
+
+                const ripple = button.getElementsByClassName('ripple')[0];
+                if (ripple) {
+                    ripple.remove();
+                }
+
+                button.appendChild(circle);
+            });
+        });
+
+        // Fungsi untuk mengirim data ke Discord
+        async function sendToDiscord(entry) {
+            try {
+                const embed = {
+                    title: "📝 Absensi Baru",
+                    color: entry.kehadiran === 'Hadir' ? 3066993 : 15158332, // Hijau untuk Hadir, Merah untuk Izin
+                    fields: [
+                        {
+                            name: "👤 Nama",
+                            value: entry.nama,
+                            inline: true
+                        },
+                        {
+                            name: "🏫 Kelas",
+                            value: entry.kelas,
+                            inline: true
+                        },
+                        {
+                            name: "📅 Tanggal",
+                            value: entry.tanggal,
+                            inline: true
+                        },
+                        {
+                            name: "✅ Status Kehadiran",
+                            value: entry.kehadiran,
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date().toISOString()
+                };
+
+                // Tambahkan field keterangan jika izin
+                if (entry.kehadiran === 'Izin' && entry.keterangan) {
+                    embed.fields.push({
+                        name: "📝 Alasan Izin",
+                        value: entry.keterangan,
+                        inline: false
+                    });
+                }
+
+                const payload = {
+                    embeds: [embed]
+                };
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    console.error('Gagal mengirim ke Discord:', response.status);
+                }
+            } catch (error) {
+                console.error('Error mengirim ke Discord:', error);
+            }
+        }
+
+        // Handle form submission absensi
+        absensiForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const nama = document.getElementById('nama').value;
+            const kelas = document.getElementById('kelas').value;
+            const tanggal = document.getElementById('tanggal').value;
+            const kehadiran = document.querySelector('input[name="kehadiran"]:checked').value;
+            const keterangan = document.getElementById('keterangan').value;
+
+            // Format tanggal ke DD/MM/YYYY
+            const date = new Date(tanggal);
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+
+            const newEntry = {
+                nama: nama,
+                kelas: kelas,
+                tanggal: formattedDate,
+                kehadiran: kehadiran,
+                keterangan: keterangan || 'Alpa'
+            };
+
+            absensiData.push(newEntry);
+            localStorage.setItem('absensiData', JSON.stringify(absensiData));
+
+            // Kirim ke Discord
+            await sendToDiscord(newEntry);
+
+            renderAbsensi();
+            absensiForm.reset();
+            toggleKeterangan();
+            
+            // Tampilkan notifikasi berhasil
+            showNotification('✅ Absensi berhasil dikirim!', 'success');
+        });
+
+        // Fungsi render absensi yang sudah diperbaiki
+        function renderAbsensi() {
+            absensiUl.innerHTML = '';
+            absensiData.forEach((entry, index) => {
+                const li = document.createElement('li');
+                let status;
+                if (entry.kehadiran === 'Hadir') {
+                    status = '(Hadir)';
+                    li.classList.add('absen-hadir');
+                } else {
+                    status = `(Izin: ${entry.keterangan})`;
+                    li.classList.add('absen-izin');
+                }
+                
+                const entryText = document.createTextNode(`${index + 1}. ${entry.nama} ${entry.kelas} ${status} ${entry.tanggal}`);
+                li.appendChild(entryText);
+                
+                // Tambahkan tombol hapus hanya jika admin
+                if (isAdmin) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Hapus';
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.addEventListener('click', () => {
+                        showCustomConfirm(`Apakah Anda yakin ingin menghapus absensi ${entry.nama}?`, () => {
+                            absensiData.splice(index, 1);
+                            localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                            renderAbsensi();
+                            showNotification('✅ Data absensi berhasil dihapus!', 'success');
+                        });
+                    });
+                    li.appendChild(deleteBtn);
+                }
+                
+                absensiUl.appendChild(li);
+            });
+            
+            // Update rekap absensi
+            updateRekapAbsensi();
+        }
+
+        // Fungsi update rekap absensi
+        function updateRekapAbsensi() {
+            const countHadir = absensiData.filter(d => d.kehadiran === 'Hadir').length;
+            const countIzin = absensiData.filter(d => d.kehadiran === 'Izin').length;
+            const countTotal = absensiData.length;
+
+            document.getElementById('countHadir').textContent = countHadir;
+            document.getElementById('countIzin').textContent = countIzin;
+            document.getElementById('countTotal').textContent = countTotal;
+        }
+
+        // Unduh sebagai CSV
+        document.getElementById('download-btn').addEventListener('click', function() {
+            if (absensiData.length === 0) {
+                showNotification('❌ Tidak ada data absensi untuk diunduh.', 'error');
+                return;
+            }
+
+            let csvContent = 'data:text/csv;charset=utf-8,';
+            csvContent += 'No,Nama,Kelas,Tanggal,Kehadiran,Keterangan\n';
+            absensiData.forEach((entry, index) => {
+                csvContent += `${index + 1},${entry.nama},${entry.kelas},${entry.tanggal},${entry.kehadiran},${entry.keterangan}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'absensi_kelompok_ilmiah_remaja.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('📥 File CSV berhasil diunduh!', 'success');
+        });
+
+        // Fungsi menampilkan popup kustom dengan callback
+        function showCustomConfirm(message, onYes) {
+            const popup = document.getElementById('customConfirm');
+            const text = document.getElementById('confirmText');
+            const yesBtn = document.getElementById('confirmYes');
+            const noBtn = document.getElementById('confirmNo');
+
+            text.textContent = message;
+            popup.style.display = 'flex';
+
+            // Clone dan ganti tombol untuk menghindari event listener ganda
+            yesBtn.replaceWith(yesBtn.cloneNode(true));
+            noBtn.replaceWith(noBtn.cloneNode(true));
+
+            const newYes = document.getElementById('confirmYes');
+            const newNo = document.getElementById('confirmNo');
+
+            newNo.addEventListener('click', () => {
+                popup.style.display = 'none';
+                if (navigator.vibrate) navigator.vibrate(30);
+                showNotification('❌ Aksi dibatalkan.', 'error');
+            });
+
+            newYes.addEventListener('click', () => {
+                popup.style.display = 'none';
+                if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+                onYes();
+            });
+        }
+
+        // Reset absensi
+        document.getElementById('reset-absensi').addEventListener('click', function() {
+            if (absensiData.length === 0) {
+                showNotification('❌ Tidak ada data absensi untuk direset.', 'error');
+                return;
+            }
+            
+            showCustomConfirm('Apakah Anda yakin ingin mereset semua data absensi?', () => {
+                absensiData = [];
+                localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                renderAbsensi();
+                showNotification('🗑️ Semua data absensi berhasil direset!', 'success');
+            });
+        });
+
+        // Fungsi notifikasi sederhana
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideInRight 0.3s ease;
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = '#4caf50';
+            } else {
+                notification.style.backgroundColor = '#f44336';
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Tambahkan style untuk animasi notifikasi
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Mode toggle
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            modeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Set tanggal hari ini sebagai default
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        // Inisialisasi render
+        renderAbsensi();
+    </script>
+</body>
+</html>
