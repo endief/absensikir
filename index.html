@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -555,6 +556,23 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+
+        /* simple toast */
+        #toast {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            display: none;
+            z-index: 99999;
+            font-weight: 600;
+        }
+        #toast.success { background: rgba(46,125,50,0.95); }
+        #toast.error { background: rgba(198,40,40,0.95); }
     </style>
 </head>
 <body>
@@ -646,11 +664,64 @@
         </div>
     </div>
 
+    <div id="toast"></div>
+
+    <!-- Firebase SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
   <script>
-    let absensiData = JSON.parse(localStorage.getItem('absensiData')) || [];
+    // ====== Data & konfigurasi ======
+    let absensiData = []; // will be populated from localStorage or Firebase
     let isAdmin = false;
     const DISCORD_WEBHOOK_URL = 'https://canary.discord.com/api/webhooks/1432263956038160424/m1PjbvI54DkQjBEAPi27dOZn70vzkbg1Zp9oInhk3NEAuCNRvBg0Qv3I8IEo9u7gqhR7';
 
+    // ----- Firebase config: (Anda sudah memberikan konfigurasi) -----
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrbnKRKQJwKZu3Q6jr290BTQ3_MdGlLI8",
+      authDomain: "absensikir.firebaseapp.com",
+      databaseURL: "https://absensikir-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "absensikir",
+      storageBucket: "absensikir.firebasestorage.app",
+      messagingSenderId: "378324562577",
+      appId: "1:378324562577:web:1b704c64002aeecc10c530",
+      measurementId: "G-DP9KBV5RVJ"
+    };
+    // ==============================================================
+
+    let FIREBASE_ENABLED = false;
+    let firebaseDbRef = null;
+
+    // Inisialisasi Firebase bila config terisi
+    if (firebaseConfig && firebaseConfig.apiKey) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            firebaseDbRef = db.ref('absensi'); // root node 'absensi'
+            FIREBASE_ENABLED = true;
+
+            // Listen realtime: ketika data di DB berubah, update absensiData & render
+            firebaseDbRef.on('value', snapshot => {
+                const val = snapshot.val() || {};
+                // konversi objek keyed -> array (ambil key sebagai _id)
+                absensiData = Object.keys(val).map(k => {
+                    return Object.assign({ _id: k }, val[k]);
+                });
+
+                // Simpan ke localStorage sebagai cache & render
+                localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                renderAbsensi();
+            });
+        } catch (e) {
+            console.error('Gagal inisialisasi Firebase:', e);
+            FIREBASE_ENABLED = false;
+        }
+    } else {
+        // Jika Firebase tidak aktif, fallback ke localStorage
+        absensiData = JSON.parse(localStorage.getItem('absensiData')) || [];
+    }
+
+    // ====== Element references ======
     const roleSelection = document.getElementById('role-selection');
     const loginForm = document.getElementById('login-form');
     const absensiForm = document.getElementById('absensi-form');
@@ -662,6 +733,7 @@
     const loginOverlay = document.getElementById('login-overlay');
     const loginPopup = document.getElementById('login-popup');
     const loginMessage = document.getElementById('login-message');
+    const toastEl = document.getElementById('toast');
 
     // Event listeners untuk pemilihan role
     document.getElementById('anggota-btn').addEventListener('click', () => {
@@ -722,7 +794,12 @@
                 loginForm.style.display = 'none';
                 adminPanel.style.display = 'block';
                 document.getElementById('absensi-list').style.display = 'block';
-                renderAbsensi(); // Render ulang dengan tombol hapus
+
+                // Jika Firebase tidak aktif, render dari localStorage
+                if (!FIREBASE_ENABLED) {
+                    absensiData = JSON.parse(localStorage.getItem('absensiData')) || absensiData;
+                    renderAbsensi();
+                }
             }, 1200);
         } else {
             // Tampilkan UI gagal
@@ -843,14 +920,14 @@
         }
     }
 
-    // Handle form submission absensi - DITAMBAH 1 BARIS
+    // Handle form submission absensi
     absensiForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        const nama = document.getElementById('nama').value;
-        const kelas = document.getElementById('kelas').value;
+        const nama = document.getElementById('nama').value.trim();
+        const kelas = document.getElementById('kelas').value.trim();
         const tanggal = document.getElementById('tanggal').value;
         const kehadiran = document.querySelector('input[name="kehadiran"]:checked').value;
-        const keterangan = document.getElementById('keterangan').value;
+        const keterangan = document.getElementById('keterangan').value.trim();
 
         // Format tanggal ke DD/MM/YYYY
         const date = new Date(tanggal);
@@ -861,23 +938,38 @@
             kelas: kelas,
             tanggal: formattedDate,
             kehadiran: kehadiran,
-            keterangan: keterangan || 'Alpa'
+            keterangan: keterangan || 'Alpa',
+            createdAt: new Date().toISOString()
         };
 
-        absensiData.push(newEntry);
-        localStorage.setItem('absensiData', JSON.stringify(absensiData));
+        if (FIREBASE_ENABLED && firebaseDbRef) {
+            // Simpan ke Firebase (source-of-truth). Akan dipropagasi ke admin devices via listener.
+            try {
+                await firebaseDbRef.push(newEntry);
+                showNotification('✅ Absensi berhasil dikirim dan disinkronkan!', 'success');
+            } catch (err) {
+                console.error('Gagal menyimpan ke Firebase:', err);
+                showNotification('⚠️ Gagal sinkron ke server, disimpan lokal saja.', 'error');
+                // fallback: simpan lokal
+                absensiData.push(newEntry);
+                localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                renderAbsensi();
+            }
+        } else {
+            // Simpan lokal saja
+            absensiData.push(newEntry);
+            localStorage.setItem('absensiData', JSON.stringify(absensiData));
+            renderAbsensi();
+            showNotification('✅ Absensi berhasil dikirim!', 'success');
+        }
 
-        // Kirim ke Discord
+        // Kirim juga ke Discord (notifikasi ke channel admin)
         await sendToDiscord(newEntry);
 
-        renderAbsensi();
         absensiForm.reset();
         toggleKeterangan();
         
-        // Tampilkan notifikasi berhasil
-        showNotification('✅ Absensi berhasil dikirim!', 'success');
-        
-        // BARIS YANG DITAMBAH: Tampilkan daftar absensi setelah submit
+        // Tampilkan daftar absensi setelah submit
         document.getElementById('absensi-list').style.display = 'block';
     });
 
@@ -905,10 +997,23 @@
                 deleteBtn.classList.add('delete-btn');
                 deleteBtn.addEventListener('click', () => {
                     showCustomConfirm(`Apakah Anda yakin ingin menghapus absensi ${entry.nama}?`, () => {
-                        absensiData.splice(index, 1);
-                        localStorage.setItem('absensiData', JSON.stringify(absensiData));
-                        renderAbsensi();
-                        showNotification('✅ Data absensi berhasil dihapus!', 'success');
+                        if (FIREBASE_ENABLED && entry._id && firebaseDbRef) {
+                            // hapus dari Firebase
+                            firebaseDbRef.child(entry._id).remove()
+                                .then(() => {
+                                    showNotification('✅ Data absensi berhasil dihapus!', 'success');
+                                })
+                                .catch(err => {
+                                    console.error('Gagal menghapus di Firebase:', err);
+                                    showNotification('❌ Gagal menghapus di server.', 'error');
+                                });
+                        } else {
+                            // hapus lokal
+                            absensiData.splice(index, 1);
+                            localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                            renderAbsensi();
+                            showNotification('✅ Data absensi berhasil dihapus!', 'success');
+                        }
                     });
                 });
                 li.appendChild(deleteBtn);
@@ -932,24 +1037,21 @@
         document.getElementById('countTotal').textContent = countTotal;
     }
 
-    // Unduh sebagai CSV - DIPERBAIKI FORMATNYA
+    // Unduh sebagai CSV
     document.getElementById('download-btn').addEventListener('click', function() {
         if (absensiData.length === 0) {
             showNotification('❌ Tidak ada data absensi untuk diunduh.', 'error');
             return;
         }
 
-        // Header dengan format yang lebih rapi
         let csvContent = 'data:text/csv;charset=utf-8,\uFEFF'; // BOM untuk Excel
         csvContent += '"No","Nama","Kelas","Tanggal","Kehadiran","Keterangan"\r\n';
         
-        // Data dengan format yang rapi
         absensiData.forEach((entry, index) => {
-            // Escape quotes dan format proper untuk CSV
-            const nama = `"${entry.nama.replace(/"/g, '""')}"`;
-            const kelas = `"${entry.kelas.replace(/"/g, '""')}"`;
-            const tanggal = `"${entry.tanggal}"`;
-            const kehadiran = `"${entry.kehadiran}"`;
+            const nama = `"${(entry.nama || '').replace(/"/g, '""')}"`;
+            const kelas = `"${(entry.kelas || '').replace(/"/g, '""')}"`;
+            const tanggal = `"${entry.tanggal || ''}"`;
+            const kehadiran = `"${entry.kehadiran || ''}"`;
             const keterangan = `"${(entry.keterangan || '').replace(/"/g, '""')}"`;
             
             csvContent += `${index + 1},${nama},${kelas},${tanggal},${kehadiran},${keterangan}\r\n`;
@@ -998,80 +1100,53 @@
 
     // Reset absensi
     document.getElementById('reset-absensi').addEventListener('click', function() {
-        if (absensiData.length === 0) {
-            showNotification('❌ Tidak ada data absensi untuk direset.', 'error');
-            return;
-        }
-        
-        showCustomConfirm('Apakah Anda yakin ingin mereset semua data absensi?', () => {
-            absensiData = [];
-            localStorage.setItem('absensiData', JSON.stringify(absensiData));
-            renderAbsensi();
-            showNotification('🗑️ Semua data absensi berhasil direset!', 'success');
+        showCustomConfirm('Apakah Anda yakin ingin mereset semua data absensi?', async () => {
+            if (FIREBASE_ENABLED && firebaseDbRef) {
+                try {
+                    await firebaseDbRef.remove();
+                    // firebase listener akan mengosongkan absensiData & render
+                    showNotification('✅ Semua data absensi berhasil direset (server).', 'success');
+                } catch (err) {
+                    console.error('Gagal mereset data di Firebase:', err);
+                    showNotification('❌ Gagal mereset data di server.', 'error');
+                }
+            } else {
+                absensiData = [];
+                localStorage.setItem('absensiData', JSON.stringify(absensiData));
+                renderAbsensi();
+                showNotification('✅ Semua data absensi berhasil direset (lokal).', 'success');
+            }
         });
     });
 
-    // Fungsi notifikasi sederhana
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            animation: slideInRight 0.3s ease;
-            max-width: 300px;
-            word-wrap: break-word;
-        `;
-        
-        if (type === 'success') {
-            notification.style.backgroundColor = '#4caf50';
-        } else {
-            notification.style.backgroundColor = '#f44336';
-        }
-
-        document.body.appendChild(notification);
-
+    // ===== Notifikasi / Toast sederhana =====
+    function showNotification(message, type = 'success', duration = 2500) {
+        toastEl.textContent = message;
+        toastEl.className = '';
+        toastEl.classList.add(type === 'error' ? 'error' : 'success');
+        toastEl.style.display = 'block';
         setTimeout(() => {
-            notification.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
+            toastEl.style.display = 'none';
+        }, duration);
     }
 
-    // Tambahkan style untuk animasi notifikasi
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-
-    // Mode toggle
-    const modeToggle = document.getElementById('modeToggle');
-    modeToggle.addEventListener('click', () => {
+    // Mode toggle (dark mode)
+    document.getElementById('modeToggle').addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
-        modeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        const btn = document.getElementById('modeToggle');
+        btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
     });
 
-    // Set tanggal hari ini sebagai default
-    document.getElementById('tanggal').valueAsDate = new Date();
+    // Jika Firebase tidak aktif, kita bisa mencoba refresh dari localStorage ketika storage event terjadi (sinkron antar tab pada device yang sama)
+    window.addEventListener('storage', (event) => {
+        if (!FIREBASE_ENABLED && event.key === 'absensiData') {
+            absensiData = JSON.parse(event.newValue) || [];
+            renderAbsensi();
+        }
+    });
 
-    // Inisialisasi render
-    renderAbsensi();
-</script>
+    // Jika Firebase aktif, admin akan menerima entri dari device lain secara realtime karena listener on('value') di atas.
+    // Jika Firebase tidak aktif, admin hanya bisa melihat entri yang tersimpan di localStorage pada device yang sama.
+  </script>
 </body>
 </html>
