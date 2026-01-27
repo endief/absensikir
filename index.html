@@ -1,1152 +1,999 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absen Online - Kelompok Ilmiah Remaja Smansala</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Absensi KIR - SMAN 1 LEMAHABANG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <style>
         :root {
-            --primary-color: #0277bd;
-            --primary-dark: #01579b;
-            --success-color: #4caf50;
-            --success-dark: #388e3c;
-            --danger-color: #f44336;
-            --danger-dark: #d32f2f;
-            --text-light: #222;
-            --text-dark: #f0f0f0;
-            --bg-light: #eaf3ff;
-            --bg-dark: radial-gradient(circle at bottom right, #1a001f 0%, #000 80%);
-            --card-light: #fff;
-            --card-dark: rgba(20, 20, 20, 0.7);
-        }
-    
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 100%);
-            color: var(--primary-dark);
-            margin: 0;
-            padding: 20px;
-            animation: fadeIn 1s ease-in;
-            transition: all 0.5s ease;
-        }
-        
-        body.dark-mode {
-            background: var(--bg-dark);
-            color: var(--text-dark);
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-            animation: slideIn 1.2s ease-out;
-            font-weight: 700;
-            font-size: 2.5em;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: 1px;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .role-selection {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: var(--card-light);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            text-align: center;
-            animation: zoomIn 1.5s ease-out;
-        }
-        
-        body.dark-mode .role-selection {
-            background-color: var(--card-dark);
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
-            border: 1px solid rgba(255, 20, 147, 0.2);
-        }
-        
-        .role-selection button {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            margin: 10px;
-        }
-        
-        .role-selection button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-        
-        form {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: var(--card-light);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            animation: zoomIn 1.5s ease-out;
-            display: none;
-        }
-        
-        body.dark-mode form {
-            background-color: var(--card-dark);
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
-            border: 1px solid rgba(255, 20, 147, 0.2);
-        }
-        
-        .admin-panel {
-            max-width: 600px;
-            margin: 20px auto;
-            background: linear-gradient(135deg, var(--card-light), #f1c40f, var(--primary-color));
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            display: none;
-            color: var(--primary-dark);
-        }
-        
-        body.dark-mode .admin-panel {
-            background: linear-gradient(135deg, var(--card-dark), #f1c40f, var(--primary-color));
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
-            border: 1px solid rgba(255, 20, 147, 0.2);
-        }
-        
-        .admin-panel h2 {
-            color: var(--primary-color);
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .admin-panel button {
-            background: linear-gradient(45deg, var(--danger-color), var(--danger-dark));
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            margin: 10px;
-        }
-        
-        .admin-panel button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-        
-        .admin-panel #download-btn {
-            background: linear-gradient(45deg, var(--success-color), var(--success-dark));
-        }
-        
-        .admin-panel #download-btn:hover {
-            background: linear-gradient(45deg, var(--success-dark), #2e7d32);
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        
-        input[type="text"], input[type="password"], input[type="date"], select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            font-size: 16px;
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--card-light);
-            color: var(--text-light);
-        }
-        
-        body.dark-mode input[type="text"], 
-        body.dark-mode input[type="password"], 
-        body.dark-mode input[type="date"], 
-        body.dark-mode select, 
-        body.dark-mode textarea {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: var(--text-dark);
-            border-color: rgba(255, 20, 147, 0.5);
-        }
-        
-        input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
-            border-color: var(--primary-dark);
-            box-shadow: 0 0 8px rgba(2, 119, 189, 0.3);
-            transform: scale(1.02);
-        }
-        
-        input[type="radio"] {
-            margin-right: 10px;
-            transform: scale(1.2);
-            transition: all 0.2s ease;
-        }
-        
-        input[type="radio"]:hover {
-            transform: scale(1.3);
-        }
-        
-        .radio-group {
-            margin-bottom: 20px;
-        }
-        
-        .radio-option {
-            display: inline-block;
-            margin-right: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .radio-option:hover {
-            color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-        
-        #keterangan-container {
-            display: none;
-            animation: fadeInUp 0.5s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        button {
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            margin-right: 10px;
-        }
-        
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-        }
-        
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-        
-        #absensi-list {
-            max-width: 600px;
-            margin: 20px auto;
-            background-color: var(--card-light);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            display: none;
-        }
-        
-        body.dark-mode #absensi-list {
-            background-color: var(--card-dark);
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.3);
-            border: 1px solid rgba(255, 20, 147, 0.2);
-        }
-        
-        #absensi-list h2 {
-            color: var(--primary-color);
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        #absensi-list ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        #absensi-list li {
-            padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .delete-btn {
-            background: linear-gradient(45deg, var(--danger-color), var(--danger-dark));
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            margin-left: 10px;
-        }
-        
-        .delete-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-        
-        #download-btn {
-            display: block;
-            margin: 20px auto;
-            background: linear-gradient(45deg, var(--success-color), var(--success-dark));
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        #download-btn:hover {
-            background: linear-gradient(45deg, var(--success-dark), #2e7d32);
-        }
-        
-        .rekap-container {
-            background: rgba(0, 123, 255, 0.08);
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-weight: 600;
-            color: var(--text-light);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        body.dark-mode .rekap-container {
-            background: linear-gradient(90deg, rgba(255,0,128,0.2), rgba(0,0,0,0.3));
-            color: var(--text-dark);
-        }
-        
-        /* Overlay untuk notifikasi login */
-        #login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.2);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-        
-        .login-popup {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            animation: popIn 0.5s ease;
-        }
-        
-        body.dark-mode .login-popup {
-            background: rgba(30, 30, 30, 0.9);
-            color: var(--text-dark);
-        }
-        
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .login-popup.success {
-            border: 3px solid var(--success-color);
-            color: #2e7d32;
-        }
-        
-        .login-popup.error {
-            border: 3px solid var(--danger-color);
-            color: #c62828;
-        }
-        
-        .login-popup .icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .login-popup.success .icon {
-            color: var(--success-color);
-            animation: checkmark 0.5s ease forwards;
-        }
-        
-        .login-popup.error .icon {
-            color: var(--danger-color);
-            animation: crossmark 0.5s ease forwards;
-        }
-        
-        @keyframes checkmark {
-            0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-        
-        @keyframes crossmark {
-            0% { transform: scale(0.5) rotate(20deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-        
-        /* Efek stabilo merah untuk izin */
-        .absen-izin {
-            background: linear-gradient(90deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.05) 100%);
-            border-left: 5px solid var(--danger-color);
-            border-radius: 6px;
-            padding-left: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .absen-izin:hover {
-            background: linear-gradient(90deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0.1) 100%);
-            transform: translateX(3px);
-        }
-        
-        /* Efek stabilo biru untuk hadir */
-        .absen-hadir {
-            background: linear-gradient(90deg, rgba(2, 119, 189, 0.15) 0%, rgba(2, 119, 189, 0.05) 100%);
-            border-left: 5px solid var(--primary-color);
-            border-radius: 6px;
-            padding-left: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .absen-hadir:hover {
-            background: linear-gradient(90deg, rgba(2, 119, 189, 0.25) 0%, rgba(2, 119, 189, 0.1) 100%);
-            transform: translateX(3px);
-        }
-        
-        /* Mode toggle button */
-        .mode-btn {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, #007bff, #00bfff);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-            transition: all 0.3s ease;
-            z-index: 999;
-        }
-        
-        .mode-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7);
-        }
-        
-        body.dark-mode .mode-btn {
-            background: linear-gradient(135deg, #ff1493, #9b30ff);
-            box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
-        }
-        
-        /* Efek Warna Neon Pink / Ungu di Elemen Aktif */
-        body.dark-mode .active,
-        body.dark-mode button:hover,
-        body.dark-mode .mode-btn {
-            background: linear-gradient(135deg, #ff1493, #9b30ff);
-            box-shadow: 0 0 20px rgba(255, 20, 147, 0.6);
-        }
-        
-        /* Highlight elemen saat hover (biar keren) */
-        body.dark-mode tr:hover,
-        body.dark-mode .menu-item:hover {
-            background: rgba(255, 20, 147, 0.1);
-            transition: 0.3s;
-        }
-        
-        /* Custom confirm popup */
-        #customConfirm {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-        
-        #customConfirm > div {
-            background: rgba(255,255,255,0.85);
-            border-radius: 16px;
-            padding: 24px 30px;
-            text-align: center;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        }
-        
-        body.dark-mode #customConfirm > div {
-            background: rgba(30, 30, 30, 0.9);
-            color: var(--text-dark);
-        }
-        
-        #confirmText {
-            font-size: 17px;
-            color: var(--text-light);
-            margin-bottom: 24px;
-        }
-        
-        body.dark-mode #confirmText {
-            color: var(--text-dark);
-        }
-        
-        #confirmYes {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin-right: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        #confirmNo {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 20, 20, 0.7);
+            --neon-blue: #00d4ff;
+            --neon-red: #ff2b2b;
+            --neon-gold: #ffcc00;
+            --neon-green: #00ff88;
+            --text-color: #ffffff;
+            --blur: blur(15px);
         }
 
-        /* simple toast */
-        #toast {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 30px;
-            background: rgba(0,0,0,0.75);
-            color: white;
-            padding: 12px 18px;
-            border-radius: 8px;
-            display: none;
-            z-index: 99999;
-            font-weight: 600;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a00 0%, #050505 100%);
         }
-        #toast.success { background: rgba(46,125,50,0.95); }
-        #toast.error { background: rgba(198,40,40,0.95); }
+
+        .hidden { display: none !important; }
+        .glass { background: var(--panel-bg); backdrop-filter: var(--blur); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.8); }
+        
+        .container { width: 95%; max-width: 500px; padding: 40px; text-align: center; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 1.4rem; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); margin-bottom: 5px; }
+        .subtitle { font-size: 0.75rem; opacity: 0.8; letter-spacing: 2px; margin-bottom: 30px; }
+
+        button.main-btn { width: 100%; padding: 15px; margin: 10px 0; font-size: 1rem; font-weight: 600; border-radius: 15px; cursor: pointer; transition: 0.4s; text-transform: uppercase; border: none; }
+        .btn-neon-blue { background: transparent; border: 2px solid var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .btn-neon-blue:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 25px var(--neon-blue); }
+        .btn-neon-red { background: transparent; border: 2px solid var(--neon-red); color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+        .btn-neon-red:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 25px var(--neon-red); }
+        .btn-neon-gold { background: transparent; border: 2px solid var(--neon-gold); color: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold); }
+        .btn-neon-gold:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 25px var(--neon-gold); }
+        .btn-neon-green { background: transparent; border: 2px solid var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .btn-neon-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 25px var(--neon-green); }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--neon-blue); }
+        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; outline: none; }
+
+        .popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); padding: 20px 40px; border-radius: 15px; z-index: 9999; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); font-weight: bold; }
+        .popup.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .pop-blue { border: 2px solid var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 30px var(--neon-blue); }
+        .pop-red { border: 2px solid var(--neon-red); color: var(--neon-red); box-shadow: 0 0 30px var(--neon-red); }
+        .pop-gold { border: 2px solid var(--neon-gold); color: var(--neon-gold); box-shadow: 0 0 30px var(--neon-gold); }
+
+        .admin-panel { width: 95%; max-width: 800px; padding: 25px; height: 90vh; overflow-y: auto; }
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { padding: 10px; border-radius: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        
+        .rekap-item { padding: 15px; margin-bottom: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .item-hadir { border: 1px solid var(--neon-blue); color: var(--neon-blue); }
+        .item-izin { border: 1px solid var(--neon-red); color: var(--neon-red); }
+        .item-owner { border: 1px solid var(--neon-gold); color: var(--neon-gold); box-shadow: inset 0 0 10px rgba(255, 204, 0, 0.1); }
+        .item-admin-list { border: 1px solid var(--neon-red); color: var(--neon-red); }
+
+        .back-btn { cursor: pointer; color: var(--neon-blue); font-size: 1.5rem; display: block; text-align: left; margin-bottom: 10px; width: fit-content; }
+        
+        .webhook-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+        
+        .firebase-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .search-box input {
+            padding-right: 40px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-blue);
+        }
+
+        /* Absensi Panel Styles */
+        .nama-list-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+        }
+        
+        .nama-item {
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nama-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .nama-item.selected {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .nama-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .nama-item.disabled:hover {
+            background: transparent;
+            transform: none;
+        }
+
+        /* Absensi Kir Panel */
+        .absensi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .anggota-card {
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .anggota-card.hadir {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        .anggota-card.hadir::before {
+            content: "✓ ";
+            color: var(--neon-green);
+        }
+        
+        .anggota-card.izin {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 43, 43, 0.3);
+        }
+        
+        .anggota-card.izin::before {
+            content: "✗ ";
+            color: var(--neon-red);
+        }
+        
+        .anggota-card.belum {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .anggota-number {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+        }
+        
+        .anggota-kelas {
+            font-size: 0.75rem;
+            margin-top: 5px;
+            color: var(--neon-blue);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .filter-btn.active {
+            transform: scale(1.05);
+        }
+        
+        .filter-btn.hadir { border-color: var(--neon-green); color: var(--neon-green); }
+        .filter-btn.hadir:hover { background: rgba(0, 255, 136, 0.1); }
+        .filter-btn.hadir.active { background: rgba(0, 255, 136, 0.2); }
+        
+        .filter-btn.izin { border-color: var(--neon-red); color: var(--neon-red); }
+        .filter-btn.izin:hover { background: rgba(255, 43, 43, 0.1); }
+        .filter-btn.izin.active { background: rgba(255, 43, 43, 0.2); }
+        
+        .filter-btn.belum { border-color: var(--neon-blue); color: var(--neon-blue); }
+        .filter-btn.belum:hover { background: rgba(0, 212, 255, 0.1); }
+        .filter-btn.belum.active { background: rgba(0, 212, 255, 0.2); }
+        
+        .filter-btn.all { border-color: var(--neon-gold); color: var(--neon-gold); }
+        .filter-btn.all:hover { background: rgba(255, 204, 0, 0.1); }
+        .filter-btn.all.active { background: rgba(255, 204, 0, 0.2); }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--neon-blue);
+        }
+        
+        .sync-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        .sync-indicator.online {
+            background-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        .sync-indicator.offline {
+            background-color: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    
-<button id="modeToggle" class="mode-btn">🌙</button>
 
-    <h1>ABSEN ONLINE KELOMPOK ILMIAH REMAJA</h1>
-    
-    <div class="role-selection" id="role-selection">
-        <h2></h2>
-        <button id="anggota-btn">Absensi</button>
-        <button id="admin-btn">Admin</button>
+    <div id="popup" class="popup"></div>
+
+    <div id="main-menu" class="container glass">
+        <h1>KELOMPOK ILMIAH REMAJA</h1>
+        <p class="subtitle">SMAN 1 LEMAHABANG</p>
+        <div id="loading-main" class="loading">
+            <div class="sync-indicator offline"></div> Menghubungkan ke server...
+        </div>
+        <div id="main-buttons" class="hidden">
+            <button class="main-btn btn-neon-blue" onclick="showPanel('absen-panel')">ABSEN</button>
+            <button class="main-btn btn-neon-red" onclick="showPanel('login-panel')">PENGELOLA</button>
+        </div>
     </div>
 
-    <form id="login-form">
-        <label for="admin-nama">Nama Admin:</label>
-        <input type="text" id="admin-nama" name="admin-nama" required>
-
-        <label for="admin-password">Password:</label>
-        <input type="password" id="admin-password" name="admin-password" required>
-
-        <button type="submit">Login</button>
-        <button type="button" id="back-to-role">Kembali</button>
-    </form>
-
-    <div class="admin-panel" id="admin-panel">
-        <h2>Admin</h2>
-        <button id="reset-absensi">Reset Absensi</button>
-        <button id="download-btn">Unduh sebagai Excel (CSV)</button>
-        <button id="logout-btn">Logout</button>
-    </div>
-
-    <form id="absensi-form">
-        <label for="nama">Nama:</label>
-        <input type="text" id="nama" name="nama" required>
-
-        <label for="kelas">Kelas:</label>
-        <input type="text" id="kelas" name="kelas" required>
-
-        <label for="tanggal">Tanggal:</label>
-        <input type="date" id="tanggal" name="tanggal" required>
-
-        <label>Kehadiran:</label>
-        <div class="radio-group">
-            <div class="radio-option">
-                <input type="radio" id="hadir" name="kehadiran" value="Hadir" checked>
-                <label for="hadir">Hadir</label>
+    <div id="absen-panel" class="container glass hidden">
+        <span class="back-btn" onclick="showPanel('main-menu')">←</span>
+        <h2>FORM ABSENSI</h2>
+        <div id="lock-msg" class="hidden" style="color: var(--neon-red); margin: 20px 0; font-weight: bold;">ABSENSI DITUTUP ADMIN</div>
+        <form id="formAbsen">
+            <div class="form-group">
+                <label>Cari Nama</label>
+                <div class="search-box">
+                    <input type="text" id="searchNama" placeholder="Ketik nama untuk mencari..." onkeyup="filterNamaList()">
+                    <span class="search-icon">🔍</span>
+                </div>
             </div>
-            <div class="radio-option">
-                <input type="radio" id="izin" name="kehadiran" value="Izin">
-                <label for="izin">Izin</label>
+            
+            <div class="form-group">
+                <label>Pilih Nama</label>
+                <div class="nama-list-container">
+                    <div id="namaList"></div>
+                </div>
+            </div>
+            
+            <input type="hidden" id="selectedNama" required>
+            <input type="hidden" id="selectedKelas" required>
+            
+            <div class="form-group">
+                <label>Kehadiran</label>
+                <select id="kehadiran" onchange="toggleIzinField()" required>
+                    <option value="">PILIH STATUS</option>
+                    <option value="HADIR">HADIR</option>
+                    <option value="IZIN">IZIN</option>
+                </select>
+            </div>
+            
+            <div id="izin-field" class="form-group hidden">
+                <label>Alasan Izin</label>
+                <input type="text" id="alasan" placeholder="Masukkan alasan izin...">
+            </div>
+            
+            <button type="submit" class="main-btn btn-neon-blue">KIRIM ABSEN</button>
+        </form>
+    </div>
+
+    <div id="login-panel" class="container glass hidden">
+        <span class="back-btn" onclick="showPanel('main-menu')">←</span>
+        <h2>LOGIN</h2>
+        <div class="form-group"><label>Nama</label><input type="text" id="adm-user"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="adm-pass"></div>
+        <button onclick="prosesLogin()" class="main-btn btn-neon-red">MASUK</button>
+    </div>
+
+    <div id="admin-dashboard" class="admin-panel glass hidden">
+        <span class="back-btn" onclick="showPanel('main-menu')">← Keluar</span>
+        <h2 style="text-align: center; color: var(--neon-blue); margin-bottom: 20px;">REKAP KEHADIRAN</h2>
+        
+        <div class="stats-container">
+            <div class="stat-card">Hadir<br><span id="s-hadir" style="color:var(--neon-green)">0</span></div>
+            <div class="stat-card">Izin<br><span id="s-izin" style="color:var(--neon-red)">0</span></div>
+            <div class="stat-card">Total<br><span id="s-total">0</span></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button id="owner-btn" class="main-btn btn-neon-gold hidden" onclick="showPanel('manage-admin-panel')" style="margin:0; flex:1;">KELOLA ADMIN</button>
+            <button class="main-btn btn-neon-green" onclick="showPanel('absensi-kir-panel')" style="margin:0; flex:1;">ABSENSI KIR</button>
+            <button class="main-btn btn-neon-red" onclick="toggleLock()" id="btn-lock" style="margin:0; flex:1;">LOCK</button>
+            <button class="main-btn btn-neon-red" onclick="resetData()" style="margin:0; flex:1;">RESET</button>
+        </div>
+
+        <div id="list-rekap"></div>
+    </div>
+
+    <div id="absensi-kir-panel" class="admin-panel glass hidden">
+        <span class="back-btn" onclick="showPanel('admin-dashboard')">← Kembali</span>
+        <h2 style="text-align: center; color: var(--neon-green); margin-bottom: 15px;">ABSENSI KIR 🜲</h2>
+        <p style="text-align: center; font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8;">Status kehadiran anggota KIR hari ini</p>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn all active" onclick="filterAnggota('all')">Semua</button>
+            <button class="filter-btn hadir" onclick="filterAnggota('hadir')">Hadir ✓</button>
+            <button class="filter-btn izin" onclick="filterAnggota('izin')">Izin ✗</button>
+            <button class="filter-btn belum" onclick="filterAnggota('belum')">Belum Absen</button>
+        </div>
+        
+        <div id="anggotaStats" style="margin-bottom: 15px; font-size: 0.9rem;">
+            <span style="color: var(--neon-green)">✓ Hadir: <span id="count-hadir">0</span></span> | 
+            <span style="color: var(--neon-red)">✗ Izin: <span id="count-izin">0</span></span> | 
+            <span style="color: var(--neon-blue)">○ Belum: <span id="count-belum">0</span></span> |
+            <span style="color: var(--neon-gold)">Total: <span id="count-total">0</span></span>
+        </div>
+        
+        <div class="absensi-grid" id="absensiGrid"></div>
+    </div>
+
+    <div id="manage-admin-panel" class="admin-panel glass hidden">
+        <span class="back-btn" onclick="showPanel('admin-dashboard')">← Kembali</span>
+        <h2 style="text-align: center; color: var(--neon-gold); margin-bottom: 20px;">PENGATURAN ADMIN 🜲</h2>
+        
+        <div class="glass" style="padding: 20px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px; font-size: 0.9rem;">Tambah Admin Baru</h3>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                <input type="text" id="new-adm-name" placeholder="Nama" style="flex:1;">
+                <input type="text" id="new-adm-pass" placeholder="Password" style="flex:1;">
+                <input type="text" id="new-adm-job" placeholder="Jabatan" style="flex:1;">
+                <button class="btn-neon-gold" onclick="tambahAdmin()" style="padding: 10px 20px; border-radius: 12px; cursor: pointer;">Daftarkan</button>
             </div>
         </div>
 
-        <div id="keterangan-container">
-            <label for="keterangan">Alasan Izin:</label>
-            <textarea id="keterangan" name="keterangan" rows="4" placeholder="Jelaskan alasan izin..."></textarea>
-        </div>
-
-        <button type="submit">Kirim</button>
-        <button type="button" id="back-to-role-absen">Kembali</button>
-    </form>
-
-    <div id="absensi-list">
-        <h2>Daftar Absensi</h2>
-        <div id="rekapAbsensi" class="rekap-container">
-            <p><strong>👥 Rekap Kehadiran:</strong></p>
-            <p>Hadir: <span id="countHadir">0</span> | 
-               Izin: <span id="countIzin">0</span> | 
-               Total: <span id="countTotal">0</span></p>
-        </div>
-        <ul id="absensi-ul"></ul>
+        <div id="list-admin-manage"></div>
     </div>
 
-    <!-- Overlay UI -->
-    <div id="login-overlay">
-        <div id="login-popup" class="login-popup">
-            <div class="icon">✓</div>
-            <h3 id="login-message">Login Berhasil</h3>
-        </div>
+    <div class="firebase-status" id="firebase-status">
+        <span class="sync-indicator offline" id="sync-indicator"></span>
+        <span id="sync-status">Menghubungkan...</span>
     </div>
 
-    <!-- Custom Confirm Popup -->
-    <div id="customConfirm">
-        <div>
-            <p id="confirmText">Apakah Anda yakin ingin mereset semua data absensi?</p>
-            <button id="confirmYes">Oke</button>
-            <button id="confirmNo">Tidak</button>
-        </div>
-    </div>
+    <script>
+        // ============================================
+        // 🔥 KONFIGURASI FIREBASE - GANTI INI!
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_NfvZGXjqPKZ7QvUujP-5t0-CKbwwuhM",
+            authDomain: "absensi-kir-sman-1-lemahabang.firebaseapp.com",
+            databaseURL: "https://absensi-kir-sman-1-lemahabang-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "absensi-kir-sman-1-lemahabang",
+            storageBucket: "absensi-kir-sman-1-lemahabang.firebasestorage.app",
+            messagingSenderId: "434762674944",
+            appId: "1:434762674944:web:1760788b3f67ff9646f9e5"
+        };
 
-    <div id="toast"></div>
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // ============================================
+        // KONFIGURASI WEBHOOK DISCORD
+        // ============================================
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1465320189985034400/IvyI0B22t5RQ0sVqMPWHUcGrM-IDOHLA7_x2asjqMxJ3PfHCQdi91IBi6dmWfi1R1Cw3";
 
-    <!-- Firebase SDK (v8) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-  <script>
-    // ====== Data & konfigurasi ======
-    let absensiData = []; // will be populated from localStorage or Firebase
-    let isAdmin = false;
-    const DISCORD_WEBHOOK_URL = 'https://canary.discord.com/api/webhooks/1432263956038160424/m1PjbvI54DkQjBEAPi27dOZn70vzkbg1Zp9oInhk3NEAuCNRvBg0Qv3I8IEo9u7gqhR7';
-
-    // ----- Firebase config: (Anda sudah memberikan konfigurasi) -----
-    const firebaseConfig = {
-      apiKey: "AIzaSyBrbnKRKQJwKZu3Q6jr290BTQ3_MdGlLI8",
-      authDomain: "absensikir.firebaseapp.com",
-      databaseURL: "https://absensikir-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "absensikir",
-      storageBucket: "absensikir.firebasestorage.app",
-      messagingSenderId: "378324562577",
-      appId: "1:378324562577:web:1b704c64002aeecc10c530",
-      measurementId: "G-DP9KBV5RVJ"
-    };
-    // ==============================================================
-
-    let FIREBASE_ENABLED = false;
-    let firebaseDbRef = null;
-
-    // Inisialisasi Firebase bila config terisi
-    if (firebaseConfig && firebaseConfig.apiKey) {
-        try {
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            firebaseDbRef = db.ref('absensi'); // root node 'absensi'
-            FIREBASE_ENABLED = true;
-
-            // Listen realtime: ketika data di DB berubah, update absensiData & render
-            firebaseDbRef.on('value', snapshot => {
-                const val = snapshot.val() || {};
-                // konversi objek keyed -> array (ambil key sebagai _id)
-                absensiData = Object.keys(val).map(k => {
-                    return Object.assign({ _id: k }, val[k]);
-                });
-
-                // Simpan ke localStorage sebagai cache & render
-                localStorage.setItem('absensiData', JSON.stringify(absensiData));
-                renderAbsensi();
-            });
-        } catch (e) {
-            console.error('Gagal inisialisasi Firebase:', e);
-            FIREBASE_ENABLED = false;
-        }
-    } else {
-        // Jika Firebase tidak aktif, fallback ke localStorage
-        absensiData = JSON.parse(localStorage.getItem('absensiData')) || [];
-    }
-
-    // ====== Element references ======
-    const roleSelection = document.getElementById('role-selection');
-    const loginForm = document.getElementById('login-form');
-    const absensiForm = document.getElementById('absensi-form');
-    const adminPanel = document.getElementById('admin-panel');
-    const radioHadir = document.getElementById('hadir');
-    const radioIzin = document.getElementById('izin');
-    const keteranganContainer = document.getElementById('keterangan-container');
-    const absensiUl = document.getElementById('absensi-ul');
-    const loginOverlay = document.getElementById('login-overlay');
-    const loginPopup = document.getElementById('login-popup');
-    const loginMessage = document.getElementById('login-message');
-    const toastEl = document.getElementById('toast');
-
-    // Event listeners untuk pemilihan role
-    document.getElementById('anggota-btn').addEventListener('click', () => {
-        roleSelection.style.display = 'none';
-        absensiForm.style.display = 'block';
-        // Sembunyikan daftar absensi untuk anggota
-        document.getElementById('absensi-list').style.display = 'none';
-    });
-
-    document.getElementById('admin-btn').addEventListener('click', () => {
-        roleSelection.style.display = 'none';
-        loginForm.style.display = 'block';
-    });
-
-    // Kembali ke pemilihan role
-    document.getElementById('back-to-role').addEventListener('click', () => {
-        loginForm.style.display = 'none';
-        roleSelection.style.display = 'block';
-        loginForm.reset();
-    });
-
-    document.getElementById('back-to-role-absen').addEventListener('click', () => {
-        absensiForm.style.display = 'none';
-        document.getElementById('absensi-list').style.display = 'none';
-        roleSelection.style.display = 'block';
-        absensiForm.reset();
-        toggleKeterangan();
-    });
-
-    // Handle login admin
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const nama = document.getElementById('admin-nama').value;
-        const password = document.getElementById('admin-password').value;
-
-        // Daftar admin
-        const admins = [
-            { nama: 'nabil', password: 'adminkir2526' },
-            { nama: 'alghazali', password: 'ketuakir2526' },
-            { nama: 'intan', password: 'wk1kir2526' },
-            { nama: 'ratih', password: 'wk2kir2526' },
-            { nama: 'frisca', password: 'sekreumumkir2526' }
+        // ============================================
+        // DATA ANGGOTA KIR
+        // ============================================
+        const dataAnggota = [
+            { id: 1, nama: "NADYA PUSPITASARI", kelas: "X1" },
+            { id: 2, nama: "AZMY RIYADI", kelas: "X1" },
+            { id: 3, nama: "YUNITA KASIH", kelas: "X1" },
+            { id: 4, nama: "APRINA SIMAMORA", kelas: "X1" },
+            { id: 5, nama: "DEVI ANJAYANI", kelas: "X1" },
+            { id: 6, nama: "ATIKA DIANA RAISYA", kelas: "X2" },
+            { id: 7, nama: "DEWI PUJA OKTAFIYA", kelas: "X2" },
+            { id: 8, nama: "HAFIZ RAYNAR HIDAYAT", kelas: "X2" },
+            { id: 9, nama: "SUHAILAH MAZNIYAH", kelas: "X2" },
+            { id: 10, nama: "GENDIS SASI KIRANA", kelas: "X3" },
+            { id: 11, nama: "BUNGA PUTRI AGUSTIN", kelas: "X4" },
+            { id: 12, nama: "DINDA NURBAETI", kelas: "X4" },
+            { id: 13, nama: "MINA NISFIL MAGFIROH", kelas: "X4" },
+            { id: 14, nama: "NASYA NURUL WATI", kelas: "X4" },
+            { id: 15, nama: "NUR SAYYIDAH FATIMATUL F.", kelas: "X4" },
+            { id: 16, nama: "NURUL BAETI", kelas: "X4" },
+            { id: 17, nama: "AULIA SALSABILA FUJA", kelas: "X5" },
+            { id: 18, nama: "SITI ALIFA", kelas: "X4" },
+            { id: 19, nama: "RIYANTI ULFA", kelas: "X5" },
+            { id: 20, nama: "HAFIDA SALSABILA", kelas: "X5" },
+            { id: 21, nama: "MUHAMAD RENDI SAPUTRA", kelas: "X6" },
+            { id: 22, nama: "TALITHA SHOFWAH FARHAN", kelas: "X6" },
+            { id: 23, nama: "ISTARI NADAIYAH", kelas: "X6" },
+            { id: 24, nama: "HASRI OLIVIA JUNIAR", kelas: "X7" },
+            { id: 25, nama: "HISAM MANSUR", kelas: "X7" },
+            { id: 26, nama: "MUHAMMAD ARYA KARSA WIJAYA", kelas: "X8" },
+            { id: 27, nama: "AJI RUKMANA", kelas: "X9" },
+            { id: 28, nama: "ILMIYAH MAHMUDA", kelas: "X9" },
+            { id: 29, nama: "LOVELY ADINDA FUTRY", kelas: "X9" },
+            { id: 30, nama: "CHINTIA PUTRI RAMADANI", kelas: "X9" },
+            { id: 31, nama: "YUSUF RIZA MAHENDRA", kelas: "X9" },
+            { id: 32, nama: "TIRTA ALVIAN SYAH", kelas: "X9" },
+            { id: 33, nama: "EEVELINA AULIYA", kelas: "X10" },
+            { id: 34, nama: "FARAH AISHA ADITYA", kelas: "X10" },
+            { id: 35, nama: "NUR SHIHA", kelas: "X10" },
+            { id: 36, nama: "MORENO PRASETIO", kelas: "X10" },
+            { id: 37, nama: "SALSA KAMILA", kelas: "XIF1" },
+            { id: 38, nama: "ANGELINA NOVIYANTI", kelas: "XIF2" },
+            { id: 39, nama: "DARA KHEISYA", kelas: "XIF2" },
+            { id: 40, nama: "RIZKY GHOIN GHOZALI MAKHROM", kelas: "XIF2" },
+            { id: 41, nama: "RATIH AMANAH RAHMADANI", kelas: "XIF3" },
+            { id: 42, nama: "ABDUL HALIM ATHILLAH R.", kelas: "XIF4" },
+            { id: 43, nama: "NI'MATUL AULIA", kelas: "XIF4" },
+            { id: 44, nama: "NAJWA PRAMESWARI", kelas: "XIF4" },
+            { id: 45, nama: "RAYSHA AURA WIGHUNA", kelas: "XIF5" },
+            { id: 46, nama: "ALMAURA ADISTI", kelas: "XIF5" },
+            { id: 47, nama: "MUTIARA MAULIDINA M.", kelas: "XIF5" },
+            { id: 48, nama: "SADAD ALI", kelas: "XIF5" },
+            { id: 49, nama: "AISHA SALMA RAMADHANI", kelas: "XIF5" },
+            { id: 50, nama: "MAYLINA", kelas: "XIF5" },
+            { id: 51, nama: "INTAN NURKALYA", kelas: "XIF5" },
+            { id: 52, nama: "AL'DIEV SYALVINE BEBY ADHANI", kelas: "XIF6" },
+            { id: 53, nama: "IRDHA NADHINA RAHMAN", kelas: "XIF6" },
+            { id: 54, nama: "INDRI CARISSA", kelas: "XIF6" },
+            { id: 55, nama: "ALYA ZALIANTY ZAHRA", kelas: "XIF7" },
+            { id: 56, nama: "MYISHA FARRAS ADRINOFA", kelas: "XIF7" },
+            { id: 57, nama: "NABIL DARUL FARIS", kelas: "XIF7" },
+            { id: 58, nama: "NAZWA AULIA", kelas: "XIF7" },
+            { id: 59, nama: "MAYLAFA CAHYA NAFIRA", kelas: "XIF8" },
+            { id: 60, nama: "JASMINE MAULID NINGTYAS", kelas: "XIF8" },
+            { id: 61, nama: "NAYARA AQILA ALWA DWI A.", kelas: "XIF8" },
+            { id: 62, nama: "NABIL AGUSTIEN CLAUDIA", kelas: "XIF8" },
+            { id: 63, nama: "PUTERA HAGIA NUGRAHA", kelas: "XIF8" },
+            { id: 64, nama: "RENDI FIRMANSYAH", kelas: "XIF8" },
+            { id: 65, nama: "FAHIRA MADINA TUZZAHRAH", kelas: "XIF8" },
+            { id: 66, nama: "NAUFAL AQIL MUNAWIR", kelas: "XIF8" },
+            { id: 67, nama: "SHEILA MARSYA", kelas: "XIF8" },
+            { id: 68, nama: "ANGGUN ZAHRATUSSHOFA", kelas: "XIF9" },
+            { id: 69, nama: "FRISCA MAULIDA RAHMA", kelas: "XIF9" },
+            { id: 70, nama: "AHMAD AL-GHAZALI", kelas: "XIF9" },
+            { id: 71, nama: "SELASIH JULIA PUTRI FERNANDA", kelas: "XIF10" },
+            { id: 72, nama: "SRI INDRIANI", kelas: "XIF10" }
         ];
 
-        const adminValid = admins.find(admin => admin.nama === nama && admin.password === password);
+        // ============================================
+        // VARIABEL GLOBAL
+        // ============================================
+        let dataAbsen = [];
+        let isLocked = false;
+        let currentAdmin = null;
+        let currentFilter = 'all';
+        let isFirebaseConnected = false;
 
-        if (adminValid) {
-            // Tampilkan UI berhasil
-            loginPopup.classList.remove('error');
-            loginPopup.classList.add('success');
-            loginPopup.querySelector('.icon').textContent = '✓';
-            loginMessage.textContent = 'Login Berhasil';
-            loginOverlay.style.display = 'flex';
+        let listAdmin = JSON.parse(localStorage.getItem('sim_admins')) || [
+            {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"},
+            {user: "alghazali", pass: "ketuakir2526", role: "Admin", job: "Admin"},
+            {user: "frisca", pass: "sekrekir2526", role: "Admin", job: "Admin"}
+        ];
 
-            setTimeout(() => {
-                loginOverlay.style.display = 'none';
-                isAdmin = true;
-                loginForm.style.display = 'none';
-                adminPanel.style.display = 'block';
-                document.getElementById('absensi-list').style.display = 'block';
+        // ============================================
+        // FIREBASE FUNCTIONS
+        // ============================================
+        database.ref('.info/connected').on('value', (snapshot) => {
+            const connected = snapshot.val() === true;
+            isFirebaseConnected = connected;
+            
+            const indicator = document.getElementById('sync-indicator');
+            const statusText = document.getElementById('sync-status');
+            
+            if (connected) {
+                indicator.className = 'sync-indicator online';
+                statusText.textContent = '';
+                showPopup(" Terhubung", "blue");
+                
+                document.getElementById('loading-main').classList.add('hidden');
+                document.getElementById('main-buttons').classList.remove('hidden');
+            } else {
+                indicator.className = 'sync-indicator offline';
+                statusText.textContent = '';
+                showPopup("⚠ Mode offline aktif", "red");
+            }
+        });
 
-                // Jika Firebase tidak aktif, render dari localStorage
-                if (!FIREBASE_ENABLED) {
-                    absensiData = JSON.parse(localStorage.getItem('absensiData')) || absensiData;
-                    renderAbsensi();
+        function loadDataFromFirebase() {
+            database.ref('absen').on('value', (snapshot) => {
+                dataAbsen = snapshot.val() || [];
+                
+                if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
+                    renderRekap();
                 }
-            }, 1200);
-        } else {
-            // Tampilkan UI gagal
-            loginPopup.classList.remove('success');
-            loginPopup.classList.add('error');
-            loginPopup.querySelector('.icon').textContent = '✗';
-            loginMessage.textContent = 'Nama atau Password Anda Salah';
-            loginOverlay.style.display = 'flex';
-
-            setTimeout(() => {
-                loginOverlay.style.display = 'none';
-            }, 1500);
+                
+                if (!document.getElementById('absensi-kir-panel').classList.contains('hidden')) {
+                    renderAbsensiKirPanel();
+                }
+            });
         }
-    });
 
-    // Logout admin
-    document.getElementById('logout-btn').addEventListener('click', () => {
-        isAdmin = false;
-        adminPanel.style.display = 'none';
-        document.getElementById('absensi-list').style.display = 'none';
-        roleSelection.style.display = 'block';
-    });
-    
-    function toggleKeterangan() {
-        if (radioIzin.checked) {
-            keteranganContainer.style.display = 'block';
-        } else {
-            keteranganContainer.style.display = 'none';
+        function loadLockStatus() {
+            database.ref('settings/lock').on('value', (snapshot) => {
+                isLocked = snapshot.val() || false;
+                
+                if (!document.getElementById('absen-panel').classList.contains('hidden')) {
+                    document.getElementById('formAbsen').classList.toggle('hidden', isLocked);
+                    document.getElementById('lock-msg').classList.toggle('hidden', !isLocked);
+                }
+                
+                if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
+                    document.getElementById('btn-lock').innerText = isLocked ? "UNLOCK" : "LOCK";
+                }
+            });
         }
-    }
 
-    radioHadir.addEventListener('change', toggleKeterangan);
-    radioIzin.addEventListener('change', toggleKeterangan);
+        async function saveAbsenToFirebase(absenData) {
+            try {
+                if (!isFirebaseConnected) {
+                    throw new Error('Tidak terhubung ke internet');
+                }
+                
+                const newData = [...dataAbsen, absenData];
+                await database.ref('absen').set(newData);
+                return true;
+            } catch (error) {
+                console.error('Error saving to Firebase:', error);
+                
+                const localData = JSON.parse(localStorage.getItem('sim_absen')) || [];
+                localData.push(absenData);
+                localStorage.setItem('sim_absen', JSON.stringify(localData));
+                
+                showPopup("⚠ Data disimpan lokal (offline)", "red");
+                return false;
+            }
+        }
 
-    // Inisialisasi
-    toggleKeterangan();
-    renderAbsensi();
+        async function deleteAbsenFromFirebase(id) {
+            try {
+                const newData = dataAbsen.filter(x => x.id !== id);
+                await database.ref('absen').set(newData);
+                return true;
+            } catch (error) {
+                console.error('Error deleting from Firebase:', error);
+                return false;
+            }
+        }
 
-    // Ripple effect pada button
-    document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            const button = e.currentTarget;
-            const circle = document.createElement('span');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
+        async function resetFirebaseData() {
+            try {
+                await database.ref('absen').set([]);
+                return true;
+            } catch (error) {
+                console.error('Error resetting Firebase:', error);
+                return false;
+            }
+        }
 
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${e.clientX - button.offsetLeft - radius}px`;
-            circle.style.top = `${e.clientY - button.offsetTop - radius}px`;
-            circle.classList.add('ripple');
+        async function updateLockStatus(locked) {
+            try {
+                await database.ref('settings/lock').set(locked);
+                return true;
+            } catch (error) {
+                console.error('Error updating lock:', error);
+                return false;
+            }
+        }
 
-            const ripple = button.getElementsByClassName('ripple')[0];
-            if (ripple) {
-                ripple.remove();
+        // ============================================
+        // FUNGSI UTAMA
+        // ============================================
+        function showPanel(id) {
+            document.querySelectorAll('.container, .admin-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            if(id === 'manage-admin-panel') renderAdminList();
+            if(id === 'absensi-kir-panel') renderAbsensiKirPanel();
+            if(id === 'absen-panel') { 
+                document.getElementById('formAbsen').classList.toggle('hidden', isLocked);
+                document.getElementById('lock-msg').classList.toggle('hidden', !isLocked);
+                if(!isLocked) renderNamaList();
+            }
+        }
+
+        function showPopup(txt, type) {
+            const p = document.getElementById('popup'); p.innerText = txt;
+            p.className = `popup active pop-${type}`;
+            setTimeout(() => p.classList.remove('active'), 2500);
+        }
+
+        function toggleIzinField() { 
+            document.getElementById('izin-field').classList.toggle('hidden', document.getElementById('kehadiran').value !== 'IZIN'); 
+        }
+
+        function renderNamaList() {
+            const container = document.getElementById('namaList');
+            const hariIni = new Date().toLocaleDateString('id-ID');
+            
+            container.innerHTML = '';
+            
+            dataAnggota.forEach(anggota => {
+                const sudahAbsen = dataAbsen.some(x => x.nama === anggota.nama && x.tanggal === hariIni);
+                const div = document.createElement('div');
+                div.className = `nama-item ${sudahAbsen ? 'disabled' : ''}`;
+                div.innerHTML = `
+                    <div style="font-weight: 600;">${anggota.nama}</div>
+                    <div style="font-size: 0.8rem; color: var(--neon-blue);">${anggota.kelas}</div>
+                    ${sudahAbsen ? '<div style="font-size: 0.7rem; color: var(--neon-red); margin-top: 3px;">Sudah Absen</div>' : ''}
+                `;
+                
+                if (!sudahAbsen) {
+                    div.onclick = () => selectNama(anggota);
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function filterNamaList() {
+            const searchTerm = document.getElementById('searchNama').value.toLowerCase();
+            const namaItems = document.querySelectorAll('.nama-item');
+            const hariIni = new Date().toLocaleDateString('id-ID');
+            
+            namaItems.forEach(item => {
+                const namaText = item.querySelector('div:first-child').textContent.toLowerCase();
+                const sudahAbsen = dataAbsen.some(x => x.nama === item.querySelector('div:first-child').textContent && x.tanggal === hariIni);
+                
+                if (namaText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function selectNama(anggota) {
+            document.getElementById('selectedNama').value = anggota.nama;
+            document.getElementById('selectedKelas').value = anggota.kelas;
+            
+            document.querySelectorAll('.nama-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            const items = document.querySelectorAll('.nama-item');
+            items.forEach(item => {
+                if (item.querySelector('div:first-child').textContent === anggota.nama) {
+                    item.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('kehadiran').focus();
+        }
+
+        function prosesLogin() {
+            const u = document.getElementById('adm-user').value.trim();
+            const p = document.getElementById('adm-pass').value.trim();
+            const admin = listAdmin.find(x => x.user === u);
+            const passOk = listAdmin.find(x => x.pass === p);
+
+            if (admin && admin.pass === p) {
+                currentAdmin = admin;
+                showPopup("✓", admin.role === 'Owner' ? "gold" : "blue");
+                
+                document.getElementById('owner-btn').classList.toggle('hidden', admin.role !== 'Owner');
+                
+                setTimeout(() => {
+                    showPanel('admin-dashboard');
+                    renderRekap();
+                }, 1000);
+            } else if (!admin && passOk) showPopup("Nama Salah", "red");
+            else if (admin && admin.pass !== p) showPopup("Password Salah", "red");
+            else showPopup("Akun Tidak Terdaftar", "red");
+        }
+
+        document.getElementById('formAbsen').onsubmit = async (e) => {
+            e.preventDefault();
+            const n = document.getElementById('selectedNama').value;
+            const k = document.getElementById('selectedKelas').value;
+            const h = document.getElementById('kehadiran').value;
+            const a = document.getElementById('alasan').value || "-";
+            const d = new Date().toLocaleDateString('id-ID');
+
+            if (!n || !k || !h) {
+                return showPopup("Pilih nama dan status kehadiran!", "red");
             }
 
-            button.appendChild(circle);
-        });
-    });
+            if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
+                return showPopup("Sudah absen hari ini!", "red");
+            }
 
-    // Fungsi untuk mengirim data ke Discord
-    async function sendToDiscord(entry) {
-        try {
+            const absenData = { 
+                id: Date.now(), 
+                nama: n, 
+                kelas: k, 
+                kehadiran: h, 
+                alasan: a, 
+                tanggal: d,
+                waktu: new Date().toLocaleTimeString('id-ID')
+            };
+            
+            const saved = await saveAbsenToFirebase(absenData);
+            
+            if (saved) {
+                await kirimKeDiscord(absenData);
+            }
+            
+            showPopup("✓ Berhasil Absen", "blue");
+            document.getElementById('formAbsen').reset();
+            renderNamaList();
+            setTimeout(() => showPanel('main-menu'), 1500);
+        };
+
+        async function kirimKeDiscord(data) {
+            const waktu = new Date().toLocaleTimeString('id-ID');
+            const tanggal = new Date().toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const color = data.kehadiran === 'HADIR' ? 3066993 : 15158332;
+            
             const embed = {
-                title: "📝 Absensi Baru",
-                color: entry.kehadiran === 'Hadir' ? 3066993 : 15158332, // Hijau untuk Hadir, Merah untuk Izin
+                title: "📋 ABSENSI KIR - SMAN 1 LEMAHABANG",
+                color: color,
                 fields: [
-                    {
-                        name: "👤 Nama",
-                        value: entry.nama,
-                        inline: true
-                    },
-                    {
-                        name: "🏫 Kelas",
-                        value: entry.kelas,
-                        inline: true
-                    },
-                    {
-                        name: "📅 Tanggal",
-                        value: entry.tanggal,
-                        inline: true
-                    },
-                    {
-                        name: "✅ Status Kehadiran",
-                        value: entry.kehadiran,
-                        inline: true
-                    }
+                    { name: "👤 Nama", value: data.nama, inline: true },
+                    { name: "🏫 Kelas", value: data.kelas, inline: true },
+                    { name: "📊 Status", value: data.kehadiran === 'HADIR' ? "✅ HADIR" : "🟡 IZIN", inline: true },
+                    { name: "📝 Alasan", value: data.alasan || "-", inline: false }
                 ],
+                footer: { text: `Absensi pada ${tanggal} pukul ${waktu}` },
                 timestamp: new Date().toISOString()
             };
 
-            // Tambahkan field keterangan jika izin
-            if (entry.kehadiran === 'Izin' && entry.keterangan) {
-                embed.fields.push({
-                    name: "📝 Alasan Izin",
-                    value: entry.keterangan,
-                    inline: false
-                });
-            }
-
             const payload = {
+                content: "**🔔 ABSENSI BARU!**",
                 embeds: [embed]
             };
 
-            const response = await fetch(DISCORD_WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    document.getElementById('webhook-status').textContent = "Webhook: Terkirim ✓";
+                    setTimeout(() => {
+                        document.getElementById('webhook-status').textContent = "Webhook: Siap";
+                    }, 3000);
+                } else {
+                    document.getElementById('webhook-status').textContent = "Webhook: Gagal ✗";
+                }
+            } catch (error) {
+                document.getElementById('webhook-status').textContent = "Webhook: Error";
+            }
+        }
+
+        function renderRekap() {
+            const list = document.getElementById('list-rekap');
+            list.innerHTML = "";
+            let h = 0, i = 0;
+
+            dataAbsen.slice().reverse().forEach(item => {
+                if(item.kehadiran === "HADIR") h++; else i++;
+                const div = document.createElement('div');
+                div.className = `rekap-item ${item.kehadiran === 'HADIR' ? 'item-hadir' : 'item-izin'}`;
+                div.innerHTML = `
+                    <span>${item.nama} ${item.kelas} (${item.kehadiran === 'HADIR' ? 'HADIR' : 'IZIN: '+item.alasan})</span>
+                    <button onclick="hapusAbsen(${item.id})" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+                `;
+                list.appendChild(div);
             });
 
-            if (!response.ok) {
-                console.error('Gagal mengirim ke Discord:', response.status);
-            }
-        } catch (error) {
-            console.error('Error mengirim ke Discord:', error);
-        }
-    }
-
-    // Handle form submission absensi
-    absensiForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const nama = document.getElementById('nama').value.trim();
-        const kelas = document.getElementById('kelas').value.trim();
-        const tanggal = document.getElementById('tanggal').value;
-        const kehadiran = document.querySelector('input[name="kehadiran"]:checked').value;
-        const keterangan = document.getElementById('keterangan').value.trim();
-
-        // Format tanggal ke DD/MM/YYYY
-        const date = new Date(tanggal);
-        const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-
-        const newEntry = {
-            nama: nama,
-            kelas: kelas,
-            tanggal: formattedDate,
-            kehadiran: kehadiran,
-            keterangan: keterangan || 'Alpa',
-            createdAt: new Date().toISOString()
-        };
-
-        if (FIREBASE_ENABLED && firebaseDbRef) {
-            // Simpan ke Firebase (source-of-truth). Akan dipropagasi ke admin devices via listener.
-            try {
-                await firebaseDbRef.push(newEntry);
-                showNotification('✅ Absensi berhasil dikirim dan disinkronkan!', 'success');
-            } catch (err) {
-                console.error('Gagal menyimpan ke Firebase:', err);
-                showNotification('⚠️ Gagal sinkron ke server, disimpan lokal saja.', 'error');
-                // fallback: simpan lokal
-                absensiData.push(newEntry);
-                localStorage.setItem('absensiData', JSON.stringify(absensiData));
-                renderAbsensi();
-            }
-        } else {
-            // Simpan lokal saja
-            absensiData.push(newEntry);
-            localStorage.setItem('absensiData', JSON.stringify(absensiData));
-            renderAbsensi();
-            showNotification('✅ Absensi berhasil dikirim!', 'success');
+            document.getElementById('s-hadir').innerText = h;
+            document.getElementById('s-izin').innerText = i;
+            document.getElementById('s-total').innerText = h + i;
+            document.getElementById('btn-lock').innerText = isLocked ? "UNLOCK" : "LOCK";
         }
 
-        // Kirim juga ke Discord (notifikasi ke channel admin)
-        await sendToDiscord(newEntry);
-
-        absensiForm.reset();
-        toggleKeterangan();
-        
-        // Tampilkan daftar absensi setelah submit
-        document.getElementById('absensi-list').style.display = 'block';
-    });
-
-    // Fungsi render absensi yang sudah diperbaiki
-    function renderAbsensi() {
-        absensiUl.innerHTML = '';
-        absensiData.forEach((entry, index) => {
-            const li = document.createElement('li');
-            let status;
-            if (entry.kehadiran === 'Hadir') {
-                status = '(Hadir)';
-                li.classList.add('absen-hadir');
+        async function hapusAbsen(id) { 
+            if (!confirm("Hapus absen ini?")) return;
+            
+            const success = await deleteAbsenFromFirebase(id);
+            if (success) {
+                showPopup("✓ Absen dihapus", "blue");
             } else {
-                status = `(Izin: ${entry.keterangan})`;
-                li.classList.add('absen-izin');
+                showPopup("⚠ Gagal menghapus", "red");
             }
-            
-            const entryText = document.createTextNode(`${index + 1}. ${entry.nama} ${entry.kelas} ${status} ${entry.tanggal}`);
-            li.appendChild(entryText);
-            
-            // Tambahkan tombol hapus hanya jika admin
-            if (isAdmin) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Hapus';
-                deleteBtn.classList.add('delete-btn');
-                deleteBtn.addEventListener('click', () => {
-                    showCustomConfirm(`Apakah Anda yakin ingin menghapus absensi ${entry.nama}?`, () => {
-                        if (FIREBASE_ENABLED && entry._id && firebaseDbRef) {
-                            // hapus dari Firebase
-                            firebaseDbRef.child(entry._id).remove()
-                                .then(() => {
-                                    showNotification('✅ Data absensi berhasil dihapus!', 'success');
-                                })
-                                .catch(err => {
-                                    console.error('Gagal menghapus di Firebase:', err);
-                                    showNotification('❌ Gagal menghapus di server.', 'error');
-                                });
-                        } else {
-                            // hapus lokal
-                            absensiData.splice(index, 1);
-                            localStorage.setItem('absensiData', JSON.stringify(absensiData));
-                            renderAbsensi();
-                            showNotification('✅ Data absensi berhasil dihapus!', 'success');
-                        }
-                    });
-                });
-                li.appendChild(deleteBtn);
-            }
-            
-            absensiUl.appendChild(li);
-        });
-        
-        // Update rekap absensi
-        updateRekapAbsensi();
-    }
-
-    // Fungsi update rekap absensi
-    function updateRekapAbsensi() {
-        const countHadir = absensiData.filter(d => d.kehadiran === 'Hadir').length;
-        const countIzin = absensiData.filter(d => d.kehadiran === 'Izin').length;
-        const countTotal = absensiData.length;
-
-        document.getElementById('countHadir').textContent = countHadir;
-        document.getElementById('countIzin').textContent = countIzin;
-        document.getElementById('countTotal').textContent = countTotal;
-    }
-
-    // Unduh sebagai CSV
-    document.getElementById('download-btn').addEventListener('click', function() {
-        if (absensiData.length === 0) {
-            showNotification('❌ Tidak ada data absensi untuk diunduh.', 'error');
-            return;
         }
-
-        let csvContent = 'data:text/csv;charset=utf-8,\uFEFF'; // BOM untuk Excel
-        csvContent += '"No","Nama","Kelas","Tanggal","Kehadiran","Keterangan"\r\n';
         
-        absensiData.forEach((entry, index) => {
-            const nama = `"${(entry.nama || '').replace(/"/g, '""')}"`;
-            const kelas = `"${(entry.kelas || '').replace(/"/g, '""')}"`;
-            const tanggal = `"${entry.tanggal || ''}"`;
-            const kehadiran = `"${entry.kehadiran || ''}"`;
-            const keterangan = `"${(entry.keterangan || '').replace(/"/g, '""')}"`;
+        async function resetData() { 
+            if(!confirm("Reset semua data absen? Tindakan ini tidak dapat dibatalkan!")) return;
             
-            csvContent += `${index + 1},${nama},${kelas},${tanggal},${kehadiran},${keterangan}\r\n`;
-        });
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', `absensi_kelompok_ilmiah_remaja_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        showNotification('📥 File CSV berhasil diunduh!', 'success');
-    });
-
-    // Fungsi menampilkan popup kustom dengan callback
-    function showCustomConfirm(message, onYes) {
-        const popup = document.getElementById('customConfirm');
-        const text = document.getElementById('confirmText');
-        const yesBtn = document.getElementById('confirmYes');
-        const noBtn = document.getElementById('confirmNo');
-
-        text.textContent = message;
-        popup.style.display = 'flex';
-
-        // Clone dan ganti tombol untuk menghindari event listener ganda
-        yesBtn.replaceWith(yesBtn.cloneNode(true));
-        noBtn.replaceWith(noBtn.cloneNode(true));
-
-        const newYes = document.getElementById('confirmYes');
-        const newNo = document.getElementById('confirmNo');
-
-        newNo.addEventListener('click', () => {
-            popup.style.display = 'none';
-            if (navigator.vibrate) navigator.vibrate(30);
-            showNotification('❌ Aksi dibatalkan.', 'error');
-        });
-
-        newYes.addEventListener('click', () => {
-            popup.style.display = 'none';
-            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-            onYes();
-        });
-    }
-
-    // Reset absensi
-    document.getElementById('reset-absensi').addEventListener('click', function() {
-        showCustomConfirm('Apakah Anda yakin ingin mereset semua data absensi?', async () => {
-            if (FIREBASE_ENABLED && firebaseDbRef) {
-                try {
-                    await firebaseDbRef.remove();
-                    // firebase listener akan mengosongkan absensiData & render
-                    showNotification('✅ Semua data absensi berhasil direset (server).', 'success');
-                } catch (err) {
-                    console.error('Gagal mereset data di Firebase:', err);
-                    showNotification('❌ Gagal mereset data di server.', 'error');
+            const success = await resetFirebaseData();
+            if (success) {
+                showPopup("✓ Semua data direset", "gold");
+                renderRekap();
+                if (!document.getElementById('absensi-kir-panel').classList.contains('hidden')) {
+                    renderAbsensiKirPanel();
                 }
             } else {
-                absensiData = [];
-                localStorage.setItem('absensiData', JSON.stringify(absensiData));
-                renderAbsensi();
-                showNotification('✅ Semua data absensi berhasil direset (lokal).', 'success');
+                showPopup("⚠ Gagal mereset data", "red");
             }
-        });
-    });
-
-    // ===== Notifikasi / Toast sederhana =====
-    function showNotification(message, type = 'success', duration = 2500) {
-        toastEl.textContent = message;
-        toastEl.className = '';
-        toastEl.classList.add(type === 'error' ? 'error' : 'success');
-        toastEl.style.display = 'block';
-        setTimeout(() => {
-            toastEl.style.display = 'none';
-        }, duration);
-    }
-
-    // Mode toggle (dark mode)
-    document.getElementById('modeToggle').addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const btn = document.getElementById('modeToggle');
-        btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-    });
-
-    // Jika Firebase tidak aktif, kita bisa mencoba refresh dari localStorage ketika storage event terjadi (sinkron antar tab pada device yang sama)
-    window.addEventListener('storage', (event) => {
-        if (!FIREBASE_ENABLED && event.key === 'absensiData') {
-            absensiData = JSON.parse(event.newValue) || [];
-            renderAbsensi();
         }
-    });
+        
+        async function toggleLock() { 
+            const newLockStatus = !isLocked;
+            const success = await updateLockStatus(newLockStatus);
+            
+            if (success) {
+                showPopup(newLockStatus ? "🔒 Absensi dikunci" : "🔓 Absensi dibuka", newLockStatus ? "red" : "green");
+            } else {
+                showPopup("⚠ Gagal mengubah status kunci", "red");
+            }
+        }
 
-    // Jika Firebase aktif, admin akan menerima entri dari device lain secara realtime karena listener on('value') di atas.
-    // Jika Firebase tidak aktif, admin hanya bisa melihat entri yang tersimpan di localStorage pada device yang sama.
-  </script>
+        function renderAbsensiKirPanel() {
+            const grid = document.getElementById('absensiGrid');
+            const hariIni = new Date().toLocaleDateString('id-ID');
+            let hadirCount = 0, izinCount = 0, belumCount = 0;
+            
+            grid.innerHTML = '';
+            
+            dataAnggota.forEach(anggota => {
+                const absenHariIni = dataAbsen.find(x => x.nama === anggota.nama && x.tanggal === hariIni);
+                let status = 'belum';
+                let statusClass = 'belum';
+                
+                if (absenHariIni) {
+                    if (absenHariIni.kehadiran === 'HADIR') {
+                        status = 'hadir';
+                        statusClass = 'hadir';
+                        hadirCount++;
+                    } else if (absenHariIni.kehadiran === 'IZIN') {
+                        status = 'izin';
+                        statusClass = 'izin';
+                        izinCount++;
+                    }
+                } else {
+                    belumCount++;
+                }
+                
+                if (currentFilter !== 'all' && status !== currentFilter) {
+                    return;
+                }
+                
+                const card = document.createElement('div');
+                card.className = `anggota-card ${statusClass}`;
+                card.innerHTML = `
+                    <div class="anggota-number">#${anggota.id}</div>
+                    <div class="anggota-nama">${anggota.nama}</div>
+                    <div class="anggota-kelas">${anggota.kelas}</div>
+                    ${absenHariIni && absenHariIni.alasan !== '-' ? `<div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.8;">${absenHariIni.alasan}</div>` : ''}
+                `;
+                
+                grid.appendChild(card);
+            });
+            
+            document.getElementById('count-hadir').textContent = hadirCount;
+            document.getElementById('count-izin').textContent = izinCount;
+            document.getElementById('count-belum').textContent = belumCount;
+            document.getElementById('count-total').textContent = dataAnggota.length;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.filter-btn.${currentFilter}`).classList.add('active');
+        }
+
+        function filterAnggota(filter) {
+            currentFilter = filter;
+            renderAbsensiKirPanel();
+        }
+
+        function renderAdminList() {
+            const list = document.getElementById('list-admin-manage');
+            list.innerHTML = "<h3 style='margin-bottom:15px; font-size:1rem;'>Daftar Admin Aktif</h3>";
+            
+            listAdmin.forEach((adm, index) => {
+                const div = document.createElement('div');
+                const isOwner = adm.role === 'Owner';
+                div.className = `rekap-item ${isOwner ? 'item-owner' : 'item-admin-list'}`;
+                
+                div.innerHTML = `
+                    <div>
+                        <strong>${index + 1}. ${adm.user}</strong> (${adm.pass}) 
+                        ${isOwner ? '<span style="color:var(--neon-gold)">🜲 Owner</span>' : '<span style="color:var(--neon-red)">🛡️ '+adm.job+'</span>'}
+                    </div>
+                    ${!isOwner ? `<button onclick="hapusAdmin('${adm.user}')" style="background:none; border:none; color:var(--neon-red); cursor:pointer; font-weight:bold;">COPOT</button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function tambahAdmin() {
+            const name = document.getElementById('new-adm-name').value.trim().toLowerCase();
+            const pass = document.getElementById('new-adm-pass').value.trim();
+            const job = document.getElementById('new-adm-job').value.trim();
+
+            if(!name || !pass || !job) return showPopup("Lengkapi Data!", "red");
+            if(listAdmin.some(x => x.user === name)) return showPopup("Nama sudah ada!", "red");
+
+            listAdmin.push({user: name, pass: pass, role: "Admin", job: job});
+            localStorage.setItem('sim_admins', JSON.stringify(listAdmin));
+            renderAdminList();
+            showPopup("Admin Terdaftar!", "gold");
+            document.getElementById('new-adm-name').value = "";
+            document.getElementById('new-adm-pass').value = "";
+            document.getElementById('new-adm-job').value = "";
+        }
+
+        function hapusAdmin(username) {
+            if(confirm(`Yakin ingin mencopot ${username} dari jabatan Admin?`)) {
+                listAdmin = listAdmin.filter(x => x.user !== username);
+                localStorage.setItem('sim_admins', JSON.stringify(listAdmin));
+                renderAdminList();
+                showPopup("Admin Dicopot!", "red");
+            }
+        }
+
+        window.onload = function() {
+            loadDataFromFirebase();
+            loadLockStatus();
+            
+            window.addEventListener('offline', () => {
+                showPopup("⚠ Anda sedang offline", "red");
+            });
+            
+            window.addEventListener('online', () => {
+                showPopup("✓ Koneksi pulih", "blue");
+            });
+            
+            setTimeout(() => {
+                document.getElementById('loading-main').classList.add('hidden');
+                document.getElementById('main-buttons').classList.remove('hidden');
+            }, 5000);
+        };
+    </script>
 </body>
 </html>
