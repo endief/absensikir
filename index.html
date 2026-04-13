@@ -566,14 +566,14 @@
             
             if (connected) {
                 indicator.className = 'sync-indicator online';
-                statusText.textContent = 'Online';
-                showPopup("✅ Terhubung ke Firebase", "blue");
+                statusText.textContent = '';
+                showPopup("Terhubung", "blue");
                 
                 document.getElementById('loading-main').classList.add('hidden');
                 document.getElementById('main-buttons').classList.remove('hidden');
             } else {
                 indicator.className = 'sync-indicator offline';
-                statusText.textContent = 'Offline';
+                statusText.textContent = '';
                 showPopup("⚠ Mode offline - data tidak tersimpan", "red");
             }
         });
@@ -770,7 +770,7 @@
             
             if (admin && admin.pass === p) {
                 currentAdmin = admin;
-                showPopup("✅ Login berhasil", admin.role === 'Owner' ? "gold" : "blue");
+                showPopup("Login berhasil", admin.role === 'Owner' ? "gold" : "blue");
                 
                 const ownerBtn = document.getElementById('owner-btn');
                 if (ownerBtn) ownerBtn.classList.toggle('hidden', admin.role !== 'Owner');
@@ -780,9 +780,9 @@
                     renderRekap();
                 }, 1000);
             } else if (!admin) {
-                showPopup("❌ Akun Tidak Terdaftar", "red");
+                showPopup("Akun Tidak Terdaftar", "red");
             } else if (admin && admin.pass !== p) {
-                showPopup("❌ Password Salah", "red");
+                showPopup("Password Salah", "red");
             }
         }
 
@@ -798,11 +798,11 @@
                 const d = new Date().toLocaleDateString('id-ID');
 
                 if (!n || !k || !h) {
-                    return showPopup("❌ Pilih nama dan status kehadiran!", "red");
+                    return showPopup("Pilih nama dan status kehadiran!", "red");
                 }
 
                 if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
-                    return showPopup("❌ Sudah absen hari ini!", "red");
+                    return showPopup("Sudah absen hari ini!", "red");
                 }
 
                 const absenData = { 
@@ -819,7 +819,7 @@
                 
                 if (saved) {
                     await kirimKeDiscord(absenData);
-                    showPopup("✅ Berhasil Absen!", "blue");
+                    showPopup("Berhasil Absen!", "blue");
                     if (formAbsen) formAbsen.reset();
                     renderNamaList();
                     setTimeout(() => showPanel('main-menu'), 1500);
@@ -898,7 +898,7 @@
             
             const success = await deleteAbsenFromFirebase(id);
             if (success) {
-                showPopup("✅ Absen dihapus", "blue");
+                showPopup("Absen dihapus", "blue");
             } else {
                 showPopup("⚠ Gagal menghapus", "red");
             }
@@ -909,7 +909,7 @@
             
             const success = await resetFirebaseData();
             if (success) {
-                showPopup("✅ Semua data direset", "gold");
+                showPopup("Semua data direset", "gold");
                 renderRekap();
                 if (!document.getElementById('absensi-kir-panel')?.classList.contains('hidden')) {
                     renderAbsensiKirPanel();
@@ -1022,15 +1022,15 @@
             const pass = document.getElementById('new-adm-pass')?.value.trim() || '';
             const job = document.getElementById('new-adm-job')?.value.trim() || '';
 
-            if(!name || !pass || !job) return showPopup("❌ Lengkapi semua data!", "red");
-            if(listAdmin.some(x => x.user === name)) return showPopup("❌ Nama admin sudah ada!", "red");
+            if(!name || !pass || !job) return showPopup("Lengkapi semua data!", "red");
+            if(listAdmin.some(x => x.user === name)) return showPopup("Nama admin sudah ada!", "red");
 
             listAdmin.push({user: name, pass: pass, role: "Admin", job: job});
             const saved = await saveAdminToFirebase();
             
             if (saved) {
                 renderAdminList();
-                showPopup("✅ Admin berhasil ditambahkan (Real-time)!", "gold");
+                showPopup("Admin ${username} berhasil!", "gold");
                 if (document.getElementById('new-adm-name')) document.getElementById('new-adm-name').value = "";
                 if (document.getElementById('new-adm-pass')) document.getElementById('new-adm-pass').value = "";
                 if (document.getElementById('new-adm-job')) document.getElementById('new-adm-job').value = "";
@@ -1046,7 +1046,7 @@
                 
                 if (saved) {
                     renderAdminList();
-                    showPopup(`✅ Admin ${username} dicopot (Real-time)!`, "red");
+                    showPopup(`Admin ${username} telah dicopot!`, "red");
                 } else {
                     showPopup("⚠ Gagal menghapus admin", "red");
                 }
@@ -1064,7 +1064,7 @@
             });
             
             window.addEventListener('online', () => {
-                showPopup("✅ Koneksi pulih", "blue");
+                showPopup("Koneksi pulih", "blue");
             });
             
             // Timeout fallback
