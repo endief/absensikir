@@ -88,6 +88,7 @@
             opacity: 0.6;
         }
 
+        /* Search Box */
         .search-box {
             margin-bottom: 20px;
             position: relative;
@@ -105,6 +106,7 @@
             color: var(--neon-blue);
         }
 
+        /* Absensi Panel Styles */
         .nama-list-container {
             max-height: 300px;
             overflow-y: auto;
@@ -144,6 +146,7 @@
             transform: none;
         }
 
+        /* Absensi Kir Panel */
         .absensi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -456,6 +459,7 @@
             { id: 30, nama: "CHINTIA PUTRI RAMADANI", kelas: "X9" },
             { id: 31, nama: "YUSUF RIZA MAHENDRA", kelas: "X9" },
             { id: 32, nama: "TIRTA ALVIAN SYAH", kelas: "X9" },
+            { id: 73, nama: "MEGA EMIRARIA GULTOM", kelas: "X9" },
             { id: 33, nama: "EEVELINA AULIYA", kelas: "X10" },
             { id: 34, nama: "FARAH AISHA ADITYA", kelas: "X10" },
             { id: 35, nama: "NUR SHIHA", kelas: "X10" },
@@ -506,57 +510,27 @@
         let currentAdmin = null;
         let currentFilter = 'all';
         let isFirebaseConnected = false;
-        let listAdmin = []; // Data admin dari Firebase
 
-        // ============================================
-        // FIREBASE FUNCTIONS - ADMIN (REAL-TIME)
-        // ============================================
-        
-        // Load data admin dari Firebase dengan real-time listener
-        function loadAdminFromFirebase() {
-            database.ref('admins').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data && Array.isArray(data) && data.length > 0) {
-                    listAdmin = data;
-                } else {
-                    // Data awal jika kosong
-                    listAdmin = [
-                        {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"},
-                        {user: "alghazali", pass: "ketuakir2526", role: "Admin", job: "Admin"},
-                        {user: "frisca", pass: "sekrekir2526", role: "Admin", job: "Admin"}
-                    ];
-                    saveAdminToFirebase(); // Simpan data awal ke Firebase
-                }
-                
-                // Update UI jika panel admin sedang terbuka
-                if (!document.getElementById('manage-admin-panel').classList.contains('hidden')) {
-                    renderAdminList();
-                }
-                
-                console.log('✅ Data admin real-time diupdate:', listAdmin);
-            }, (error) => {
-                console.error('Error loading admin:', error);
-                showPopup("⚠ Gagal memuat data admin", "red");
-            });
-        }
+                let listAdmin = [
+            {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"},
+            {user: "alghazali", pass: "ketuakir2526", role: "Admin", job: "Admin"},
+            {user: "frisca", pass: "sekrekir2526", role: "Admin", job: "Admin"}
+        ];
 
-        // Simpan data admin ke Firebase
-        async function saveAdminToFirebase() {
-            try {
-                await database.ref('admins').set(listAdmin);
-                console.log('✅ Data admin disimpan ke Firebase');
-                return true;
-            } catch (error) {
-                console.error('Error saving admin:', error);
-                showPopup("⚠ Gagal menyimpan data admin", "red");
-                return false;
+        // Membungkus localStorage dengan try-catch agar tidak crash di App Inventor
+        try {
+            let savedAdmin = localStorage.getItem('sim_admins');
+            if (savedAdmin) {
+                listAdmin = JSON.parse(savedAdmin);
             }
+        } catch(e) {
+            console.warn("LocalStorage diblokir, menggunakan daftar admin default.");
         }
+        
 
         // ============================================
-        // FIREBASE FUNCTIONS - LAINNYA
+        // FIREBASE FUNCTIONS
         // ============================================
-        
         database.ref('.info/connected').on('value', (snapshot) => {
             const connected = snapshot.val() === true;
             isFirebaseConnected = connected;
@@ -566,15 +540,15 @@
             
             if (connected) {
                 indicator.className = 'sync-indicator online';
-                statusText.textContent = 'Online';
-                showPopup("✅ Terhubung ke Firebase", "blue");
+                statusText.textContent = '';
+                showPopup(" Terhubung", "blue");
                 
                 document.getElementById('loading-main').classList.add('hidden');
                 document.getElementById('main-buttons').classList.remove('hidden');
             } else {
                 indicator.className = 'sync-indicator offline';
-                statusText.textContent = 'Offline';
-                showPopup("⚠ Mode offline - data tidak tersimpan", "red");
+                statusText.textContent = '';
+                showPopup("⚠ Mode offline aktif", "red");
             }
         });
 
@@ -589,11 +563,6 @@
                 if (!document.getElementById('absensi-kir-panel').classList.contains('hidden')) {
                     renderAbsensiKirPanel();
                 }
-                
-                // Update daftar nama absen jika panel absen terbuka
-                if (!document.getElementById('absen-panel').classList.contains('hidden') && !isLocked) {
-                    renderNamaList();
-                }
             });
         }
 
@@ -602,16 +571,12 @@
                 isLocked = snapshot.val() || false;
                 
                 if (!document.getElementById('absen-panel').classList.contains('hidden')) {
-                    const form = document.getElementById('formAbsen');
-                    const lockMsg = document.getElementById('lock-msg');
-                    if (form) form.classList.toggle('hidden', isLocked);
-                    if (lockMsg) lockMsg.classList.toggle('hidden', !isLocked);
-                    if (!isLocked) renderNamaList();
+                    document.getElementById('formAbsen').classList.toggle('hidden', isLocked);
+                    document.getElementById('lock-msg').classList.toggle('hidden', !isLocked);
                 }
                 
                 if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
-                    const btnLock = document.getElementById('btn-lock');
-                    if (btnLock) btnLock.innerText = isLocked ? "UNLOCK" : "LOCK";
+                    document.getElementById('btn-lock').innerText = isLocked ? "UNLOCK" : "LOCK";
                 }
             });
         }
@@ -627,7 +592,12 @@
                 return true;
             } catch (error) {
                 console.error('Error saving to Firebase:', error);
-                showPopup("⚠ Gagal menyimpan ke server", "red");
+                
+                const localData = JSON.parse(localStorage.getItem('sim_absen')) || [];
+                localData.push(absenData);
+                localStorage.setItem('sim_absen', JSON.stringify(localData));
+                
+                showPopup("⚠ Data disimpan lokal (offline)", "red");
                 return false;
             }
         }
@@ -673,35 +643,26 @@
             if(id === 'manage-admin-panel') renderAdminList();
             if(id === 'absensi-kir-panel') renderAbsensiKirPanel();
             if(id === 'absen-panel') { 
-                const form = document.getElementById('formAbsen');
-                const lockMsg = document.getElementById('lock-msg');
-                if (form) form.classList.toggle('hidden', isLocked);
-                if (lockMsg) lockMsg.classList.toggle('hidden', !isLocked);
+                document.getElementById('formAbsen').classList.toggle('hidden', isLocked);
+                document.getElementById('lock-msg').classList.toggle('hidden', !isLocked);
                 if(!isLocked) renderNamaList();
             }
         }
 
         function showPopup(txt, type) {
-            const p = document.getElementById('popup'); 
-            if (!p) return;
-            p.innerText = txt;
+            const p = document.getElementById('popup'); p.innerText = txt;
             p.className = `popup active pop-${type}`;
             setTimeout(() => p.classList.remove('active'), 2500);
         }
 
         function toggleIzinField() { 
-            const izinField = document.getElementById('izin-field');
-            const kehadiran = document.getElementById('kehadiran');
-            if (izinField && kehadiran) {
-                izinField.classList.toggle('hidden', kehadiran.value !== 'IZIN');
-            }
+            document.getElementById('izin-field').classList.toggle('hidden', document.getElementById('kehadiran').value !== 'IZIN'); 
         }
 
         function renderNamaList() {
             const container = document.getElementById('namaList');
-            if (!container) return;
-            
             const hariIni = new Date().toLocaleDateString('id-ID');
+            
             container.innerHTML = '';
             
             dataAnggota.forEach(anggota => {
@@ -723,11 +684,14 @@
         }
 
         function filterNamaList() {
-            const searchTerm = document.getElementById('searchNama')?.value.toLowerCase() || '';
+            const searchTerm = document.getElementById('searchNama').value.toLowerCase();
             const namaItems = document.querySelectorAll('.nama-item');
+            const hariIni = new Date().toLocaleDateString('id-ID');
             
             namaItems.forEach(item => {
-                const namaText = item.querySelector('div:first-child')?.textContent.toLowerCase() || '';
+                const namaText = item.querySelector('div:first-child').textContent.toLowerCase();
+                const sudahAbsen = dataAbsen.some(x => x.nama === item.querySelector('div:first-child').textContent && x.tanggal === hariIni);
+                
                 if (namaText.includes(searchTerm)) {
                     item.style.display = 'block';
                 } else {
@@ -737,10 +701,8 @@
         }
 
         function selectNama(anggota) {
-            const selectedNama = document.getElementById('selectedNama');
-            const selectedKelas = document.getElementById('selectedKelas');
-            if (selectedNama) selectedNama.value = anggota.nama;
-            if (selectedKelas) selectedKelas.value = anggota.kelas;
+            document.getElementById('selectedNama').value = anggota.nama;
+            document.getElementById('selectedKelas').value = anggota.kelas;
             
             document.querySelectorAll('.nama-item').forEach(item => {
                 item.classList.remove('selected');
@@ -748,88 +710,75 @@
             
             const items = document.querySelectorAll('.nama-item');
             items.forEach(item => {
-                const namaDiv = item.querySelector('div:first-child');
-                if (namaDiv && namaDiv.textContent === anggota.nama) {
+                if (item.querySelector('div:first-child').textContent === anggota.nama) {
                     item.classList.add('selected');
                 }
             });
             
-            const kehadiranSelect = document.getElementById('kehadiran');
-            if (kehadiranSelect) kehadiranSelect.focus();
+            document.getElementById('kehadiran').focus();
         }
 
-        async function prosesLogin() {
-            const u = document.getElementById('adm-user')?.value.trim() || '';
-            const p = document.getElementById('adm-pass')?.value.trim() || '';
-            
-            // Ambil data admin terbaru dari Firebase
-            const snapshot = await database.ref('admins').once('value');
-            const admins = snapshot.val() || [];
-            
-            const admin = admins.find(x => x.user === u);
-            
+        function prosesLogin() {
+            const u = document.getElementById('adm-user').value.trim();
+            const p = document.getElementById('adm-pass').value.trim();
+            const admin = listAdmin.find(x => x.user === u);
+            const passOk = listAdmin.find(x => x.pass === p);
+
             if (admin && admin.pass === p) {
                 currentAdmin = admin;
-                showPopup("✅ Login berhasil", admin.role === 'Owner' ? "gold" : "blue");
+                showPopup("✓", admin.role === 'Owner' ? "gold" : "blue");
                 
-                const ownerBtn = document.getElementById('owner-btn');
-                if (ownerBtn) ownerBtn.classList.toggle('hidden', admin.role !== 'Owner');
+                document.getElementById('owner-btn').classList.toggle('hidden', admin.role !== 'Owner');
                 
                 setTimeout(() => {
                     showPanel('admin-dashboard');
                     renderRekap();
                 }, 1000);
-            } else if (!admin) {
-                showPopup("❌ Akun Tidak Terdaftar", "red");
-            } else if (admin && admin.pass !== p) {
-                showPopup("❌ Password Salah", "red");
+            } else if (!admin && passOk) showPopup("Nama Salah", "red");
+            else if (admin && admin.pass !== p) showPopup("Password Salah", "red");
+            else showPopup("Akun Tidak Terdaftar", "red");
+        }
+
+        document.getElementById('formAbsen').onsubmit = async (e) => {
+            e.preventDefault();
+            const n = document.getElementById('selectedNama').value;
+            const k = document.getElementById('selectedKelas').value;
+            const h = document.getElementById('kehadiran').value;
+            const a = document.getElementById('alasan').value || "-";
+            const d = new Date().toLocaleDateString('id-ID');
+
+            if (!n || !k || !h) {
+                return showPopup("Pilih nama dan status kehadiran!", "red");
             }
-        }
 
-        // Event listener form absen
-        const formAbsen = document.getElementById('formAbsen');
-        if (formAbsen) {
-            formAbsen.onsubmit = async (e) => {
-                e.preventDefault();
-                const n = document.getElementById('selectedNama')?.value || '';
-                const k = document.getElementById('selectedKelas')?.value || '';
-                const h = document.getElementById('kehadiran')?.value || '';
-                const a = document.getElementById('alasan')?.value || '-';
-                const d = new Date().toLocaleDateString('id-ID');
+            if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
+                return showPopup("Sudah absen hari ini!", "red");
+            }
 
-                if (!n || !k || !h) {
-                    return showPopup("❌ Pilih nama dan status kehadiran!", "red");
-                }
-
-                if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
-                    return showPopup("❌ Sudah absen hari ini!", "red");
-                }
-
-                const absenData = { 
-                    id: Date.now(), 
-                    nama: n, 
-                    kelas: k, 
-                    kehadiran: h, 
-                    alasan: a, 
-                    tanggal: d,
-                    waktu: new Date().toLocaleTimeString('id-ID')
-                };
-                
-                const saved = await saveAbsenToFirebase(absenData);
-                
-                if (saved) {
-                    await kirimKeDiscord(absenData);
-                    showPopup("✅ Berhasil Absen!", "blue");
-                    if (formAbsen) formAbsen.reset();
-                    renderNamaList();
-                    setTimeout(() => showPanel('main-menu'), 1500);
-                } else {
-                    showPopup("⚠ Gagal menyimpan absen", "red");
-                }
+            const absenData = { 
+                id: Date.now(), 
+                nama: n, 
+                kelas: k, 
+                kehadiran: h, 
+                alasan: a, 
+                tanggal: d,
+                waktu: new Date().toLocaleTimeString('id-ID')
             };
-        }
+            
+            const saved = await saveAbsenToFirebase(absenData);
+            
+            if (saved) {
+                await kirimKeDiscord(absenData);
+            }
+            
+            showPopup("✓ Berhasil Absen", "blue");
+            document.getElementById('formAbsen').reset();
+            renderNamaList();
+            setTimeout(() => showPanel('main-menu'), 1500);
+        };
 
         async function kirimKeDiscord(data) {
+            const waktu = new Date().toLocaleTimeString('id-ID');
             const tanggal = new Date().toLocaleDateString('id-ID', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -848,7 +797,7 @@
                     { name: "📊 Status", value: data.kehadiran === 'HADIR' ? "✅ HADIR" : "🟡 IZIN", inline: true },
                     { name: "📝 Alasan", value: data.alasan || "-", inline: false }
                 ],
-                footer: { text: `Absensi pada ${tanggal} pukul ${data.waktu}` },
+                footer: { text: `Absensi pada ${tanggal} pukul ${waktu}` },
                 timestamp: new Date().toISOString()
             };
 
@@ -858,82 +807,86 @@
             };
 
             try {
-                await fetch(WEBHOOK_URL, {
+                const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+
+                if (response.ok) {
+                    document.getElementById('webhook-status').textContent = "Webhook: Terkirim ✓";
+                    setTimeout(() => {
+                        document.getElementById('webhook-status').textContent = "Webhook: Siap";
+                    }, 3000);
+                } else {
+                    document.getElementById('webhook-status').textContent = "Webhook: Gagal ✗";
+                }
             } catch (error) {
-                console.error('Webhook error:', error);
+                document.getElementById('webhook-status').textContent = "Webhook: Error";
             }
         }
 
         function renderRekap() {
             const list = document.getElementById('list-rekap');
-            if (!list) return;
             list.innerHTML = "";
             let h = 0, i = 0;
 
-            [...dataAbsen].reverse().forEach(item => {
+            dataAbsen.slice().reverse().forEach(item => {
                 if(item.kehadiran === "HADIR") h++; else i++;
                 const div = document.createElement('div');
                 div.className = `rekap-item ${item.kehadiran === 'HADIR' ? 'item-hadir' : 'item-izin'}`;
                 div.innerHTML = `
-                    <span>${item.nama} (${item.kelas}) - ${item.kehadiran === 'HADIR' ? '✅ HADIR' : '📝 IZIN: '+item.alasan}</span>
-                    <button onclick="hapusAbsen(${item.id})" style="background:none; border:none; color:#ff5555; cursor:pointer; font-size:1.2rem;">🗑️</button>
+                    <span>${item.nama} ${item.kelas} (${item.kehadiran === 'HADIR' ? 'HADIR' : 'IZIN: '+item.alasan})</span>
+                    <button onclick="hapusAbsen(${item.id})" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
                 `;
                 list.appendChild(div);
             });
 
-            const sHadir = document.getElementById('s-hadir');
-            const sIzin = document.getElementById('s-izin');
-            const sTotal = document.getElementById('s-total');
-            if (sHadir) sHadir.innerText = h;
-            if (sIzin) sIzin.innerText = i;
-            if (sTotal) sTotal.innerText = h + i;
+            document.getElementById('s-hadir').innerText = h;
+            document.getElementById('s-izin').innerText = i;
+            document.getElementById('s-total').innerText = h + i;
+            document.getElementById('btn-lock').innerText = isLocked ? "UNLOCK" : "LOCK";
         }
 
-        window.hapusAbsen = async function(id) { 
+        async function hapusAbsen(id) { 
             if (!confirm("Hapus absen ini?")) return;
             
             const success = await deleteAbsenFromFirebase(id);
             if (success) {
-                showPopup("✅ Absen dihapus", "blue");
+                showPopup("✓ Absen dihapus", "blue");
             } else {
                 showPopup("⚠ Gagal menghapus", "red");
             }
-        };
+        }
         
-        window.resetData = async function() { 
-            if(!confirm("⚠️ RESET SEMUA DATA ABSEN? Tindakan ini tidak dapat dibatalkan!")) return;
+        async function resetData() { 
+            if(!confirm("Reset semua data absen? Tindakan ini tidak dapat dibatalkan!")) return;
             
             const success = await resetFirebaseData();
             if (success) {
-                showPopup("✅ Semua data direset", "gold");
+                showPopup("✓ Semua data direset", "gold");
                 renderRekap();
-                if (!document.getElementById('absensi-kir-panel')?.classList.contains('hidden')) {
+                if (!document.getElementById('absensi-kir-panel').classList.contains('hidden')) {
                     renderAbsensiKirPanel();
                 }
             } else {
                 showPopup("⚠ Gagal mereset data", "red");
             }
-        };
+        }
         
-        window.toggleLock = async function() { 
+        async function toggleLock() { 
             const newLockStatus = !isLocked;
             const success = await updateLockStatus(newLockStatus);
             
             if (success) {
-                showPopup(newLockStatus ? "🔒 Absensi DITUTUP" : "🔓 Absensi DIBUKA", newLockStatus ? "red" : "green");
+                showPopup(newLockStatus ? "🔒 Absensi dikunci" : "🔓 Absensi dibuka", newLockStatus ? "red" : "green");
             } else {
-                showPopup("⚠ Gagal mengubah status", "red");
+                showPopup("⚠ Gagal mengubah status kunci", "red");
             }
-        };
+        }
 
         function renderAbsensiKirPanel() {
             const grid = document.getElementById('absensiGrid');
-            if (!grid) return;
-            
             const hariIni = new Date().toLocaleDateString('id-ID');
             let hadirCount = 0, izinCount = 0, belumCount = 0;
             
@@ -941,13 +894,16 @@
             
             dataAnggota.forEach(anggota => {
                 const absenHariIni = dataAbsen.find(x => x.nama === anggota.nama && x.tanggal === hariIni);
+                let status = 'belum';
                 let statusClass = 'belum';
                 
                 if (absenHariIni) {
                     if (absenHariIni.kehadiran === 'HADIR') {
+                        status = 'hadir';
                         statusClass = 'hadir';
                         hadirCount++;
                     } else if (absenHariIni.kehadiran === 'IZIN') {
+                        status = 'izin';
                         statusClass = 'izin';
                         izinCount++;
                     }
@@ -955,10 +911,8 @@
                     belumCount++;
                 }
                 
-                if (currentFilter !== 'all') {
-                    if (currentFilter === 'hadir' && statusClass !== 'hadir') return;
-                    if (currentFilter === 'izin' && statusClass !== 'izin') return;
-                    if (currentFilter === 'belum' && statusClass !== 'belum') return;
+                if (currentFilter !== 'all' && status !== currentFilter) {
+                    return;
                 }
                 
                 const card = document.createElement('div');
@@ -967,39 +921,31 @@
                     <div class="anggota-number">#${anggota.id}</div>
                     <div class="anggota-nama">${anggota.nama}</div>
                     <div class="anggota-kelas">${anggota.kelas}</div>
-                    ${absenHariIni && absenHariIni.alasan !== '-' ? `<div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.8;">📝 ${absenHariIni.alasan}</div>` : ''}
+                    ${absenHariIni && absenHariIni.alasan !== '-' ? `<div style="font-size: 0.7rem; margin-top: 5px; opacity: 0.8;">${absenHariIni.alasan}</div>` : ''}
                 `;
                 
                 grid.appendChild(card);
             });
             
-            const countHadir = document.getElementById('count-hadir');
-            const countIzin = document.getElementById('count-izin');
-            const countBelum = document.getElementById('count-belum');
-            const countTotal = document.getElementById('count-total');
-            
-            if (countHadir) countHadir.textContent = hadirCount;
-            if (countIzin) countIzin.textContent = izinCount;
-            if (countBelum) countBelum.textContent = belumCount;
-            if (countTotal) countTotal.textContent = dataAnggota.length;
-        }
-
-        window.filterAnggota = function(filter) {
-            currentFilter = filter;
-            renderAbsensiKirPanel();
+            document.getElementById('count-hadir').textContent = hadirCount;
+            document.getElementById('count-izin').textContent = izinCount;
+            document.getElementById('count-belum').textContent = belumCount;
+            document.getElementById('count-total').textContent = dataAnggota.length;
             
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            const activeBtn = document.querySelector(`.filter-btn.${filter}`);
-            if (activeBtn) activeBtn.classList.add('active');
-        };
+            document.querySelector(`.filter-btn.${currentFilter}`).classList.add('active');
+        }
+
+        function filterAnggota(filter) {
+            currentFilter = filter;
+            renderAbsensiKirPanel();
+        }
 
         function renderAdminList() {
             const list = document.getElementById('list-admin-manage');
-            if (!list) return;
-            
-            list.innerHTML = "<h3 style='margin-bottom:15px; font-size:1rem;'>📋 Daftar Admin Aktif</h3>";
+            list.innerHTML = "<h3 style='margin-bottom:15px; font-size:1rem;'>Daftar Admin Aktif</h3>";
             
             listAdmin.forEach((adm, index) => {
                 const div = document.createElement('div');
@@ -1008,73 +954,56 @@
                 
                 div.innerHTML = `
                     <div>
-                        <strong>${index + 1}. ${adm.user}</strong> 
-                        ${isOwner ? '<span style="color:var(--neon-gold)"> 👑 OWNER</span>' : '<span style="color:var(--neon-red)"> 🛡️ '+adm.job+'</span>'}
+                        <strong>${index + 1}. ${adm.user}</strong> (${adm.pass}) 
+                        ${isOwner ? '<span style="color:var(--neon-gold)">🜲 Owner</span>' : '<span style="color:var(--neon-red)">🛡️ '+adm.job+'</span>'}
                     </div>
-                    ${!isOwner ? `<button onclick="window.hapusAdmin('${adm.user}')" style="background:none; border:none; color:var(--neon-red); cursor:pointer; font-weight:bold; font-size:1.2rem;">🗑️</button>` : ''}
+                    ${!isOwner ? `<button onclick="hapusAdmin('${adm.user}')" style="background:none; border:none; color:var(--neon-red); cursor:pointer; font-weight:bold;">COPOT</button>` : ''}
                 `;
                 list.appendChild(div);
             });
         }
 
-        window.tambahAdmin = async function() {
-            const name = document.getElementById('new-adm-name')?.value.trim().toLowerCase() || '';
-            const pass = document.getElementById('new-adm-pass')?.value.trim() || '';
-            const job = document.getElementById('new-adm-job')?.value.trim() || '';
+        function tambahAdmin() {
+            const name = document.getElementById('new-adm-name').value.trim().toLowerCase();
+            const pass = document.getElementById('new-adm-pass').value.trim();
+            const job = document.getElementById('new-adm-job').value.trim();
 
-            if(!name || !pass || !job) return showPopup("❌ Lengkapi semua data!", "red");
-            if(listAdmin.some(x => x.user === name)) return showPopup("❌ Nama admin sudah ada!", "red");
+            if(!name || !pass || !job) return showPopup("Lengkapi Data!", "red");
+            if(listAdmin.some(x => x.user === name)) return showPopup("Nama sudah ada!", "red");
 
             listAdmin.push({user: name, pass: pass, role: "Admin", job: job});
-            const saved = await saveAdminToFirebase();
-            
-            if (saved) {
-                renderAdminList();
-                showPopup("✅ Admin berhasil ditambahkan (Real-time)!", "gold");
-                if (document.getElementById('new-adm-name')) document.getElementById('new-adm-name').value = "";
-                if (document.getElementById('new-adm-pass')) document.getElementById('new-adm-pass').value = "";
-                if (document.getElementById('new-adm-job')) document.getElementById('new-adm-job').value = "";
-            } else {
-                showPopup("⚠ Gagal menyimpan admin", "red");
-            }
-        };
+            localStorage.setItem('sim_admins', JSON.stringify(listAdmin));
+            renderAdminList();
+            showPopup("Admin Terdaftar!", "gold");
+            document.getElementById('new-adm-name').value = "";
+            document.getElementById('new-adm-pass').value = "";
+            document.getElementById('new-adm-job').value = "";
+        }
 
-        window.hapusAdmin = async function(username) {
+        function hapusAdmin(username) {
             if(confirm(`Yakin ingin mencopot ${username} dari jabatan Admin?`)) {
                 listAdmin = listAdmin.filter(x => x.user !== username);
-                const saved = await saveAdminToFirebase();
-                
-                if (saved) {
-                    renderAdminList();
-                    showPopup(`✅ Admin ${username} dicopot (Real-time)!`, "red");
-                } else {
-                    showPopup("⚠ Gagal menghapus admin", "red");
-                }
+                localStorage.setItem('sim_admins', JSON.stringify(listAdmin));
+                renderAdminList();
+                showPopup("Admin Dicopot!", "red");
             }
-        };
+        }
 
-        // Inisialisasi
         window.onload = function() {
             loadDataFromFirebase();
             loadLockStatus();
-            loadAdminFromFirebase(); // REAL-TIME ADMIN
             
             window.addEventListener('offline', () => {
                 showPopup("⚠ Anda sedang offline", "red");
             });
             
             window.addEventListener('online', () => {
-                showPopup("✅ Koneksi pulih", "blue");
+                showPopup("✓ Koneksi pulih", "blue");
             });
             
-            // Timeout fallback
             setTimeout(() => {
-                const loading = document.getElementById('loading-main');
-                const mainButtons = document.getElementById('main-buttons');
-                if (loading && mainButtons) {
-                    loading.classList.add('hidden');
-                    mainButtons.classList.remove('hidden');
-                }
+                document.getElementById('loading-main').classList.add('hidden');
+                document.getElementById('main-buttons').classList.remove('hidden');
             }, 5000);
         };
     </script>
