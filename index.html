@@ -402,7 +402,7 @@
 
     <script>
         // ============================================
-        // 🔥 KONFIGURASI FIREBASE - GANTI INI!
+        // 🔥 KONFIGURASI FIREBASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyA_NfvZGXjqPKZ7QvUujP-5t0-CKbwwuhM",
@@ -510,11 +510,22 @@
         let currentFilter = 'all';
         let isFirebaseConnected = false;
 
-        let listAdmin = JSON.parse(localStorage.getItem('sim_admins')) || [
+                let listAdmin = [
             {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"},
             {user: "alghazali", pass: "ketuakir2526", role: "Admin", job: "Admin"},
             {user: "frisca", pass: "sekrekir2526", role: "Admin", job: "Admin"}
         ];
+
+        // Membungkus localStorage dengan try-catch agar tidak crash di App Inventor
+        try {
+            let savedAdmin = localStorage.getItem('sim_admins');
+            if (savedAdmin) {
+                listAdmin = JSON.parse(savedAdmin);
+            }
+        } catch(e) {
+            console.warn("LocalStorage diblokir, menggunakan daftar admin default.");
+        }
+        
 
         // ============================================
         // FIREBASE FUNCTIONS
