@@ -636,7 +636,7 @@
                 
                 if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
                     const btnLock = document.getElementById('btn-lock');
-                    if (btnLock) btnLock.innerText = isLocked ? "UNLOCK" : "LOCK";
+                    if (btnLock) btnLock.innerText = isLocked ? "DIBUKA" : "DITUTUP";
                 }
             });
         }
@@ -947,13 +947,10 @@ if (formAbsen) {
     }
     
     try {
-        // Urutkan data dari yang terbaru
         const sortedData = [...dataAbsen].sort((a, b) => b.id - a.id);
         
-        // Header
         const headers = ["NO", "NAMA LENGKAP", "KELAS", "STATUS", "ALASAN IZIN", "WAKTU", "TANGGAL"];
         
-        // Buat baris data
         const rows = sortedData.map((item, index) => [
             index + 1,
             item.nama || "-",
@@ -964,25 +961,24 @@ if (formAbsen) {
             item.tanggal || "-"
         ]);
         
-        // Gabungkan header dan rows
         const worksheet = [headers, ...rows];
         
-        // Konversi ke CSV (TANPA BOM)
+        // Gunakan titik koma (;) sebagai pemisah agar kompatibel dengan Excel Indonesia
+        const delimiter = ";";
+        
         const csvContent = worksheet.map(row => 
             row.map(cell => {
                 const cellStr = String(cell);
-                // Escape koma dan quote
-                if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+                // Escape jika ada delimiter, quote, atau newline
+                if (cellStr.includes(delimiter) || cellStr.includes('"') || cellStr.includes('\n')) {
                     return `"${cellStr.replace(/"/g, '""')}"`;
                 }
                 return cellStr;
-            }).join(',')
+            }).join(delimiter)
         ).join('\n');
         
-        // Gunakan charset windows-1252 atau utf-8 tanpa BOM
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        
-        // Download
+        // Tambahkan BOM untuk UTF-8 (biar huruf Indonesia terbaca)
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         const now = new Date();
