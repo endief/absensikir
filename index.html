@@ -1078,12 +1078,12 @@ window.resetData = function() {
             
             if (saved) {
                 renderAdminList();
-                showPopup("Admin baru berhasil!", "gold");
+                showPopup("Pengelola baru ditambahkan!", "gold");
                 if (document.getElementById('new-adm-name')) document.getElementById('new-adm-name').value = "";
                 if (document.getElementById('new-adm-pass')) document.getElementById('new-adm-pass').value = "";
                 if (document.getElementById('new-adm-job')) document.getElementById('new-adm-job').value = "";
             } else {
-                showPopup("⚠ Gagal menyimpan admin", "red");
+                showPopup("⚠ Gagal menambahkan", "red");
             }
         };
         
