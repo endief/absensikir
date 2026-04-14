@@ -398,9 +398,7 @@
     </div>
 
     <script>
-        // ============================================
         // 🔥 KONFIGURASI FIREBASE
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyA_NfvZGXjqPKZ7QvUujP-5t0-CKbwwuhM",
             authDomain: "absensi-kir-sman-1-lemahabang.firebaseapp.com",
@@ -415,14 +413,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         
-        // ============================================
         // KONFIGURASI WEBHOOK DISCORD
-        // ============================================
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1465320189985034400/IvyI0B22t5RQ0sVqMPWHUcGrM-IDOHLA7_x2asjqMxJ3PfHCQdi91IBi6dmWfi1R1Cw3";
 
-        // ============================================
         // DATA ANGGOTA KIR
-        // ============================================
         const dataAnggota = [
             { id: 1, nama: "NADYA PUSPITASARI", kelas: "X1" },
             { id: 2, nama: "AZMY RIYADI", kelas: "X1" },
@@ -498,20 +492,15 @@
             { id: 72, nama: "SRI INDRIANI", kelas: "XIF10" }
         ];
 
-        // ============================================
         // VARIABEL GLOBAL
-        // ============================================
         let dataAbsen = [];
         let isLocked = false;
         let currentAdmin = null;
         let currentFilter = 'all';
         let isFirebaseConnected = false;
         let listAdmin = []; // Data admin dari Firebase
-
-        // ============================================
-        // FIREBASE FUNCTIONS - ADMIN (REAL-TIME)
-        // ============================================
         
+        // FIREBASE FUNCTIONS - ADMIN
         // Load data admin dari Firebase dengan real-time listener
         function loadAdminFromFirebase() {
             database.ref('admins').on('value', (snapshot) => {
@@ -519,11 +508,9 @@
                 if (data && Array.isArray(data) && data.length > 0) {
                     listAdmin = data;
                 } else {
-                    // Data awal jika kosong
+                    // Owner Absensi
                     listAdmin = [
-                        {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"},
-                        {user: "alghazali", pass: "ketuakir2526", role: "Admin", job: "Admin"},
-                        {user: "frisca", pass: "sekrekir2526", role: "Admin", job: "Admin"}
+                        {user: "nabil", pass: "adminkir2526", role: "Owner", job: "Owner"}
                     ];
                     saveAdminToFirebase(); // Simpan data awal ke Firebase
                 }
@@ -552,11 +539,8 @@
                 return false;
             }
         }
-
-        // ============================================
-        // FIREBASE FUNCTIONS - LAINNYA
-        // ============================================
         
+        // FIREBASE FUNCTIONS - LAINNYA
         database.ref('.info/connected').on('value', (snapshot) => {
             const connected = snapshot.val() === true;
             isFirebaseConnected = connected;
@@ -574,7 +558,7 @@
             } else {
                 indicator.className = 'sync-indicator offline';
                 statusText.textContent = '';
-                showPopup("⚠ Mode offline - data tidak tersimpan", "red");
+                showPopup("⚠ Tidak Terhubung", "red");
             }
         });
 
@@ -663,9 +647,7 @@
             }
         }
 
-        // ============================================
         // FUNGSI UTAMA
-        // ============================================
         function showPanel(id) {
             document.querySelectorAll('.container, .admin-panel').forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
@@ -806,7 +788,7 @@ if (formAbsen) {
             return showPopup("Pilih status kehadiran (HADIR/IZIN)!", "red");
         }
 
-        // ✅ VALIDASI KHUSUS IZIN: Alasan wajib diisi
+        // VALIDASI KHUSUS IZIN: Alasan wajib diisi
         if (h === 'IZIN') {
             if (!a || a === '') {
                 showPopup("Harap isi alasan izin terlebih dahulu!", "red");
