@@ -938,34 +938,6 @@ if (formAbsen) {
             if (sIzin) sIzin.innerText = i;
             if (sTotal) sTotal.innerText = h + i;
         }
-
-window.hapusAbsen = function(id) {
-    customConfirm('🗑️ Hapus data absen ini?', function(confirmed) {
-        if (confirmed) {
-            for (var i = 0; i < dataAbsen.length; i++) {
-                if (dataAbsen[i].id === id) {
-                    dataAbsen.splice(i, 1);
-                    break;
-                }
-            }
-            saveAbsen();
-            if (typeof renderRekap === 'function') renderRekap();
-            showPopup('Berhasil!', 'blue');
-        }
-    });
-};
-        
-window.resetData = function() {
-    customConfirm('⚠️ RESET SEMUA DATA ABSEN?', function(confirmed) {
-        if (confirmed) {
-            dataAbsen = [];
-            saveAbsen();
-            if (typeof renderRekap === 'function') renderRekap();
-            if (typeof renderAbsensiKirPanel === 'function') renderAbsensiKirPanel();
-            showPopup('Berhasil!', 'gold');
-        }
-    });
-};
         
         window.toggleLock = async function() { 
             const newLockStatus = !isLocked;
@@ -1087,18 +1059,33 @@ window.resetData = function() {
             }
         };
         
+// Ganti fungsi hapusAbsen
+window.hapusAbsen = function(id) {
+    customConfirm('🗑️ Hapus data absen ini?', function(confirmed) {
+        if (confirmed) {
+            const newData = dataAbsen.filter(x => x.id !== id);
+            database.ref('absen').set(newData);
+            showPopup('Absen dihapus!', 'blue');
+        }
+    });
+};
+
+// Ganti fungsi resetData
+window.resetData = function() {
+    customConfirm('⚠️ RESET SEMUA DATA ABSEN?', function(confirmed) {
+        if (confirmed) {
+            database.ref('absen').set([]);
+            showPopup('Semua data direset!', 'gold');
+        }
+    });
+};
+
+// Ganti fungsi hapusAdmin
 window.hapusAdmin = function(username) {
     customConfirm('🗑️ Yakin ingin mencopot ' + username + '?', function(confirmed) {
         if (confirmed) {
-            var newList = [];
-            for (var i = 0; i < listAdmin.length; i++) {
-                if (listAdmin[i].user !== username) {
-                    newList.push(listAdmin[i]);
-                }
-            }
-            listAdmin = newList;
-            if (typeof saveAdmins === 'function') saveAdmins();
-            if (typeof renderAdminList === 'function') renderAdminList();
+            listAdmin = listAdmin.filter(x => x.user !== username);
+            database.ref('admins').set(listAdmin);
             showPopup('Admin ' + username + ' dicopot!', 'red');
         }
     });
