@@ -399,14 +399,14 @@
         
         <div class="filter-buttons">
             <button class="filter-btn all active" onclick="filterAnggota('all')">Semua</button>
-            <button class="filter-btn hadir" onclick="filterAnggota('hadir')">Hadir ✓</button>
-            <button class="filter-btn izin" onclick="filterAnggota('izin')">Izin ✗</button>
+            <button class="filter-btn hadir" onclick="filterAnggota('hadir')">Hadir</button>
+            <button class="filter-btn izin" onclick="filterAnggota('izin')">Izin</button>
             <button class="filter-btn belum" onclick="filterAnggota('belum')">Belum Absen</button>
         </div>
         
         <div id="anggotaStats" style="margin-bottom: 15px; font-size: 0.9rem;">
-            <span style="color: var(--neon-green)">✓ Hadir: <span id="count-hadir">0</span></span> | 
-            <span style="color: var(--neon-red)">✗ Izin: <span id="count-izin">0</span></span> | 
+            <span style="color: var(--neon-green)"> Hadir: <span id="count-hadir">0</span></span> | 
+            <span style="color: var(--neon-red)"> Izin: <span id="count-izin">0</span></span> | 
             <span style="color: var(--neon-blue)">○ Belum: <span id="count-belum">0</span></span> |
             <span style="color: var(--neon-gold)">Total: <span id="count-total">0</span></span>
         </div>
@@ -416,10 +416,10 @@
 
     <div id="manage-admin-panel" class="admin-panel glass hidden">
         <span class="back-btn" onclick="showPanel('admin-dashboard')">← Kembali</span>
-        <h2 style="text-align: center; color: var(--neon-gold); margin-bottom: 20px;">PENGATURAN ADMIN 🜲</h2>
+        <h2 style="text-align: center; color: var(--neon-gold); margin-bottom: 20px;">PENGATURAN PENGELOLA</h2>
         
         <div class="glass" style="padding: 20px; margin-bottom: 20px;">
-            <h3 style="margin-bottom: 10px; font-size: 0.9rem;">Tambah Admin Baru</h3>
+            <h3 style="margin-bottom: 10px; font-size: 0.9rem;">Tambah Pengelola Baru</h3>
             <div style="display: flex; gap: 5px; flex-wrap: wrap;">
                 <input type="text" id="new-adm-name" placeholder="Nama" style="flex:1;">
                 <input type="text" id="new-adm-pass" placeholder="Password" style="flex:1;">
@@ -939,16 +939,21 @@ if (formAbsen) {
             if (sTotal) sTotal.innerText = h + i;
         }
 
-        window.hapusAbsen = async function(id) { 
-            if (!confirm("Hapus absen ini?")) return;
-            
-            const success = await deleteAbsenFromFirebase(id);
-            if (success) {
-                showPopup("Absen dihapus", "blue");
-            } else {
-                showPopup("⚠ Gagal menghapus", "red");
+window.hapusAbsen = function(id) {
+    customConfirm('🗑️ Hapus data absen ini?', function(confirmed) {
+        if (confirmed) {
+            for (var i = 0; i < dataAbsen.length; i++) {
+                if (dataAbsen[i].id === id) {
+                    dataAbsen.splice(i, 1);
+                    break;
+                }
             }
-        };
+            saveAbsen();
+            if (typeof renderRekap === 'function') renderRekap();
+            showPopup('Berhasil!', 'blue');
+        }
+    });
+};
         
 window.resetData = function() {
     customConfirm('⚠️ RESET SEMUA DATA ABSEN?', function(confirmed) {
@@ -957,7 +962,7 @@ window.resetData = function() {
             saveAbsen();
             if (typeof renderRekap === 'function') renderRekap();
             if (typeof renderAbsensiKirPanel === 'function') renderAbsensiKirPanel();
-            showPopup('Berhasil', 'gold');
+            showPopup('Berhasil!', 'gold');
         }
     });
 };
