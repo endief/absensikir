@@ -266,9 +266,48 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    padding: 30px;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90%;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+#confirmMessage {
+    font-size: 1.1rem;
+    color: var(--neon-gold);
+}
     </style>
 </head>
 <body>
+    
+<div id="confirmModal" class="modal hidden">
+    <div class="modal-content glass">
+        <p id="confirmMessage" style="font-size: 1.1rem; color: var(--neon-gold);">Apakah Anda yakin?</p>
+        <div style="display: flex; gap: 15px; margin-top: 25px; justify-content: center;">
+            <button id="confirmYes" class="main-btn btn-neon-red" style="margin:0; padding: 10px 25px; width: auto;">YA</button>
+            <button id="confirmNo" class="main-btn btn-neon-blue" style="margin:0; padding: 10px 25px; width: auto;">BATAL</button>
+        </div>
+    </div>
+</div>
 
     <div id="popup" class="popup"></div>
 
@@ -445,6 +484,7 @@
             { id: 25, nama: "HISAM MANSUR", kelas: "X7" },
             { id: 26, nama: "MUHAMMAD ARYA KARSA WIJAYA", kelas: "X8" },
             { id: 27, nama: "AJI RUKMANA", kelas: "X9" },
+            { id: 73, nama: "AHMAD IBNI IHSAN", kelas: "X9" },
             { id: 28, nama: "ILMIYAH MAHMUDA", kelas: "X9" },
             { id: 29, nama: "LOVELY ADINDA FUTRY", kelas: "X9" },
             { id: 30, nama: "CHINTIA PUTRI RAMADANI", kelas: "X9" },
@@ -910,20 +950,17 @@ if (formAbsen) {
             }
         };
         
-        window.resetData = async function() { 
-            if(!confirm("⚠️ RESET SEMUA DATA ABSEN?")) return;
-            
-            const success = await resetFirebaseData();
-            if (success) {
-                showPopup("Semua data direset", "gold");
-                renderRekap();
-                if (!document.getElementById('absensi-kir-panel')?.classList.contains('hidden')) {
-                    renderAbsensiKirPanel();
-                }
-            } else {
-                showPopup("⚠ Gagal mereset data", "red");
-            }
-        };
+window.resetData = function() {
+    customConfirm('⚠️ RESET SEMUA DATA ABSEN?', function(confirmed) {
+        if (confirmed) {
+            dataAbsen = [];
+            saveAbsen();
+            if (typeof renderRekap === 'function') renderRekap();
+            if (typeof renderAbsensiKirPanel === 'function') renderAbsensiKirPanel();
+            showPopup('Berhasil', 'gold');
+        }
+    });
+};
         
         window.toggleLock = async function() { 
             const newLockStatus = !isLocked;
@@ -1044,20 +1081,23 @@ if (formAbsen) {
                 showPopup("⚠ Gagal menyimpan admin", "red");
             }
         };
-
-        window.hapusAdmin = async function(username) {
-            if(confirm(`Yakin ingin mencopot ${username} dari jabatan Admin?`)) {
-                listAdmin = listAdmin.filter(x => x.user !== username);
-                const saved = await saveAdminToFirebase();
-                
-                if (saved) {
-                    renderAdminList();
-                    showPopup(`Admin ${username} telah dicopot!`, "red");
-                } else {
-                    showPopup("⚠ Gagal menghapus admin", "red");
+        
+window.hapusAdmin = function(username) {
+    customConfirm('🗑️ Yakin ingin mencopot ' + username + '?', function(confirmed) {
+        if (confirmed) {
+            var newList = [];
+            for (var i = 0; i < listAdmin.length; i++) {
+                if (listAdmin[i].user !== username) {
+                    newList.push(listAdmin[i]);
                 }
             }
-        };
+            listAdmin = newList;
+            if (typeof saveAdmins === 'function') saveAdmins();
+            if (typeof renderAdminList === 'function') renderAdminList();
+            showPopup('Admin ' + username + ' dicopot!', 'red');
+        }
+    });
+};
 
         // Inisialisasi
         window.onload = function() {
@@ -1083,6 +1123,31 @@ if (formAbsen) {
                 }
             }, 5000);
         };
+function customConfirm(message, callback) {
+    var modal = document.getElementById('confirmModal');
+    var msgElement = document.getElementById('confirmMessage');
+    var yesBtn = document.getElementById('confirmYes');
+    var noBtn = document.getElementById('confirmNo');
+    
+    msgElement.innerText = message;
+    modal.classList.remove('hidden');
+    
+    // Hapus event listener lama
+    var newYes = yesBtn.cloneNode(true);
+    var newNo = noBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYes, yesBtn);
+    noBtn.parentNode.replaceChild(newNo, noBtn);
+    
+    newYes.onclick = function() {
+        modal.classList.add('hidden');
+        callback(true);
+    };
+    
+    newNo.onclick = function() {
+        modal.classList.add('hidden');
+        callback(false);
+    };
+        }
     </script>
 </body>
 </html>
