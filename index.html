@@ -287,7 +287,7 @@
     <div id="absen-panel" class="container glass hidden">
         <span class="back-btn" onclick="showPanel('main-menu')">←</span>
         <h2>FORM ABSENSI</h2>
-        <div id="lock-msg" class="hidden" style="color: var(--neon-red); margin: 20px 0; font-weight: bold;">ABSENSI DITUTUP ADMIN</div>
+        <div id="lock-msg" class="hidden" style="color: var(--neon-red); margin: 20px 0; font-weight: bold;">ABSENSI DITUTUP</div>
         <form id="formAbsen">
             <div class="form-group">
                 <label>Cari Nama</label>
@@ -627,7 +627,7 @@
                 return true;
             } catch (error) {
                 console.error('Error saving to Firebase:', error);
-                showPopup("⚠ Gagal menyimpan ke server", "red");
+                showPopup("⚠ Absen Gagal", "red");
                 return false;
             }
         }
@@ -824,7 +824,7 @@
                     renderNamaList();
                     setTimeout(() => showPanel('main-menu'), 1500);
                 } else {
-                    showPopup("⚠ Gagal menyimpan absen", "red");
+                    showPopup("⚠ Absen Gagal", "red");
                 }
             };
         }
@@ -905,7 +905,7 @@
         };
         
         window.resetData = async function() { 
-            if(!confirm("⚠️ RESET SEMUA DATA ABSEN? Tindakan ini tidak dapat dibatalkan!")) return;
+            if(!confirm("⚠️ RESET SEMUA DATA ABSEN?")) return;
             
             const success = await resetFirebaseData();
             if (success) {
