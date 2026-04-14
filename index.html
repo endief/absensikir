@@ -853,6 +853,7 @@ if (formAbsen) {
         }
     };
 }
+            async function kirimKeDiscord(data) {
             const tanggal = new Date().toLocaleDateString('id-ID', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -876,7 +877,7 @@ if (formAbsen) {
             };
 
             const payload = {
-                content: "**🔔 ABSENSI BARU!**",
+                content: "**🔔 ADA YANG BARU ABSEN NIH!**",
                 embeds: [embed]
             };
 
