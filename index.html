@@ -785,51 +785,74 @@
                 showPopup("Password Salah", "red");
             }
         }
+          // Event listener form absen
+const formAbsen = document.getElementById('formAbsen');
+if (formAbsen) {
+    formAbsen.onsubmit = async (e) => {
+        e.preventDefault();
+        const n = document.getElementById('selectedNama')?.value || '';
+        const k = document.getElementById('selectedKelas')?.value || '';
+        const h = document.getElementById('kehadiran')?.value || '';
+        const a = document.getElementById('alasan')?.value.trim() || '';
+        const d = new Date().toLocaleDateString('id-ID');
 
-        // Event listener form absen
-        const formAbsen = document.getElementById('formAbsen');
-        if (formAbsen) {
-            formAbsen.onsubmit = async (e) => {
-                e.preventDefault();
-                const n = document.getElementById('selectedNama')?.value || '';
-                const k = document.getElementById('selectedKelas')?.value || '';
-                const h = document.getElementById('kehadiran')?.value || '';
-                const a = document.getElementById('alasan')?.value || '-';
-                const d = new Date().toLocaleDateString('id-ID');
-
-                if (!n || !k || !h) {
-                    return showPopup("Pilih nama dan status kehadiran!", "red");
-                }
-
-                if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
-                    return showPopup("Sudah absen hari ini!", "red");
-                }
-
-                const absenData = { 
-                    id: Date.now(), 
-                    nama: n, 
-                    kelas: k, 
-                    kehadiran: h, 
-                    alasan: a, 
-                    tanggal: d,
-                    waktu: new Date().toLocaleTimeString('id-ID')
-                };
-                
-                const saved = await saveAbsenToFirebase(absenData);
-                
-                if (saved) {
-                    await kirimKeDiscord(absenData);
-                    showPopup("Berhasil Absen!", "blue");
-                    if (formAbsen) formAbsen.reset();
-                    renderNamaList();
-                    setTimeout(() => showPanel('main-menu'), 1500);
-                } else {
-                    showPopup("⚠ Absen Gagal", "red");
-                }
-            };
+        // Validasi nama dan kelas
+        if (!n || !k) {
+            return showPopup("Silakan pilih nama terlebih dahulu!", "red");
         }
 
-        async function kirimKeDiscord(data) {
+        // Validasi status kehadiran
+        if (!h) {
+            return showPopup("Pilih status kehadiran (HADIR/IZIN)!", "red");
+        }
+
+        // ✅ VALIDASI KHUSUS IZIN: Alasan wajib diisi
+        if (h === 'IZIN') {
+            if (!a || a === '') {
+                showPopup("Harap isi alasan izin terlebih dahulu!", "red");
+                document.getElementById('alasan').focus();
+                return false;
+            }
+            // Minimal 3 karakter untuk alasan yang valid
+            if (a.length < 3) {
+                showPopup("Alasan izin terlalu pendek!", "red");
+                document.getElementById('alasan').focus();
+                return false;
+            }
+        }
+
+        // Cek apakah sudah absen hari ini
+        if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) {
+            return showPopup("Sudah absen!", "red");
+        }
+
+        const absenData = { 
+            id: Date.now(), 
+            nama: n, 
+            kelas: k, 
+            kehadiran: h, 
+            alasan: a || '-', 
+            tanggal: d,
+            waktu: new Date().toLocaleTimeString('id-ID')
+        };
+        
+        const saved = await saveAbsenToFirebase(absenData);
+        
+        if (saved) {
+            await kirimKeDiscord(absenData);
+            showPopup("Berhasil Absen!", "blue");
+            if (formAbsen) formAbsen.reset();
+            // Reset field izin
+            document.getElementById('izin-field').classList.add('hidden');
+            document.getElementById('kehadiran').value = '';
+            document.getElementById('alasan').value = '';
+            renderNamaList();
+            setTimeout(() => showPanel('main-menu'), 1500);
+        } else {
+            showPopup("⚠ Gagal menyimpan absen", "red");
+        }
+    };
+}
             const tanggal = new Date().toLocaleDateString('id-ID', { 
                 weekday: 'long', 
                 year: 'numeric', 
