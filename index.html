@@ -991,7 +991,7 @@ if (formAbsen) {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
         
-        showPopup(`Berhasil mengekspor ${dataAbsen.length} data!`, "gold");
+        showPopup(`Berhasil mengekspor data absensi!`, "gold");
         
     } catch (error) {
         console.error("Error:", error);
@@ -1201,73 +1201,6 @@ function customConfirm(message, callback) {
     };
         }
         
-// EXPORT KE EXCEL
-function exportToExcel() {
-    if (!dataAbsen || dataAbsen.length === 0) {
-        showPopup("⚠ Tidak ada data untuk diekspor!", "red");
-        return;
-    }
-    
-    // Urutkan data dari yang terbaru ke terlama
-    const sortedData = [...dataAbsen].sort((a, b) => b.id - a.id);
-    
-    // Buat header untuk Excel (urutan baru)
-    const headers = [
-        "NO", 
-        "NAMA LENGKAP", 
-        "KELAS", 
-        "STATUS", 
-        "ALASAN IZIN", 
-        "WAKTU", 
-        "TANGGAL"
-    ];
-    
-    // Buat baris data
-    const rows = sortedData.map((item, index) => [
-        index + 1,
-        item.nama || "-",
-        item.kelas || "-",
-        item.kehadiran || "-",
-        item.kehadiran === "IZIN" ? (item.alasan || "-") : "-",
-        item.waktu || "-",
-        item.tanggal || "-"
-    ]);
-    
-    // Gabungkan header dan rows
-    const worksheet = [headers, ...rows];
-    
-    // Konversi ke format CSV
-    const csvContent = worksheet.map(row => 
-        row.map(cell => {
-            const cellStr = String(cell);
-            if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
-                return `"${cellStr.replace(/"/g, '""')}"`;
-            }
-            return cellStr;
-        }).join(',')
-    ).join('\n');
-    
-    // Tambahkan BOM untuk UTF-8
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    
-    // Buat link download
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    
-    // Nama file dengan tanggal
-    const now = new Date();
-    const fileName = `Absensi_KIR_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}.csv`;
-    
-    link.setAttribute("href", url);
-    link.setAttribute("download", fileName);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    showPopup(`Berhasil mengekspor ${dataAbsen.length} data!`, "gold");
-}
     </script>
 </body>
 </html>
