@@ -292,7 +292,7 @@
     </div>
 
     <script>
-        // FUNGSI POP-UP KEHADIRAN BARU
+        
         function bukaPopUpKehadiran() {
             document.getElementById('popupKehadiran').classList.add('aktif');
         }
@@ -308,7 +308,6 @@
             selectEl.value = status;
             btnTampil.innerText = status;
             
-            // Warna tombol pop up: HADIR (Blue), IZIN (Red)
             const warna = (status === 'HADIR') ? 'var(--neon-blue)' : 'var(--neon-red)';
             btnTampil.style.color = warna;
             btnTampil.style.borderColor = warna;
@@ -355,7 +354,7 @@
             { id: 34, nama: "FARAH AISHA ADITYA", kelas: "X10" }, { id: 35, nama: "NUR SHIHA", kelas: "X10" },
             { id: 36, nama: "MORENO PRASETIO", kelas: "X10" }, { id: 37, nama: "SALSA KAMILA", kelas: "XIF1" },
             { id: 38, nama: "ANGELINA NOVIYANTI", kelas: "XIF2" }, { id: 39, nama: "DARA KHEISYA", kelas: "XIF2" },
-            { id: 40, nama: "RIZKY GHOIN GHOZALI MAKHROM", kelas: "XIF2" }, { id: 41, nama: "RATIH AMANAH RAHMADANI", kelas: "XIF3" },
+            { id: 40, nama: "RIZKY KU GHOIN GHOZALI MAKHROM", kelas: "XIF2" }, { id: 41, nama: "RATIH AMANAH RAHMADANI", kelas: "XIF3" },
             { id: 42, nama: "ABDUL HALIM ATHILLAH R.", kelas: "XIF4" }, { id: 43, nama: "NI'MATUL AULIA", kelas: "XIF4" },
             { id: 44, nama: "NAJWA PRAMESWARI", kelas: "XIF4" }, { id: 45, nama: "RAYSHA AURA WIGHUNA", kelas: "XIF5" },
             { id: 46, nama: "ALMAURA ADISTI", kelas: "XIF5" }, { id: 47, nama: "MUTIARA MAULIDINA M.", kelas: "XIF5" },
@@ -373,11 +372,9 @@
             { id: 70, nama: "AHMAD AL-GHAZALI", kelas: "XIF9" }, { id: 71, nama: "SELASIH JULIA PUTRI FERNANDA", kelas: "XIF10" },
             { id: 72, nama: "SRI INDRIANI", kelas: "XIF10" }
         ];
-
-        // VARIABEL GLOBAL
+        
         let dataAbsen = [], isLocked = false, currentAdmin = null, currentFilter = 'all', isFirebaseConnected = false, listAdmin = [];
         
-        // FIREBASE FUNCTIONS
         function loadAdminFromFirebase() {
             database.ref('admins').on('value', (snapshot) => {
                 const data = snapshot.val();
