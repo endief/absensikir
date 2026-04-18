@@ -174,14 +174,84 @@
             <input type="hidden" id="selectedNama" required>
             <input type="hidden" id="selectedKelas" required>
             
-            <div class="form-group">
-                <label>Kehadiran</label>
-                <select id="kehadiran" onchange="toggleIzinField()" required>
-                    <option value="">PILIH STATUS</option>
-                    <option value="HADIR">HADIR</option>
-                    <option value="IZIN">IZIN</option>
-                </select>
-            </div>
+            <style>
+    /* Animasi pop-up yang lebih santai (smooth fade & slight slide) */
+    #popupKehadiran {
+        position: fixed; 
+        top: 50%; 
+        left: 50%;
+        /* Mulai sedikit dari bawah titik tengah layar */
+        transform: translate(-50%, -40%); 
+        opacity: 0;
+        visibility: hidden;
+        
+        padding: 30px; 
+        border-radius: 15px; 
+        z-index: 10000; 
+        backdrop-filter: blur(20px); 
+        background: var(--bg-color); 
+        /* Tema Pop-up diubah jadi Gold */
+        border: 2px solid var(--neon-gold); 
+        box-shadow: 0 0 30px var(--neon-gold); 
+        text-align: center; 
+        min-width: 280px;
+        
+        /* Transisi santai, persis seperti efek perpindahan menu bawaan Anda */
+        transition: all 0.4s ease;
+    }
+
+    #popupKehadiran.muncul {
+        transform: translate(-50%, -50%)
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
+
+<div class="form-group">
+    <label style="color: var(--neon-blue);">Kehadiran</label>
+    <div id="btnPilihStatus" class="main-btn" style="border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; padding: 12px; border-radius: 12px; text-align: left; cursor: pointer; text-transform: none; font-weight: normal; font-size: 1rem;" onclick="bukaPopUpKehadiran()">
+        PILIH STATUS ▾
+    </div>
+    
+    <select id="kehadiran" onchange="toggleIzinField()" required style="display: none;">
+        <option value="">PILIH STATUS</option>
+        <option value="HADIR">HADIR</option>
+        <option value="IZIN">IZIN</option>
+    </select>
+</div>
+
+<div id="popupKehadiran">
+    <h3 style="color: var(--neon-blue); margin-bottom: 20px;">STATUS KEHADIRAN</h3>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        <button type="button" class="main-btn btn-neon-blue" onclick="setKehadiranPopUp('HADIR')" style="margin: 0;">HADIR</button>
+        <button type="button" class="main-btn btn-neon-red" onclick="setKehadiranPopUp('IZIN')" style="margin: 0;">IZIN</button>
+        <button type="button" style="margin-top: 10px; background: transparent; color: var(--text-color); border: none; cursor: pointer; opacity: 0.7;" onclick="tutupPopUpKehadiran()">Batal</button>
+    </div>
+</div>
+
+<script>
+    function bukaPopUpKehadiran() {
+        document.getElementById('popupKehadiran').classList.add('muncul');
+    }
+
+    function tutupPopUpKehadiran() {
+        document.getElementById('popupKehadiran').classList.remove('muncul');
+    }
+
+    function setKehadiranPopUp(status) {
+        const selectEl = document.getElementById('kehadiran');
+        const btnTampil = document.getElementById('btnPilihStatus');
+        
+        selectEl.value = status;
+        btnTampil.innerText = status;
+        btnTampil.style.color = status === 'HADIR' ? 'var(--neon-blue)' : 'var(--neon-red)';
+        btnTampil.style.borderColor = status === 'HADIR' ? 'var(--neon-blue)' : 'var(--neon-red)';
+        btnTampil.style.boxShadow = status === 'HADIR' ? '0 0 10px var(--neon-blue)' : '0 0 10px var(--neon-red)';
+        
+        tutupPopUpKehadiran();
+        toggleIzinField();
+    }
+</script>
             
             <div id="izin-field" class="form-group hidden">
                 <label>Alasan Izin</label>
