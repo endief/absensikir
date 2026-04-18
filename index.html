@@ -633,7 +633,7 @@
         
         window.toggleLock = async function() { 
             const success = await updateLockStatus(!isLocked);
-            showPopup(success ? (!isLocked ? "🔒 Absensi DITUTUP" : "🔓 Absensi DIBUKA") : "⚠ Gagal mengubah status", success ? (!isLocked ? "red" : "blue") : "red");
+            showPopup(success ? (!isLocked ? "🔓 Absensi DIBUKA" : "🔒 Absensi DITUTUP") : "⚠ Gagal mengubah status", success ? (!isLocked ? "red" : "blue") : "red");
         };
 
         function renderAbsensiKirPanel() {
