@@ -175,12 +175,11 @@
             <input type="hidden" id="selectedKelas" required>
             
             <style>
-    /* Animasi pop-up yang lebih santai (smooth fade & slight slide) */
     #popupKehadiran {
         position: fixed; 
         top: 50%; 
         left: 50%;
-        /* Mulai sedikit dari bawah titik tengah layar */
+        
         transform: translate(-50%, -40%); 
         opacity: 0;
         visibility: hidden;
@@ -190,13 +189,12 @@
         z-index: 10000; 
         backdrop-filter: blur(20px); 
         background: var(--bg-color); 
-        /* Tema Pop-up diubah jadi Gold */
-        border: 2px solid var(--neon-gold); 
-        box-shadow: 0 0 30px var(--neon-gold); 
+        
+        border: 2px solid var(--neon-blue); 
+        box-shadow: 0 0 30px var(--neon-blue); 
         text-align: center; 
         min-width: 280px;
         
-        /* Transisi santai, persis seperti efek perpindahan menu bawaan Anda */
         transition: all 0.4s ease;
     }
 
