@@ -118,8 +118,6 @@
         .sync-indicator.online { background-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
         .sync-indicator.offline { background-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Animasi masuk santai untuk pop up kehadiran */
         @keyframes masukSantai {
             from { opacity: 0; transform: translate(-50%, -45%); }
             to { opacity: 1; transform: translate(-50%, -50%); }
@@ -163,20 +161,24 @@
     <div id="popup" class="popup"></div>
 
     <div id="main-menu" class="container glass">
-        <h1>KELOMPOK ILMIAH REMAJA</h1>
-        <p class="subtitle">SMAN 1 LEMAHABANG</p>
+        <h1>ABSENSI DIGITAL KELOMPOK ILMIAH REMAJA</h1>
+        <p class="subtitle"><strong>SMA NEGERI 1 LEMAHABANG</strong><br>KABUPATEN CIREBON<br></p>
         <div id="loading-main" class="loading">
             <div class="sync-indicator offline"></div> Menghubungkan...
         </div>
-        <div id="main-buttons" class="hidden">
+                <div id="main-buttons" class="hidden">
             <button class="main-btn btn-neon-blue" onclick="showPanel('absen-panel')">ABSEN</button>
             <button class="main-btn btn-neon-red" onclick="showPanel('login-panel')">PENGELOLA</button>
+            
+            <a href="https://sites.google.com/view/kirsmansala/lct-mipa-2026" target="_blank" style="display: block; margin-top: 15px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); text-decoration: none; cursor: pointer;">
+                Website kir?
+            </a>
         </div>
-    </div>
+
 
     <div id="absen-panel" class="container glass hidden">
-        <span class="back-btn" onclick="showPanel('main-menu')">←</span>
-        <h2>FORM ABSENSI</h2>
+        <span class="back-btn" onclick="showPanel('main-menu')">← Kembali</span>
+        <h2>FORUM ABSENSI KIR</h2>
         <div id="lock-msg" class="hidden" style="color: var(--neon-red); margin: 20px 0; font-weight: bold;">ABSENSI DITUTUP</div>
         <form id="formAbsen">
             <div class="form-group">
@@ -219,8 +221,8 @@
     </div>
 
     <div id="login-panel" class="container glass hidden">
-        <span class="back-btn" onclick="showPanel('main-menu')">←</span>
-        <h2>LOGIN</h2>
+        <span class="back-btn" onclick="showPanel('main-menu')">← Kembali</span>
+        <h2>AKSES PENGELOLA</h2>
         <div class="form-group"><label>Nama</label><input type="text" id="adm-user"></div>
         <div class="form-group"><label>Password</label><input type="password" id="adm-pass"></div>
         <button onclick="prosesLogin()" class="main-btn btn-neon-red">MASUK</button>
@@ -237,7 +239,7 @@
         </div>
 
         <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            <button id="owner-btn" class="main-btn btn-neon-gold hidden" onclick="showPanel('manage-admin-panel')" style="margin:0; flex:1;">KELOLA ADMIN</button>
+            <button id="owner-btn" class="main-btn btn-neon-gold hidden" onclick="showPanel('manage-admin-panel')" style="margin:0; flex:1;">AKSES PENGELOLA</button>
             <button class="main-btn btn-neon-blue" onclick="showPanel('absensi-kir-panel')" style="margin:0; flex:1;">ABSENSI KIR</button>
             <button class="main-btn btn-neon-red" onclick="toggleLock()" id="btn-lock" style="margin:0; flex:1;">LOCK</button>
             <button class="main-btn btn-neon-blue" onclick="exportToExcel()" style="margin:0; flex:1;">EXPORT EXCEL</button>
@@ -271,7 +273,7 @@
 
     <div id="manage-admin-panel" class="admin-panel glass hidden">
         <span class="back-btn" onclick="showPanel('admin-dashboard')">← Kembali</span>
-        <h2 style="text-align: center; color: var(--neon-gold); margin-bottom: 20px;">PENGATURAN PENGELOLA</h2>
+        <h2 style="text-align: center; color: var(--neon-gold); margin-bottom: 20px;">DAFTAR PENGELOLA</h2>
         
         <div class="glass" style="padding: 20px; margin-bottom: 20px;">
             <h3 style="margin-bottom: 10px; font-size: 0.9rem;">Tambah Pengelola Baru</h3>
@@ -327,7 +329,7 @@
             messagingSenderId: "434762674944",
             appId: "1:434762674944:web:1760788b3f67ff9646f9e5"
         };
-
+        
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1465320189985034400/IvyI0B22t5RQ0sVqMPWHUcGrM-IDOHLA7_x2asjqMxJ3PfHCQdi91IBi6dmWfi1R1Cw3";
@@ -731,8 +733,7 @@
         function customConfirm(message, callback) {
             const modal = document.getElementById('confirmModal');
             document.getElementById('confirmMessage').innerText = message;
-            
-            // Hapus class hidden agar pop up konfirmasi muncul
+        
             modal.classList.remove('hidden');
             
             const handleConfirm = (res) => {
