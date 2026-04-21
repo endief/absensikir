@@ -217,7 +217,7 @@
             </div>
 
                         <div id="kamera-container" class="form-group hidden">
-                <label style="color: var(--neon-blue);">Bukti Hadir (Live Selfie)</label>
+                <label style="color: var(--neon-blue);">Bukti Hadir (Foto Selfie)</label>
                 
                 <video id="videoSelfie" autoplay playsinline style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-blue); display: none; margin-bottom: 10px;"></video>
                 <canvas id="canvasSelfie" style="display: none;"></canvas>
@@ -335,12 +335,11 @@
             tutupPopUpKehadiran();
             toggleIzinField();
 
-            // LOGIKA BARU: Munculkan kamera jika Hadir, Sembunyikan jika Izin
             if (status === 'HADIR') {
                 kameraContainer.classList.remove('hidden');
             } else {
                 kameraContainer.classList.add('hidden');
-                matikanKamera(); // Matikan kamera jika ganti ke Izin
+                matikanKamera();
                 document.getElementById('fotoBase64').value = ''; 
             }
         }
@@ -526,7 +525,6 @@
             document.querySelectorAll('.nama-item').forEach(item => {
                 item.classList.toggle('selected', item.querySelector('div')?.textContent === anggota.nama);
             });
-            // Fokus otomatis ke kotak pilihan kehadiran custom
             document.getElementById('btnPilihStatus')?.scrollIntoView({behavior: "smooth", block: "center"});
         }
 
@@ -544,7 +542,7 @@
                 document.getElementById('btnAmbilFoto').classList.remove('hidden');
                 document.getElementById('hasilSelfie').style.display = 'none';
             } catch (err) {
-                showPopup("⚠ Akses kamera ditolak/tidak tersedia!", "red");
+                showPopup("⚠ Akses kamera ditolak!", "red");
             }
         }
 
@@ -554,24 +552,21 @@
             const img = document.getElementById('hasilSelfie');
             const inputBase64 = document.getElementById('fotoBase64');
 
-            // Menggambar frame video ke dalam canvas
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Konversi gambar ke Base64 (kualitas 80%)
             const base64Data = canvas.toDataURL('image/jpeg', 0.8); 
             inputBase64.value = base64Data;
             img.src = base64Data;
 
-            // Sembunyikan video live, tampilkan hasil jepretan
             video.style.display = 'none';
             img.style.display = 'block';
             
             document.getElementById('btnAmbilFoto').classList.add('hidden');
             document.getElementById('btnUlangFoto').classList.remove('hidden');
             
-            matikanKamera(); // Matikan lampu kamera setelah memotret
+            matikanKamera(); 
         }
 
         function ulangFoto() {
@@ -587,7 +582,6 @@
             }
         }
         
-        // Fungsi pembantu untuk mengubah base64 menjadi File/Blob agar bisa dikirim ke Discord
         function dataURItoBlob(dataURI) {
             let byteString = atob(dataURI.split(',')[1]);
             let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -614,7 +608,6 @@
             }
         }
 
-        // Event listener form absen
                 const formAbsen = document.getElementById('formAbsen');
         if (formAbsen) {
             formAbsen.onsubmit = async (e) => {
@@ -684,11 +677,10 @@
 
             const formData = new FormData();
             
-            // Jika ada foto, jadikan file dan lampirkan ke webhook discord
             if (fotoBase64) {
                 const blob = dataURItoBlob(fotoBase64);
                 formData.append('file', blob, 'bukti_hadir.jpg');
-                embed.image = { url: "attachment://bukti_hadir.jpg" }; // Menampilkan foto di dalam Embed
+                embed.image = { url: "attachment://bukti_hadir.jpg" };
             }
 
             formData.append('payload_json', JSON.stringify({
@@ -697,7 +689,7 @@
             }));
 
             try {
-                // Jangan gunakan Content-Type header jika memakai FormData, biarkan browser mengaturnya otomatis
+                
                 await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     body: formData
