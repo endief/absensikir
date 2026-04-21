@@ -215,6 +215,22 @@
                 <label>Alasan Izin</label>
                 <input type="text" id="alasan" placeholder="Masukkan alasan izin...">
             </div>
+
+                        <div id="kamera-container" class="form-group hidden">
+                <label style="color: var(--neon-blue);">Bukti Hadir (Live Selfie)</label>
+                
+                <video id="videoSelfie" autoplay playsinline style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-blue); display: none; margin-bottom: 10px;"></video>
+                <canvas id="canvasSelfie" style="display: none;"></canvas>
+                <img id="hasilSelfie" style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-green); display: none; margin-bottom: 10px;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="btnBukaKamera" class="main-btn btn-neon-blue" onclick="bukaKamera()" style="margin: 0; padding: 10px; font-size: 0.85rem;">Buka Kamera</button>
+                    <button type="button" id="btnAmbilFoto" class="main-btn btn-neon-green hidden" onclick="ambilFoto()" style="margin: 0; padding: 10px; font-size: 0.85rem;">Ambil Foto</button>
+                    <button type="button" id="btnUlangFoto" class="main-btn btn-neon-red hidden" onclick="ulangFoto()" style="margin: 0; padding: 10px; font-size: 0.85rem;">Foto Ulang</button>
+                </div>
+                
+                <input type="hidden" id="fotoBase64">
+                        </div>
             
             <button type="submit" class="main-btn btn-neon-blue">KIRIM ABSEN</button>
         </form>
@@ -303,9 +319,10 @@
             document.getElementById('popupKehadiran').classList.remove('aktif');
         }
 
-        function setKehadiranPopUp(status) {
+                function setKehadiranPopUp(status) {
             const selectEl = document.getElementById('kehadiran');
             const btnTampil = document.getElementById('btnPilihStatus');
+            const kameraContainer = document.getElementById('kamera-container');
             
             selectEl.value = status;
             btnTampil.innerText = status;
@@ -317,6 +334,15 @@
             
             tutupPopUpKehadiran();
             toggleIzinField();
+
+            // LOGIKA BARU: Munculkan kamera jika Hadir, Sembunyikan jika Izin
+            if (status === 'HADIR') {
+                kameraContainer.classList.remove('hidden');
+            } else {
+                kameraContainer.classList.add('hidden');
+                matikanKamera(); // Matikan kamera jika ganti ke Izin
+                document.getElementById('fotoBase64').value = ''; 
+            }
         }
 
         // 🔥 KONFIGURASI FIREBASE
@@ -504,6 +530,74 @@
             document.getElementById('btnPilihStatus')?.scrollIntoView({behavior: "smooth", block: "center"});
         }
 
+                let streamKamera = null;
+
+        async function bukaKamera() {
+            try {
+                // Meminta akses kamera depan (user)
+                streamKamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                const video = document.getElementById('videoSelfie');
+                video.srcObject = streamKamera;
+                video.style.display = 'block';
+                
+                document.getElementById('btnBukaKamera').classList.add('hidden');
+                document.getElementById('btnAmbilFoto').classList.remove('hidden');
+                document.getElementById('hasilSelfie').style.display = 'none';
+            } catch (err) {
+                showPopup("⚠ Akses kamera ditolak/tidak tersedia!", "red");
+            }
+        }
+
+        function ambilFoto() {
+            const video = document.getElementById('videoSelfie');
+            const canvas = document.getElementById('canvasSelfie');
+            const img = document.getElementById('hasilSelfie');
+            const inputBase64 = document.getElementById('fotoBase64');
+
+            // Menggambar frame video ke dalam canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Konversi gambar ke Base64 (kualitas 80%)
+            const base64Data = canvas.toDataURL('image/jpeg', 0.8); 
+            inputBase64.value = base64Data;
+            img.src = base64Data;
+
+            // Sembunyikan video live, tampilkan hasil jepretan
+            video.style.display = 'none';
+            img.style.display = 'block';
+            
+            document.getElementById('btnAmbilFoto').classList.add('hidden');
+            document.getElementById('btnUlangFoto').classList.remove('hidden');
+            
+            matikanKamera(); // Matikan lampu kamera setelah memotret
+        }
+
+        function ulangFoto() {
+            document.getElementById('fotoBase64').value = '';
+            document.getElementById('btnUlangFoto').classList.add('hidden');
+            bukaKamera();
+        }
+
+        function matikanKamera() {
+            if (streamKamera) {
+                streamKamera.getTracks().forEach(track => track.stop());
+                streamKamera = null;
+            }
+        }
+        
+        // Fungsi pembantu untuk mengubah base64 menjadi File/Blob agar bisa dikirim ke Discord
+        function dataURItoBlob(dataURI) {
+            let byteString = atob(dataURI.split(',')[1]);
+            let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            let ab = new ArrayBuffer(byteString.length);
+            let ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            return new Blob([ab], {type: mimeString});
+        }
+        
+
         async function prosesLogin() {
             const u = document.getElementById('adm-user')?.value.trim() || '';
             const p = document.getElementById('adm-pass')?.value.trim() || '';
@@ -521,7 +615,7 @@
         }
 
         // Event listener form absen
-        const formAbsen = document.getElementById('formAbsen');
+                const formAbsen = document.getElementById('formAbsen');
         if (formAbsen) {
             formAbsen.onsubmit = async (e) => {
                 e.preventDefault();
@@ -529,6 +623,7 @@
                 const k = document.getElementById('selectedKelas')?.value || '';
                 const h = document.getElementById('kehadiran')?.value || '';
                 const a = document.getElementById('alasan')?.value.trim() || '';
+                const fotoBase64 = document.getElementById('fotoBase64')?.value || '';
                 const d = new Date().toLocaleDateString('id-ID');
 
                 if (!n || !k) return showPopup("Silakan pilih nama terlebih dahulu!", "red");
@@ -539,17 +634,21 @@
                     document.getElementById('alasan').focus();
                     return false;
                 }
+                
+                // Mencegah curang: Wajib foto jika hadir
+                if (h === 'HADIR' && !fotoBase64) {
+                    return showPopup("Harap ambil foto Bukti Hadir!", "red");
+                }
 
-                if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) return showPopup("Sudah absen!", "red");
+                if(dataAbsen.some(x => x.nama === n && x.tanggal === d)) return showPopup("Sudah absen hari ini!", "red");
 
                 const absenData = { id: Date.now(), nama: n, kelas: k, kehadiran: h, alasan: a || '-', tanggal: d, waktu: new Date().toLocaleTimeString('id-ID') };
                 
                 if (await saveAbsenToFirebase(absenData)) {
-                    kirimKeDiscord(absenData);
+                    kirimKeDiscord(absenData, fotoBase64); // Kirim data beserta foto
                     showPopup("Berhasil Absen!", "blue");
                     formAbsen.reset();
                     
-                    // Reset custom button tampilan
                     const btnTampil = document.getElementById('btnPilihStatus');
                     btnTampil.innerText = "PILIH STATUS ▾";
                     btnTampil.style.color = "#fff";
@@ -557,13 +656,19 @@
                     btnTampil.style.boxShadow = "none";
                     
                     document.getElementById('izin-field').classList.add('hidden');
+                    document.getElementById('kamera-container').classList.add('hidden');
+                    document.getElementById('hasilSelfie').style.display = 'none';
+                    document.getElementById('btnUlangFoto').classList.add('hidden');
+                    document.getElementById('btnBukaKamera').classList.remove('hidden');
+                    matikanKamera();
+                    
                     renderNamaList();
                     setTimeout(() => showPanel('main-menu'), 1500);
                 }
             };
         }
 
-        async function kirimKeDiscord(data) {
+        async function kirimKeDiscord(data, fotoBase64) {
             const embed = {
                 title: "📋 ABSENSI KIR - SMAN 1 LEMAHABANG",
                 color: data.kehadiran === 'HADIR' ? 3066993 : 15158332,
@@ -577,14 +682,29 @@
                 timestamp: new Date().toISOString()
             };
 
+            const formData = new FormData();
+            
+            // Jika ada foto, jadikan file dan lampirkan ke webhook discord
+            if (fotoBase64) {
+                const blob = dataURItoBlob(fotoBase64);
+                formData.append('file', blob, 'bukti_hadir.jpg');
+                embed.image = { url: "attachment://bukti_hadir.jpg" }; // Menampilkan foto di dalam Embed
+            }
+
+            formData.append('payload_json', JSON.stringify({
+                content: "**🔔 ADA YANG BARU ABSEN NIH!**",
+                embeds: [embed]
+            }));
+
             try {
+                // Jangan gunakan Content-Type header jika memakai FormData, biarkan browser mengaturnya otomatis
                 await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: "**🔔 ADA YANG BARU ABSEN NIH!**", embeds: [embed] })
+                    body: formData
                 });
             } catch (error) { console.error('Webhook error:', error); }
         }
+
 
         function renderRekap() {
             const list = document.getElementById('list-rekap');
