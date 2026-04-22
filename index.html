@@ -218,8 +218,7 @@
 
                         <div id="kamera-container" class="form-group hidden">
                 <label style="color: var(--neon-blue);">Bukti Hadir (Foto Selfie)</label>
-                
-                <video id="videoSelfie" autoplay playsinline style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-blue); display: none; margin-bottom: 10px;"></video>
+                <video id="videoSelfie" autoplay playsinline style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-blue); display: none; margin-bottom: 10px; transform: scaleX(-1);"></video>
                 <canvas id="canvasSelfie" style="display: none;"></canvas>
                 <img id="hasilSelfie" style="width: 100%; border-radius: 12px; border: 1px solid var(--neon-green); display: none; margin-bottom: 10px;">
                 
@@ -547,27 +546,39 @@
         }
 
         function ambilFoto() {
+
+                    function ambilFoto() {
             const video = document.getElementById('videoSelfie');
             const canvas = document.getElementById('canvasSelfie');
             const img = document.getElementById('hasilSelfie');
             const inputBase64 = document.getElementById('fotoBase64');
 
+            // Set ukuran canvas sama dengan resolusi video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const ctx = canvas.getContext('2d');
             
+            // LOGIKA BARU: Membalik (un-mirror) gambar sebelum difoto
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            
+            // Menggambar frame video ke dalam canvas yang sudah dibalik
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Konversi gambar ke Base64 (kualitas 80%)
             const base64Data = canvas.toDataURL('image/jpeg', 0.8); 
             inputBase64.value = base64Data;
             img.src = base64Data;
 
+            // Sembunyikan video live, tampilkan hasil jepretan
             video.style.display = 'none';
             img.style.display = 'block';
             
             document.getElementById('btnAmbilFoto').classList.add('hidden');
             document.getElementById('btnUlangFoto').classList.remove('hidden');
             
-            matikanKamera(); 
-        }
+            matikanKamera(); // Matikan lampu kamera setelah memotret
+                    }
 
         function ulangFoto() {
             document.getElementById('fotoBase64').value = '';
