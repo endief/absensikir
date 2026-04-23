@@ -415,19 +415,24 @@
             catch { showPopup("⚠ Gagal menyimpan data admin", "red"); return false; }
         }
         
-        database.ref('.info/connected').on('value', (snapshot) => {
+                database.ref('.info/connected').on('value', (snapshot) => {
             isFirebaseConnected = snapshot.val() === true;
-            document.getElementById('sync-indicator').className = `sync-indicator ${isFirebaseConnected ? 'online' : 'offline'}`;
-            document.getElementById('sync-status').textContent = '';
+            
+            const indicator = document.getElementById('sync-indicator');
+            if (indicator) indicator.className = `sync-indicator ${isFirebaseConnected ? 'online' : 'offline'}`;
+            
+            const statusText = document.getElementById('sync-status');
+            if (statusText) statusText.textContent = '';
             
             if (isFirebaseConnected) {
                 showPopup("Terhubung", "blue");
-                document.getElementById('loading-main').classList.add('hidden');
-                document.getElementById('main-buttons').classList.remove('hidden');
+                document.getElementById('loading-main')?.classList.add('hidden');
+                document.getElementById('main-buttons')?.classList.remove('hidden');
             } else {
                 showPopup("⚠ Tidak Terhubung", "red");
             }
         });
+
 
         function loadDataFromFirebase() {
             database.ref('absen').on('value', (snapshot) => {
