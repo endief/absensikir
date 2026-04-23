@@ -52,7 +52,7 @@
             overflow-x: hidden;
         }
 
-        /* --- CONTAINER KACA (GLASSMORPHISM) --- */
+        /* --- CONTAINER KACA --- */
         .app-container {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -69,7 +69,6 @@
             margin-bottom: 30px;
         }
 
-        /* Border Glow Dinamis di atas Container */
         .app-container::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
             background: var(--primary-grad);
@@ -99,7 +98,7 @@
         h2 { font-family: var(--font-heading); font-size: 24px; font-weight: 700; text-align: center; color: var(--text-main);}
         p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 30px; font-weight: 500;}
 
-        /* --- TRANSISI PANEL --- */
+        /* --- PANEL TRANSITION --- */
         .panel { 
             display: none; opacity: 0;
             transform: scale(0.97) translateY(15px);
@@ -107,7 +106,7 @@
         }
         .panel.active { display: block; opacity: 1; transform: scale(1) translateY(0); }
 
-        /* --- TOMBOL ELEGAN --- */
+        /* --- TOMBOL --- */
         button {
             font-family: var(--font-body);
             width: 100%; padding: 16px; border: none; border-radius: 16px;
@@ -157,6 +156,30 @@
             box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15); 
         }
         
+        /* Input File Khusus */
+        input[type="file"].input-field {
+            padding: 12px 18px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        input[type="file"]::file-selector-button {
+            font-family: var(--font-body);
+            font-weight: 600;
+            background: var(--bg-color);
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: 10px;
+            color: var(--text-main);
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.2s;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: var(--neon-cyan);
+            color: white;
+            border-color: var(--neon-cyan);
+        }
+
         .custom-select-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-muted); }
         .custom-select-btn:hover { border-color: #cbd5e1; }
         .custom-select-btn.selected { color: var(--text-main); font-weight: 700; border-color: var(--neon-cyan); }
@@ -188,7 +211,7 @@
 
         .name-item.disabled { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; pointer-events: none; }
 
-        /* --- RADIO BUTTON STATUS --- */
+        /* --- RADIO BUTTON --- */
         .radio-group { display: flex; gap: 15px; }
         .radio-btn { 
             flex: 1; text-align: center; padding: 16px; border: 1.5px solid var(--border-light); 
@@ -206,27 +229,20 @@
             box-shadow: 0 10px 20px -5px rgba(236, 72, 153, 0.2); transform: translateY(-2px);
         }
 
-        /* --- KAMERA (MEMPERBAIKI MIRROR) --- */
+        /* --- KAMERA --- */
         #area-dinamis { transition: all 0.4s ease; overflow: hidden; }
         .camera-wrapper {
             width: 100%; border-radius: 20px; overflow: hidden; background: #0f172a;
             margin-bottom: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        
-        /* PENTING: Hanya video yang di-mirror oleh CSS. Canvas TIDAK BOLEH di-mirror CSS lagi */
         #video-kamera { 
             width: 100%; display: block; border-radius: 20px; 
-            transform: scaleX(-1); 
-            -webkit-transform: scaleX(-1);
+            transform: scaleX(-1); -webkit-transform: scaleX(-1);
         }
-        #canvas-kamera { 
-            width: 100%; display: block; border-radius: 20px; 
-            transform: none !important; /* Mencegah double mirror */
-        } 
-        
+        #canvas-kamera { width: 100%; display: block; border-radius: 20px; transform: none !important; } 
         .hidden { display: none !important; }
 
-        /* --- MODAL BAWAH (BOTTOM SHEET) --- */
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px);
@@ -260,7 +276,6 @@
             border-color: var(--neon-cyan); background: rgba(14, 165, 233, 0.05); 
             color: var(--neon-cyan); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
         }
-
     </style>
 </head>
 <body>
@@ -280,10 +295,23 @@
         <div id="panel-pengelola" class="panel">
             <h2>Panel Admin</h2>
             <p>Masukkan kredensial keamanan</p>
-            <input type="text" placeholder="Username / ID" class="input-field" style="margin-bottom: 16px;">
-            <input type="password" placeholder="Password Security" class="input-field" style="margin-bottom: 24px;">
-            <button class="btn-primary" onclick="Swal.fire('Terhubung', 'Sistem pengelola dalam pengembangan. Belum terhubung ke Database.', 'info')">Otorisasi Masuk</button>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="admin-user" placeholder="Username / ID" class="input-field">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="admin-pass" placeholder="Password Security" class="input-field">
+            </div>
+            <button class="btn-primary" onclick="loginAdmin()">Otorisasi Masuk</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Kembali ke Beranda</button>
+        </div>
+
+        <div id="panel-dashboard-admin" class="panel">
+            <h2>Dashboard Pengelola</h2>
+            <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 10px;">Akses Diberikan (Admin)</p>
+            <p>Selamat datang! Rekapitulasi database absensi sedang disiapkan dalam tahap pengembangan selanjutnya.</p>
+            <button class="btn-secondary" style="margin-top: 20px;" onclick="logoutAdmin()">Log Out (Keluar)</button>
         </div>
 
         <div id="panel-absen" class="panel">
@@ -332,14 +360,17 @@
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
                     </div>
-                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()">Ambil Foto Selfie</button>
-                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()">Ulangi Pengambilan</button>
+                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()" style="margin-bottom: 0;">Ambil Foto Selfie</button>
+                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()" style="margin-bottom: 0;">Ulangi Pengambilan</button>
                     <input type="hidden" id="foto-data" value="">
                 </div>
 
                 <div id="area-izin" class="hidden">
                     <label>Keterangan Absen (Izin/Sakit)</label>
                     <textarea id="keterangan-izin" class="input-field" rows="3" placeholder="Sertakan alasan yang jelas (Min. 5 huruf)..."></textarea>
+                    
+                    <label style="margin-top: 20px;">Unggah Surat Bukti (*Wajib)</label>
+                    <input type="file" id="surat-izin" accept="image/*" class="input-field">
                 </div>
             </div>
 
@@ -397,6 +428,32 @@
         ];
 
         let stateNamaTerpilih = "";
+
+        // --- SISTEM LOGIN ADMIN ---
+        function loginAdmin() {
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            if(user === 'admin' && pass === 'admin123') {
+                Swal.fire({
+                    title: 'Otorisasi Berhasil',
+                    text: 'Selamat datang di Panel Admin.',
+                    icon: 'success',
+                    confirmButtonColor: '#0ea5e9'
+                }).then(() => {
+                    // Kosongkan form lalu pindah panel
+                    document.getElementById('admin-user').value = '';
+                    document.getElementById('admin-pass').value = '';
+                    switchPanel('panel-dashboard-admin');
+                });
+            } else {
+                Swal.fire('Akses Ditolak', 'Username atau Password salah!', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            switchPanel('panel-awal');
+        }
 
         // --- NAVIGASI MULUS ---
         function switchPanel(panelId) {
@@ -544,24 +601,18 @@
             if (streamKamera) streamKamera.getTracks().forEach(track => track.stop());
         }
 
-        // --- PENGAMBILAN FOTO (MIRROR DIPERBAIKI) ---
         function takeSnapshot() {
             const video = document.getElementById('video-kamera');
             const canvas = document.getElementById('canvas-kamera');
             const context = canvas.getContext('2d');
             
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            
-            // Kita flip di javascript agar gambar aslinya menjadi mirror
             context.translate(canvas.width, 0);
             context.scale(-1, 1);
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Simpan gambar base64 yang sudah dimirror
             document.getElementById('foto-data').value = canvas.toDataURL('image/png');
             
-            // Karena canvas-kamera CSS transform-nya sudah dinonaktifkan (transform: none), 
-            // gambar ini akan ditampilkan apa adanya (sudah mirrored sesuai preview HP).
             video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden');
             document.getElementById('btn-retake').classList.remove('hidden');
@@ -588,13 +639,31 @@
                 return;
             }
 
-            let foto = ""; let keterangan = "";
+            let foto = ""; 
+            let keterangan = "";
+            let dataSurat = null; // Menampung data file surat
+
             if (status === 'Hadir') {
                 foto = document.getElementById('foto-data').value;
-                if (!foto) { Swal.fire('Foto Diperlukan', 'Harap lakukan verifikasi foto wajah terlebih dahulu.', 'warning'); return; }
+                if (!foto) { 
+                    Swal.fire('Foto Diperlukan', 'Harap lakukan verifikasi foto wajah terlebih dahulu.', 'warning'); 
+                    return; 
+                }
             } else if (status === 'Izin') {
                 keterangan = document.getElementById('keterangan-izin').value.trim();
-                if (keterangan.length < 5) { Swal.fire('Alasan Ditolak', 'Keterangan izin harus jelas dan lebih dari 5 huruf.', 'warning'); return; }
+                const fileSurat = document.getElementById('surat-izin').files;
+                
+                if (keterangan.length < 5) { 
+                    Swal.fire('Alasan Ditolak', 'Keterangan izin harus jelas dan lebih dari 5 huruf.', 'warning'); 
+                    return; 
+                }
+                if (fileSurat.length === 0) {
+                    Swal.fire('Surat Diperlukan', 'Harap unggah foto bukti surat izin atau surat keterangan dokter terlebih dahulu.', 'warning'); 
+                    return; 
+                }
+                
+                // Menyimpan nama file sebagai bukti (bisa dikonversi ke base64 jika butuh upload firebase)
+                dataSurat = fileSurat[0].name;
             }
 
             // SIMULASI PENGIRIMAN SUKSES
@@ -605,11 +674,14 @@
                 const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
                 localStorage.setItem(cekAbsenKunci, 'true');
                 
+                // Reset Form
                 document.getElementById('nama-terpilih').value = ""; stateNamaTerpilih = "";
                 document.querySelector('input[name="status"]:checked').checked = false;
                 document.getElementById('area-dinamis').classList.add('hidden');
                 document.getElementById('label-hadir').classList.remove('active-hadir');
                 document.getElementById('label-izin').classList.remove('active-izin');
+                document.getElementById('surat-izin').value = ""; // Reset File input
+                
                 matikanKamera(); renderNama();
             });
         }
