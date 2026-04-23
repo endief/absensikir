@@ -31,7 +31,6 @@
             -webkit-tap-highlight-color: transparent; 
         }
 
-        /* Latar belakang diberi tekstur dot-grid futuristik namun tetap clean */
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(#d5d5d5 1px, transparent 1px);
@@ -45,7 +44,19 @@
             overflow-x: hidden;
         }
 
-        /* Container Utama dengan efek Glass & Glow neon halus */
+        /* --- ANIMASI NEON LIVE --- */
+        @keyframes container-glow {
+            0% { box-shadow: 0 15px 40px rgba(0, 229, 255, 0.1), 0 5px 15px rgba(255, 0, 122, 0.05); }
+            50% { box-shadow: 0 15px 50px rgba(0, 229, 255, 0.3), 0 5px 25px rgba(255, 0, 122, 0.2); }
+            100% { box-shadow: 0 15px 40px rgba(0, 229, 255, 0.1), 0 5px 15px rgba(255, 0, 122, 0.05); }
+        }
+
+        @keyframes text-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .app-container {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -53,12 +64,12 @@
             width: 100%;
             max-width: 450px;
             border-radius: 24px;
-            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.08), 0 5px 15px rgba(255, 0, 122, 0.05);
-            border: 1px solid rgba(0, 229, 255, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3);
             overflow: hidden;
             padding: 35px 30px;
             position: relative;
             margin-top: 20px;
+            animation: container-glow 4s ease-in-out infinite; /* Efek bernapas/Glow live */
         }
 
         header {
@@ -66,16 +77,17 @@
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border-light);
-            position: relative;
         }
 
         h1 { 
             font-size: 28px; 
             font-weight: 700;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink), var(--neon-cyan));
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 0.5px;
+            animation: text-flow 3s linear infinite; /* Teks gradasi bergerak */
         }
         
         .panel { 
@@ -84,263 +96,141 @@
             transform: scale(0.96) translateY(10px);
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .panel.active { 
-            display: block; 
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
+        .panel.active { display: block; opacity: 1; transform: scale(1) translateY(0); }
 
         h2 { font-size: 22px; margin-bottom: 5px; text-align: center; font-weight: 600;}
         p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
 
-        /* Tombol Mulus & Premium Glow */
+        /* Tombol Live Neon */
         button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            margin-bottom: 15px; transition: all 0.3s ease;
         }
-
         button:active { transform: scale(0.97); }
 
         .btn-primary { 
-            background: linear-gradient(135deg, var(--neon-cyan), #0077ff); 
+            background: linear-gradient(90deg, #0077ff, var(--neon-cyan), var(--neon-pink), #0077ff); 
+            background-size: 300% 300%;
             color: white; 
-            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.25); 
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.3); 
+            animation: text-flow 4s ease infinite; /* Background tombol bergerak */
         }
-        .btn-primary:hover { 
-            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.4); 
-            transform: translateY(-2px);
-        }
+        .btn-primary:hover { box-shadow: 0 10px 25px rgba(0, 229, 255, 0.5); transform: translateY(-2px); }
 
         .btn-secondary { 
-            background: #ffffff; 
-            color: var(--text-main); 
-            border: 2px solid var(--border-light);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            background: #ffffff; color: var(--text-main); 
+            border: 2px solid var(--border-light); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .btn-secondary:hover { 
-            border-color: var(--neon-pink); 
-            color: var(--neon-pink); 
-        }
+        .btn-secondary:hover { border-color: var(--neon-pink); color: var(--neon-pink); }
         
-        .btn-text { 
-            background: transparent; 
-            color: var(--text-muted); 
-            padding: 5px; 
-            margin-top: -5px; 
-            font-size: 14px; 
-            box-shadow: none;
-        }
+        .btn-text { background: transparent; color: var(--text-muted); padding: 5px; margin-top: -5px; font-size: 14px;}
         .btn-text:hover { color: var(--text-main); }
 
-        /* Form Inputs */
+        /* Form Inputs & Custom Dropdown */
         .form-group { margin-bottom: 22px; }
-        .form-group label { 
-            display: block; 
-            font-size: 13px; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: #444;
-        }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #444; }
 
-        .input-field {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--border-light);
-            background: #f9fbfd;
-            border-radius: 14px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
+        .input-field, .custom-select-btn {
+            width: 100%; padding: 15px; border: 2px solid var(--border-light);
+            background: #f9fbfd; border-radius: 14px; font-size: 14px;
+            outline: none; transition: all 0.3s ease;
         }
-        .input-field:focus { 
-            border-color: var(--neon-cyan); 
-            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.1);
-            background: #ffffff;
-        }
-
-        /* Custom Dropdown Triggers */
-        .custom-select-btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--border-light);
-            background: #f9fbfd;
-            border-radius: 14px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-muted);
-        }
+        .input-field:focus { border-color: var(--neon-cyan); box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.1); background: #ffffff;}
+        
+        .custom-select-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-muted); }
         .custom-select-btn:hover { background: #ffffff; border-color: #d0d0d0; }
-        .custom-select-btn:active { transform: scale(0.98); }
-        .custom-select-btn.selected { 
-            color: var(--text-main); 
-            font-weight: 600; 
-            border-color: var(--neon-cyan); 
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.05);
-        }
+        .custom-select-btn.selected { color: var(--text-main); font-weight: 600; border-color: var(--neon-cyan); background: #ffffff; }
 
-        /* Pencarian dan List Nama */
+        /* List Nama & Status Disabled */
         .search-box { margin-bottom: 12px; }
         .name-list {
-            max-height: 180px;
-            overflow-y: auto;
-            border: 1px solid var(--border-light);
-            border-radius: 14px;
-            background: #ffffff;
-            scroll-behavior: smooth;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+            max-height: 180px; overflow-y: auto; border: 1px solid var(--border-light);
+            border-radius: 14px; background: #ffffff; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
-        
         .name-list::-webkit-scrollbar { width: 6px; }
         .name-list::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
         
         .name-item {
-            padding: 14px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-light);
-            font-size: 14px;
-            transition: all 0.2s ease;
-            position: relative;
-            color: #555;
+            padding: 14px 16px; cursor: pointer; border-bottom: 1px solid var(--border-light);
+            font-size: 14px; transition: all 0.2s ease; position: relative; color: #555;
         }
         .name-item:last-child { border-bottom: none; }
-        .name-item:hover { background: rgba(0, 229, 255, 0.05); color: var(--text-main);}
+        .name-item:hover:not(.disabled) { background: rgba(0, 229, 255, 0.05); color: var(--text-main);}
         
-        /* Highlight Nama Terpilih (Garis Neon) */
         .name-item.terpilih {
-            background: rgba(0, 229, 255, 0.08);
-            color: var(--text-main);
-            font-weight: 600;
-            padding-left: 22px;
+            background: rgba(0, 229, 255, 0.08); color: var(--text-main);
+            font-weight: 600; padding-left: 22px;
         }
         .name-item.terpilih::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 5px;
-            background: var(--neon-cyan);
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background: var(--neon-cyan); border-radius: 0 6px 6px 0;
             box-shadow: 2px 0 8px rgba(0, 229, 255, 0.5);
+        }
+
+        /* Tampilan Jika Nama Sudah Absen */
+        .name-item.disabled {
+            background-color: #f5f5f5;
+            color: #aaa;
+            cursor: not-allowed;
+            pointer-events: none; /* Tidak bisa diklik */
         }
 
         /* Radio Buttons Status */
         .radio-group { display: flex; gap: 15px; }
         .radio-btn { 
-            flex: 1; text-align: center; padding: 14px; 
-            border: 2px solid var(--border-light); 
-            background: #f9fbfd;
-            border-radius: 14px; cursor: pointer; 
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 14px;
-            position: relative;
+            flex: 1; text-align: center; padding: 14px; border: 2px solid var(--border-light); 
+            background: #f9fbfd; border-radius: 14px; cursor: pointer; 
+            transition: all 0.3s ease; font-weight: 600; font-size: 14px;
         }
         .radio-btn input { display: none; }
-        .radio-btn.active-hadir { 
-            border-color: var(--neon-cyan); 
-            background: rgba(0, 229, 255, 0.08); 
-            color: #0099aa;
-            box-shadow: 0 5px 15px rgba(0,229,255,0.15);
-        }
-        .radio-btn.active-izin { 
-            border-color: var(--neon-pink); 
-            background: rgba(255, 0, 122, 0.08); 
-            color: #cc0062;
-            box-shadow: 0 5px 15px rgba(255,0,122,0.15);
-        }
+        .radio-btn.active-hadir { border-color: var(--neon-cyan); background: rgba(0, 229, 255, 0.08); color: #0099aa;}
+        .radio-btn.active-izin { border-color: var(--neon-pink); background: rgba(255, 0, 122, 0.08); color: #cc0062;}
 
-        /* Kamera Area */
+        /* Kamera Area (Diperbaiki agar Mirror seperti HP Asli) */
         #area-dinamis { transition: all 0.4s ease; overflow: hidden; }
         .camera-wrapper {
-            width: 100%;
-            border-radius: 16px;
-            overflow: hidden;
-            background: #000;
-            margin-bottom: 15px;
-            position: relative;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            width: 100%; border-radius: 16px; overflow: hidden; background: #000;
+            margin-bottom: 15px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
-        /* Memaksa video agar TIDAK MIRROR */
+        /* transform scaleX(-1) membuat tampilan seperti cermin sungguhan */
         #video-kamera, #canvas-kamera { 
-            width: 100%; 
-            display: block; 
-            border-radius: 16px; 
-            transform: scaleX(1) !important;
-            -webkit-transform: scaleX(1) !important;
+            width: 100%; display: block; border-radius: 16px; 
+            transform: scaleX(-1) !important; 
+            -webkit-transform: scaleX(-1) !important;
         } 
-        
         .hidden { display: none !important; }
 
-        /* MODAL PANEL (BOTTOM SHEET) */
+        /* MODAL PANEL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px);
             display: flex; justify-content: center; align-items: flex-end;
-            opacity: 0; visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 1000;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 1000;
         }
         .modal-overlay.show { opacity: 1; visibility: visible; }
-        
         .modal-content {
-            background: var(--bg-color);
-            width: 100%; max-width: 450px;
-            border-top-left-radius: 28px; border-top-right-radius: 28px;
-            padding: 30px 25px;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 -15px 40px rgba(0,0,0,0.1);
+            background: var(--bg-color); width: 100%; max-width: 450px;
+            border-radius: 28px 28px 0 0; padding: 30px 25px;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             max-height: 85vh; overflow-y: auto;
         }
         .modal-overlay.show .modal-content { transform: translateY(0); }
-
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         .modal-header h3 { font-size: 18px; font-weight: 600; }
         .close-btn { 
-            background: #f0f0f0; width: 36px; height: 36px; 
-            border-radius: 50%; display: flex; justify-content: center; 
-            align-items: center; cursor: pointer; padding: 0; margin: 0; 
-            color: #555; border: none; transition: 0.2s;
+            background: #f0f0f0; width: 36px; height: 36px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; cursor: pointer; 
+            border: none; transition: 0.2s; color: #555;
         }
         .close-btn:hover { background: #e0e0e0; }
-        
         .modal-item {
-            padding: 16px;
-            border: 2px solid var(--border-light);
-            border-radius: 14px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            text-align: center;
-            background: #fff;
+            padding: 16px; border: 2px solid var(--border-light); border-radius: 14px;
+            margin-bottom: 12px; cursor: pointer; font-weight: 500; text-align: center; background: #fff;
         }
         .modal-item:active { transform: scale(0.97); }
-        .modal-item:hover { 
-            border-color: var(--neon-cyan); 
-            background: rgba(0,229,255,0.05); 
-            color: #0099aa;
-            font-weight: 600;
-        }
+        .modal-item:hover { border-color: var(--neon-cyan); background: rgba(0,229,255,0.05); color: #0099aa; font-weight: 600;}
 
     </style>
 </head>
@@ -353,7 +243,7 @@
 
         <div id="panel-awal" class="panel active">
             <h2>Portal Kehadiran</h2>
-            <p>Sistem Absensi Digital Kelas XIF7</p>
+            <p>Sistem Absensi Digital Interaktif</p>
             <button class="btn-primary" onclick="switchPanel('panel-absen')">📝 ABSEN SEKARANG</button>
             <button class="btn-secondary" onclick="switchPanel('panel-pengelola')">⚙️ PENGELOLA (ADMIN)</button>
         </div>
@@ -408,7 +298,7 @@
 
             <div id="area-dinamis" class="hidden">
                 <div id="area-kamera" class="hidden">
-                    <label>Verifikasi Wajah (Selfie Asli, Tidak Mirror):</label>
+                    <label>Verifikasi Wajah (Kamera Normal):</label>
                     <div class="camera-wrapper">
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
@@ -425,7 +315,7 @@
             </div>
 
             <br>
-            <button class="btn-primary" onclick="kirimAbsen()" style="box-shadow: 0 10px 25px rgba(255,0,122,0.3); background: linear-gradient(135deg, var(--neon-pink), #ff5e00);">🚀 KIRIM DATA ABSEN</button>
+            <button class="btn-primary" onclick="kirimAbsen()">🚀 KIRIM DATA ABSEN</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Batalkan</button>
         </div>
     </div>
@@ -452,13 +342,12 @@
                 <h3>Pilih Mata Pelajaran</h3>
                 <button class="close-btn" onclick="closeModal('modal-mapel')">✕</button>
             </div>
-            <div id="list-mapel-container">
-                </div>
+            <div id="list-mapel-container"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. DATA JADWAL & NAMA ---
+        // --- DATA ---
         const jadwalPelajaran = {
             "Senin": ["PKWU (07.10 - 08.30)", "BIOLOGI (08.30 - 09.50)", "BAHASA SUNDA (10.10 - 11.30)", "MATEMATIKA (11.30 - 13.40)", "BAHASA INDONESIA (13.40 - 15.00)"],
             "Selasa": ["SEJARAH (06.30 - 08.00)", "PJOK (08.00 - 10.30)", "EKONOMI (10.30 - 13.30)", "MATEMATIKA (13.30 - 15.00)"],
@@ -480,7 +369,7 @@
 
         let stateNamaTerpilih = "";
 
-        // --- 2. NAVIGASI PANEL ---
+        // --- NAVIGASI ---
         function switchPanel(panelId) {
             const currentActive = document.querySelector('.panel.active');
             if(currentActive) {
@@ -498,27 +387,30 @@
             if(panelId === 'panel-awal') matikanKamera(); 
         }
 
-        // --- 3. MODAL HARI & MAPEL ---
+        // --- MODAL ---
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
         function pilihHari(hari) {
             document.getElementById('hari').value = hari;
-            const btnHari = document.getElementById('btn-pilih-hari');
             document.getElementById('teks-hari').innerText = hari;
-            btnHari.classList.add('selected');
+            document.getElementById('btn-pilih-hari').classList.add('selected');
             
             document.getElementById('mapel').value = "";
             document.getElementById('teks-mapel').innerText = "Pilih Mata Pelajaran...";
             document.getElementById('btn-pilih-mapel').classList.remove('selected');
 
+            // Reset nama terpilih jika ganti jadwal
+            stateNamaTerpilih = "";
+            document.getElementById('nama-terpilih').value = "";
+
             closeModal('modal-hari');
             generateListMapel(hari);
+            renderNama(document.getElementById('search-nama').value); // Update list untuk cek status disabled
         }
 
         function bukaModalMapel() {
-            const hari = document.getElementById('hari').value;
-            if(!hari) {
+            if(!document.getElementById('hari').value) {
                 Swal.fire({icon: 'warning', title: 'Oops', text: 'Pilih hari terlebih dahulu!', confirmButtonColor: '#00e5ff'});
                 return;
             }
@@ -531,8 +423,7 @@
             if(jadwalPelajaran[hari]) {
                 jadwalPelajaran[hari].forEach(mapel => {
                     let div = document.createElement('div');
-                    div.className = 'modal-item';
-                    div.innerText = mapel;
+                    div.className = 'modal-item'; div.innerText = mapel;
                     div.onclick = () => pilihMapel(mapel);
                     container.appendChild(div);
                 });
@@ -543,40 +434,55 @@
             document.getElementById('mapel').value = mapel;
             document.getElementById('teks-mapel').innerText = mapel;
             document.getElementById('btn-pilih-mapel').classList.add('selected');
+            
+            stateNamaTerpilih = "";
+            document.getElementById('nama-terpilih').value = "";
+            
             closeModal('modal-mapel');
+            renderNama(document.getElementById('search-nama').value); // Update list
         }
 
-        // --- 4. RENDER PENCARIAN NAMA ---
-        const listContainer = document.getElementById('list-nama');
+        // --- RENDER NAMA & CEK DOUBLE ABSEN ---
         function renderNama(filterText = "") {
+            const listContainer = document.getElementById('list-nama');
+            const hari = document.getElementById('hari').value;
+            const mapel = document.getElementById('mapel').value;
+            
             listContainer.innerHTML = "";
             const filtered = daftarNama.filter(nama => nama.toLowerCase().includes(filterText.toLowerCase()));
             
             filtered.forEach(nama => {
                 let div = document.createElement('div');
                 div.className = 'name-item';
-                div.innerText = nama;
                 
-                if(nama === stateNamaTerpilih) {
-                    div.classList.add('terpilih');
-                }
+                // Cek apakah siswa ini sudah absen di hari & mapel yang dipilih
+                const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
+                const sudahAbsen = (hari && mapel && localStorage.getItem(cekAbsenKunci));
 
-                div.onclick = () => {
-                    stateNamaTerpilih = nama;
-                    document.getElementById('nama-terpilih').value = nama;
-                    renderNama(document.getElementById('search-nama').value);
-                };
+                if (sudahAbsen) {
+                    // Jika sudah absen: Beri class disabled dan info
+                    div.innerHTML = `${nama} <span style="float:right; color:#00e5ff; font-weight:bold;">✓ Selesai</span>`;
+                    div.classList.add('disabled');
+                } else {
+                    // Jika belum absen: Tampilkan normal
+                    div.innerText = nama;
+                    if(nama === stateNamaTerpilih) div.classList.add('terpilih');
+
+                    div.onclick = () => {
+                        stateNamaTerpilih = nama;
+                        document.getElementById('nama-terpilih').value = nama;
+                        renderNama(document.getElementById('search-nama').value);
+                    };
+                }
+                
                 listContainer.appendChild(div);
             });
         }
         renderNama(); 
 
-        function filterNama() {
-            const text = document.getElementById('search-nama').value;
-            renderNama(text);
-        }
+        function filterNama() { renderNama(document.getElementById('search-nama').value); }
 
-        // --- 5. LOGIKA UI STATUS & KAMERA ---
+        // --- UI STATUS & KAMERA ---
         let streamKamera = null;
 
         function ubahStatus(status) {
@@ -586,45 +492,36 @@
             const labelHadir = document.getElementById('label-hadir');
             const labelIzin = document.getElementById('label-izin');
 
-            labelHadir.classList.remove('active-hadir');
-            labelIzin.classList.remove('active-izin');
+            labelHadir.classList.remove('active-hadir'); labelIzin.classList.remove('active-izin');
             areaDinamis.classList.remove('hidden');
 
             if (status === 'Hadir') {
                 labelHadir.classList.add('active-hadir');
-                areaIzin.classList.add('hidden');
-                areaKamera.classList.remove('hidden');
+                areaIzin.classList.add('hidden'); areaKamera.classList.remove('hidden');
                 mulaiKamera();
             } else {
                 labelIzin.classList.add('active-izin');
-                areaKamera.classList.add('hidden');
-                areaIzin.classList.remove('hidden');
+                areaKamera.classList.add('hidden'); areaIzin.classList.remove('hidden');
                 matikanKamera();
             }
         }
 
-        // KAMERA DIATUR AGAR TIDAK MIRROR & PAKAI KAMERA DEPAN
         async function mulaiKamera() {
             const video = document.getElementById('video-kamera');
             try {
-                // facingMode: "user" memastikan kamera depan untuk HP
-                streamKamera = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" } 
-                });
+                streamKamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 video.srcObject = streamKamera;
                 document.getElementById('video-kamera').classList.remove('hidden');
                 document.getElementById('canvas-kamera').classList.add('hidden');
                 document.getElementById('btn-capture').classList.remove('hidden');
                 document.getElementById('btn-retake').classList.add('hidden');
             } catch (err) {
-                Swal.fire('Error', 'Gagal membuka kamera. Pastikan browser diizinkan mengakses kamera.', 'error');
+                Swal.fire('Error', 'Izin kamera ditolak. Izinkan browser untuk mengakses kamera.', 'error');
             }
         }
 
         function matikanKamera() {
-            if (streamKamera) {
-                streamKamera.getTracks().forEach(track => track.stop());
-            }
+            if (streamKamera) streamKamera.getTracks().forEach(track => track.stop());
         }
 
         function takeSnapshot() {
@@ -632,14 +529,16 @@
             const canvas = document.getElementById('canvas-kamera');
             const context = canvas.getContext('2d');
             
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             
+            // Mirroring Context agar hasil foto tidak terbalik (Sama dengan preview)
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
             document.getElementById('foto-data').value = canvas.toDataURL('image/png');
             
-            video.classList.add('hidden');
-            canvas.classList.remove('hidden');
+            video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden');
             document.getElementById('btn-retake').classList.remove('hidden');
         }
@@ -652,7 +551,7 @@
             document.getElementById('btn-retake').classList.add('hidden');
         }
 
-        // --- 6. VALIDASI & PENGIRIMAN ---
+        // --- PENGIRIMAN ---
         function kirimAbsen() {
             const hari = document.getElementById('hari').value;
             const mapel = document.getElementById('mapel').value;
@@ -661,66 +560,39 @@
             const status = statusEl ? statusEl.value : null;
 
             if (!hari || !mapel || !nama || !status) {
-                Swal.fire({
-                    title: 'Data Belum Lengkap',
-                    text: 'Pastikan Hari, Mapel, Nama, dan Status Kehadiran telah diisi.',
-                    icon: 'warning',
-                    confirmButtonColor: '#ff007a'
-                });
+                Swal.fire({ title: 'Data Belum Lengkap', text: 'Pastikan Hari, Mapel, Nama, dan Status Kehadiran telah diisi.', icon: 'warning', confirmButtonColor: '#ff007a' });
                 return;
             }
 
-            // CEK DOUBLE ABSEN (Mencegah nama, hari, dan mapel yang sama diabsen ulang)
-            const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
-            if (localStorage.getItem(cekAbsenKunci)) {
-                Swal.fire({
-                    title: 'Sudah Absen!',
-                    text: `Siswa bernama ${nama} sudah melakukan absensi untuk pelajaran ${mapel} pada hari ${hari}.`,
-                    icon: 'error',
-                    confirmButtonColor: '#ff007a'
-                });
-                return;
-            }
-
-            let foto = "";
-            let keterangan = "";
-
+            let foto = ""; let keterangan = "";
             if (status === 'Hadir') {
                 foto = document.getElementById('foto-data').value;
-                if (!foto) {
-                    Swal.fire('Oops!', 'Jangan lupa jepret foto selfie kamu (Pastikan wajah & seragam jelas).', 'warning');
-                    return;
-                }
+                if (!foto) { Swal.fire('Oops!', 'Jangan lupa jepret foto selfie kamu.', 'warning'); return; }
             } else if (status === 'Izin') {
                 keterangan = document.getElementById('keterangan-izin').value.trim();
-                if (keterangan.length < 5) {
-                    Swal.fire('Oops!', 'Tuliskan alasan izin minimal 5 karakter huruf.', 'warning');
-                    return;
-                }
+                if (keterangan.length < 5) { Swal.fire('Oops!', 'Tuliskan alasan izin minimal 5 karakter huruf.', 'warning'); return; }
             }
 
-            // Data final siap dikirim
-            const payload = {
-                waktu: new Date().toISOString(),
-                hari: hari,
-                mapel: mapel,
-                nama: nama,
-                status: status,
-                foto: foto, 
-                keterangan: keterangan
-            };
-
-            // SIMULASI SUKSES UI
+            // SIMULASI SUKSES
             Swal.fire({
-                title: 'Absen Terkirim! 🚀',
-                text: `Data kehadiran ${nama} berhasil dicatat di sistem.`,
-                icon: 'success',
-                confirmButtonColor: '#00e5ff',
-                background: '#fff'
+                title: 'Absen Terkirim! 🚀', text: `Data kehadiran ${nama} berhasil dicatat.`,
+                icon: 'success', confirmButtonColor: '#00e5ff', background: '#fff'
             }).then(() => {
-                // Simpan kunci di penyimpanan lokal browser agar tidak bisa dobel absen
+                // Simpan history absen agar nama terkunci saat dibuka lagi
+                const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
                 localStorage.setItem(cekAbsenKunci, 'true');
-                window.location.reload();
+                
+                // Reset Form Pilihan
+                document.getElementById('nama-terpilih').value = "";
+                stateNamaTerpilih = "";
+                document.querySelector('input[name="status"]:checked').checked = false;
+                document.getElementById('area-dinamis').classList.add('hidden');
+                document.getElementById('label-hadir').classList.remove('active-hadir');
+                document.getElementById('label-izin').classList.remove('active-izin');
+                matikanKamera();
+                
+                // Refresh list nama agar berubah abu-abu (disabled)
+                renderNama();
             });
         }
     </script>
