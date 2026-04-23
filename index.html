@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Kelas XIF7 Neon</title>
+    <title>Absensi Kelas XIF7 Premium</title>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -11,17 +11,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
         :root {
-            /* Tema Neon on White */
-            --bg-color: #ffffff;
-            --card-bg: #ffffff;
-            --text-main: #111111;
+            --bg-color: #fdfdfd;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1a1a2e;
             --text-muted: #888888;
-            --neon-cyan: #00f3ff;
+            --neon-cyan: #00e5ff;
             --neon-pink: #ff007a;
-            --border-light: #eeeeee;
+            --border-light: #e6e8ec;
         }
 
         * {
@@ -29,11 +28,14 @@
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Hilangkan efek tap biru di HP */
+            -webkit-tap-highlight-color: transparent; 
         }
 
+        /* Latar belakang diberi tekstur dot-grid futuristik namun tetap clean */
         body {
             background-color: var(--bg-color);
+            background-image: radial-gradient(#d5d5d5 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--text-main);
             display: flex;
             justify-content: center;
@@ -43,49 +45,43 @@
             overflow-x: hidden;
         }
 
-        /* Container Utama dengan efek glow neon super halus */
+        /* Container Utama dengan efek Glass & Glow neon halus */
         .app-container {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             width: 100%;
             max-width: 450px;
             border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.15), 0 -10px 40px rgba(255, 0, 122, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.08), 0 5px 15px rgba(255, 0, 122, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
             overflow: hidden;
-            padding: 30px;
+            padding: 35px 30px;
             position: relative;
             margin-top: 20px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
         }
 
         header {
             text-align: center;
             margin-bottom: 25px;
-            padding-bottom: 15px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border-light);
             position: relative;
         }
 
         h1 { 
-            font-size: 26px; 
+            font-size: 28px; 
             font-weight: 700;
             background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         
-        .clock { 
-            font-size: 16px; 
-            font-weight: 600; 
-            color: var(--text-muted); 
-            margin-top: 5px;
-        }
-
-        /* Transisi Panel yang sangat Smooth */
         .panel { 
             display: none; 
             opacity: 0;
-            transform: scale(0.95) translateY(15px);
+            transform: scale(0.96) translateY(10px);
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .panel.active { 
@@ -94,15 +90,15 @@
             transform: scale(1) translateY(0);
         }
 
-        h2 { font-size: 20px; margin-bottom: 5px; text-align: center; font-weight: 600;}
+        h2 { font-size: 22px; margin-bottom: 5px; text-align: center; font-weight: 600;}
         p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
 
-        /* Tombol Mulus & Glow */
+        /* Tombol Mulus & Premium Glow */
         button {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -112,43 +108,63 @@
             overflow: hidden;
         }
 
-        button:active { transform: scale(0.96); }
+        button:active { transform: scale(0.97); }
 
         .btn-primary { 
-            background: linear-gradient(45deg, var(--neon-cyan), #0088ff); 
+            background: linear-gradient(135deg, var(--neon-cyan), #0077ff); 
             color: white; 
-            box-shadow: 0 8px 20px rgba(0, 243, 255, 0.3); 
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.25); 
         }
-        .btn-primary:hover { box-shadow: 0 8px 25px rgba(0, 243, 255, 0.5); }
+        .btn-primary:hover { 
+            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.4); 
+            transform: translateY(-2px);
+        }
 
         .btn-secondary { 
-            background: #fff; 
+            background: #ffffff; 
             color: var(--text-main); 
             border: 2px solid var(--border-light);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .btn-secondary:hover { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-secondary:hover { 
+            border-color: var(--neon-pink); 
+            color: var(--neon-pink); 
+        }
         
-        .btn-text { background: transparent; color: var(--text-muted); padding: 5px; margin-top: -5px; font-size: 14px; box-shadow: none;}
+        .btn-text { 
+            background: transparent; 
+            color: var(--text-muted); 
+            padding: 5px; 
+            margin-top: -5px; 
+            font-size: 14px; 
+            box-shadow: none;
+        }
         .btn-text:hover { color: var(--text-main); }
 
         /* Form Inputs */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #555;}
+        .form-group { margin-bottom: 22px; }
+        .form-group label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #444;
+        }
 
         .input-field {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: 2px solid var(--border-light);
-            background: #fcfcfc;
-            border-radius: 12px;
+            background: #f9fbfd;
+            border-radius: 14px;
             font-size: 14px;
             outline: none;
             transition: all 0.3s ease;
         }
         .input-field:focus { 
             border-color: var(--neon-cyan); 
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.1);
+            background: #ffffff;
         }
 
         /* Custom Dropdown Triggers */
@@ -157,50 +173,58 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             border: 2px solid var(--border-light);
-            background: #fcfcfc;
-            border-radius: 12px;
+            background: #f9fbfd;
+            border-radius: 14px;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             color: var(--text-muted);
         }
-        .custom-select-btn:active { transform: scale(0.98); border-color: var(--neon-pink); }
-        .custom-select-btn.selected { color: var(--text-main); font-weight: 600; border-color: var(--neon-cyan); }
+        .custom-select-btn:hover { background: #ffffff; border-color: #d0d0d0; }
+        .custom-select-btn:active { transform: scale(0.98); }
+        .custom-select-btn.selected { 
+            color: var(--text-main); 
+            font-weight: 600; 
+            border-color: var(--neon-cyan); 
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.05);
+        }
 
         /* Pencarian dan List Nama */
-        .search-box { margin-bottom: 10px; }
+        .search-box { margin-bottom: 12px; }
         .name-list {
             max-height: 180px;
             overflow-y: auto;
             border: 1px solid var(--border-light);
-            border-radius: 12px;
-            background: #fff;
+            border-radius: 14px;
+            background: #ffffff;
             scroll-behavior: smooth;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
         }
         
-        /* Custom Scrollbar */
         .name-list::-webkit-scrollbar { width: 6px; }
-        .name-list::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+        .name-list::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
         
         .name-item {
-            padding: 12px 15px;
+            padding: 14px 16px;
             cursor: pointer;
             border-bottom: 1px solid var(--border-light);
             font-size: 14px;
             transition: all 0.2s ease;
             position: relative;
+            color: #555;
         }
         .name-item:last-child { border-bottom: none; }
-        .name-item:hover { background: rgba(0, 243, 255, 0.05); }
+        .name-item:hover { background: rgba(0, 229, 255, 0.05); color: var(--text-main);}
         
         /* Highlight Nama Terpilih (Garis Neon) */
         .name-item.terpilih {
-            background: rgba(0, 243, 255, 0.1);
+            background: rgba(0, 229, 255, 0.08);
             color: var(--text-main);
-            font-weight: 700;
-            padding-left: 20px;
+            font-weight: 600;
+            padding-left: 22px;
         }
         .name-item.terpilih::before {
             content: '';
@@ -208,30 +232,40 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 4px;
+            width: 5px;
             background: var(--neon-cyan);
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 0 10px var(--neon-cyan);
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            box-shadow: 2px 0 8px rgba(0, 229, 255, 0.5);
         }
 
         /* Radio Buttons Status */
         .radio-group { display: flex; gap: 15px; }
         .radio-btn { 
-            flex: 1; text-align: center; padding: 12px; 
+            flex: 1; text-align: center; padding: 14px; 
             border: 2px solid var(--border-light); 
-            border-radius: 12px; cursor: pointer; 
+            background: #f9fbfd;
+            border-radius: 14px; cursor: pointer; 
             transition: all 0.3s ease;
             font-weight: 600;
             font-size: 14px;
             position: relative;
-            overflow: hidden;
         }
-        .radio-btn input { display: none; } /* Sembunyikan bulatannya */
-        .radio-btn.active-hadir { border-color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); box-shadow: 0 0 15px rgba(0,243,255,0.2);}
-        .radio-btn.active-izin { border-color: var(--neon-pink); background: rgba(255, 0, 122, 0.1); box-shadow: 0 0 15px rgba(255,0,122,0.2);}
+        .radio-btn input { display: none; }
+        .radio-btn.active-hadir { 
+            border-color: var(--neon-cyan); 
+            background: rgba(0, 229, 255, 0.08); 
+            color: #0099aa;
+            box-shadow: 0 5px 15px rgba(0,229,255,0.15);
+        }
+        .radio-btn.active-izin { 
+            border-color: var(--neon-pink); 
+            background: rgba(255, 0, 122, 0.08); 
+            color: #cc0062;
+            box-shadow: 0 5px 15px rgba(255,0,122,0.15);
+        }
 
-        /* Kamera Area dengan Animasi Smooth */
+        /* Kamera Area */
         #area-dinamis { transition: all 0.4s ease; overflow: hidden; }
         .camera-wrapper {
             width: 100%;
@@ -240,19 +274,27 @@
             background: #000;
             margin-bottom: 15px;
             position: relative;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
-        #video-kamera, #canvas-kamera { width: 100%; display: block; border-radius: 16px; }
-        #video-kamera { transform: scaleX(1); } /* Tetap tidak mirror */
+        
+        /* Memaksa video agar TIDAK MIRROR */
+        #video-kamera, #canvas-kamera { 
+            width: 100%; 
+            display: block; 
+            border-radius: 16px; 
+            transform: scaleX(1) !important;
+            -webkit-transform: scaleX(1) !important;
+        } 
         
         .hidden { display: none !important; }
 
-        /* ================= POP-UP MODAL PANEL (BOTTOM SHEET) ================= */
+        /* MODAL PANEL (BOTTOM SHEET) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            display: flex; justify-content: center; align-items: flex-end; /* Muncul dari bawah */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: flex-end;
             opacity: 0; visibility: hidden;
             transition: all 0.3s ease;
             z-index: 1000;
@@ -262,31 +304,43 @@
         .modal-content {
             background: var(--bg-color);
             width: 100%; max-width: 450px;
-            border-top-left-radius: 24px; border-top-right-radius: 24px;
-            padding: 25px;
+            border-top-left-radius: 28px; border-top-right-radius: 28px;
+            padding: 30px 25px;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 -10px 40px rgba(0, 243, 255, 0.1);
-            max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.1);
+            max-height: 85vh; overflow-y: auto;
         }
         .modal-overlay.show .modal-content { transform: translateY(0); }
 
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
         .modal-header h3 { font-size: 18px; font-weight: 600; }
-        .close-btn { background: #f0f0f0; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; margin: 0; color: #555;}
+        .close-btn { 
+            background: #f0f0f0; width: 36px; height: 36px; 
+            border-radius: 50%; display: flex; justify-content: center; 
+            align-items: center; cursor: pointer; padding: 0; margin: 0; 
+            color: #555; border: none; transition: 0.2s;
+        }
+        .close-btn:hover { background: #e0e0e0; }
         
         .modal-item {
-            padding: 15px;
+            padding: 16px;
             border: 2px solid var(--border-light);
-            border-radius: 12px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            margin-bottom: 12px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.2s;
             text-align: center;
+            background: #fff;
         }
         .modal-item:active { transform: scale(0.97); }
-        .modal-item:hover { border-color: var(--neon-cyan); background: rgba(0,243,255,0.05); }
+        .modal-item:hover { 
+            border-color: var(--neon-cyan); 
+            background: rgba(0,229,255,0.05); 
+            color: #0099aa;
+            font-weight: 600;
+        }
 
     </style>
 </head>
@@ -295,30 +349,30 @@
     <div class="app-container">
         <header>
             <h1>XIF7 ABSENTIA</h1>
-            <div id="live-clock" class="clock">00:00:00</div>
         </header>
 
         <div id="panel-awal" class="panel active">
             <h2>Portal Kehadiran</h2>
-            <p>Sistem Absensi Real-time Interaktif</p>
+            <p>Sistem Absensi Digital Kelas XIF7</p>
             <button class="btn-primary" onclick="switchPanel('panel-absen')">📝 ABSEN SEKARANG</button>
             <button class="btn-secondary" onclick="switchPanel('panel-pengelola')">⚙️ PENGELOLA (ADMIN)</button>
         </div>
 
         <div id="panel-pengelola" class="panel">
             <h2>Akses Admin</h2>
-            <p>Khusus pengelola absensi</p>
+            <p>Silakan masuk ke panel pengelola</p>
             <input type="text" placeholder="Username" class="input-field" style="margin-bottom: 15px;">
-            <input type="password" placeholder="Password" class="input-field" style="margin-bottom: 20px;">
+            <input type="password" placeholder="Password" class="input-field" style="margin-bottom: 25px;">
             <button class="btn-primary" onclick="Swal.fire('Restricted', 'Panel Admin belum terhubung ke database.', 'info')">LOGIN</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Kembali</button>
         </div>
 
         <div id="panel-absen" class="panel">
-            <h2>Formulir Siswa</h2>
+            <h2>Formulir Kehadiran</h2>
+            <p style="margin-bottom: 20px;">Isi data dengan teliti dan benar</p>
             
             <div class="form-group">
-                <label>Pilih Jadwal:</label>
+                <label>Pilih Jadwal Hari:</label>
                 <input type="hidden" id="hari" value="">
                 <div class="custom-select-btn" id="btn-pilih-hari" onclick="openModal('modal-hari')">
                     <span id="teks-hari">Pilih Hari...</span> <span>▼</span>
@@ -326,6 +380,7 @@
             </div>
 
             <div class="form-group">
+                <label>Pilih Mata Pelajaran:</label>
                 <input type="hidden" id="mapel" value="">
                 <div class="custom-select-btn" id="btn-pilih-mapel" onclick="bukaModalMapel()">
                     <span id="teks-mapel">Pilih Mata Pelajaran...</span> <span>▼</span>
@@ -334,43 +389,43 @@
 
             <div class="form-group">
                 <label>Identitas Siswa:</label>
-                <input type="text" id="search-nama" class="input-field search-box" placeholder="🔍 Ketik nama kamu..." oninput="filterNama()">
+                <input type="text" id="search-nama" class="input-field search-box" placeholder="🔍 Cari nama kamu..." oninput="filterNama()">
                 <div id="list-nama" class="name-list"></div>
                 <input type="hidden" id="nama-terpilih" value="">
             </div>
 
             <div class="form-group">
-                <label>Kehadiran:</label>
+                <label>Status Kehadiran:</label>
                 <div class="radio-group">
                     <label class="radio-btn" id="label-hadir">
-                        <input type="radio" name="status" value="Hadir" onchange="ubahStatus('Hadir')"> HADIR
+                        <input type="radio" name="status" value="Hadir" onchange="ubahStatus('Hadir')"> ✅ HADIR
                     </label>
                     <label class="radio-btn" id="label-izin">
-                        <input type="radio" name="status" value="Izin" onchange="ubahStatus('Izin')"> IZIN
+                        <input type="radio" name="status" value="Izin" onchange="ubahStatus('Izin')"> ✉️ IZIN
                     </label>
                 </div>
             </div>
 
             <div id="area-dinamis" class="hidden">
                 <div id="area-kamera" class="hidden">
-                    <label>Verifikasi Wajah (Selfie):</label>
+                    <label>Verifikasi Wajah (Selfie Asli, Tidak Mirror):</label>
                     <div class="camera-wrapper">
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
                     </div>
-                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()">📸 Ambil Foto</button>
-                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()">🔄 Foto Ulang</button>
+                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()">📸 Jepret Foto</button>
+                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()">🔄 Ulangi Foto</button>
                     <input type="hidden" id="foto-data" value="">
                 </div>
 
                 <div id="area-izin" class="hidden">
                     <label>Alasan Izin:</label>
-                    <textarea id="keterangan-izin" class="input-field" rows="3" placeholder="Jelaskan alasan izin minimal 5 huruf..."></textarea>
+                    <textarea id="keterangan-izin" class="input-field" rows="3" placeholder="Jelaskan alasan izin (Minimal 5 huruf)..."></textarea>
                 </div>
             </div>
 
             <br>
-            <button class="btn-primary" onclick="kirimAbsen()" style="box-shadow: 0 8px 25px rgba(255,0,122,0.4); background: linear-gradient(45deg, var(--neon-pink), #ff5e00);">🚀 KIRIM DATA ABSEN</button>
+            <button class="btn-primary" onclick="kirimAbsen()" style="box-shadow: 0 10px 25px rgba(255,0,122,0.3); background: linear-gradient(135deg, var(--neon-pink), #ff5e00);">🚀 KIRIM DATA ABSEN</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Batalkan</button>
         </div>
     </div>
@@ -425,31 +480,25 @@
 
         let stateNamaTerpilih = "";
 
-        // --- 2. FITUR JAM & TRANSISI PANEL ---
-        setInterval(() => {
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('id-ID');
-        }, 1000);
-
+        // --- 2. NAVIGASI PANEL ---
         function switchPanel(panelId) {
-            // Animasi tutup panel saat ini, baru buka yang baru
             const currentActive = document.querySelector('.panel.active');
             if(currentActive) {
                 currentActive.style.opacity = 0;
-                currentActive.style.transform = 'scale(0.95) translateY(15px)';
+                currentActive.style.transform = 'scale(0.96) translateY(10px)';
                 setTimeout(() => {
                     currentActive.classList.remove('active');
                     const nextPanel = document.getElementById(panelId);
                     nextPanel.classList.add('active');
-                    // Paksa reflow agar transisi CSS berjalan
                     void nextPanel.offsetWidth;
                     nextPanel.style.opacity = 1;
                     nextPanel.style.transform = 'scale(1) translateY(0)';
-                }, 300); // Sinkron dengan durasi CSS
+                }, 300);
             }
             if(panelId === 'panel-awal') matikanKamera(); 
         }
 
-        // --- 3. LOGIKA CUSTOM MODAL (HARI & MAPEL) ---
+        // --- 3. MODAL HARI & MAPEL ---
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -459,7 +508,6 @@
             document.getElementById('teks-hari').innerText = hari;
             btnHari.classList.add('selected');
             
-            // Reset Mapel jika ganti hari
             document.getElementById('mapel').value = "";
             document.getElementById('teks-mapel').innerText = "Pilih Mata Pelajaran...";
             document.getElementById('btn-pilih-mapel').classList.remove('selected');
@@ -471,7 +519,7 @@
         function bukaModalMapel() {
             const hari = document.getElementById('hari').value;
             if(!hari) {
-                Swal.fire({icon: 'warning', title: 'Oops', text: 'Pilih hari terlebih dahulu!', confirmButtonColor: '#00f3ff'});
+                Swal.fire({icon: 'warning', title: 'Oops', text: 'Pilih hari terlebih dahulu!', confirmButtonColor: '#00e5ff'});
                 return;
             }
             openModal('modal-mapel');
@@ -498,7 +546,7 @@
             closeModal('modal-mapel');
         }
 
-        // --- 4. RENDER NAMA & HIGHLIGHT NEON ---
+        // --- 4. RENDER PENCARIAN NAMA ---
         const listContainer = document.getElementById('list-nama');
         function renderNama(filterText = "") {
             listContainer.innerHTML = "";
@@ -509,7 +557,6 @@
                 div.className = 'name-item';
                 div.innerText = nama;
                 
-                // Jika nama ini yang dipilih, beri class 'terpilih'
                 if(nama === stateNamaTerpilih) {
                     div.classList.add('terpilih');
                 }
@@ -517,13 +564,12 @@
                 div.onclick = () => {
                     stateNamaTerpilih = nama;
                     document.getElementById('nama-terpilih').value = nama;
-                    // Render ulang untuk memindahkan garis neon (highlight)
                     renderNama(document.getElementById('search-nama').value);
                 };
                 listContainer.appendChild(div);
             });
         }
-        renderNama(); // Load awal
+        renderNama(); 
 
         function filterNama() {
             const text = document.getElementById('search-nama').value;
@@ -540,39 +586,38 @@
             const labelHadir = document.getElementById('label-hadir');
             const labelIzin = document.getElementById('label-izin');
 
-            // Reset UI Radio Button
             labelHadir.classList.remove('active-hadir');
             labelIzin.classList.remove('active-izin');
-
             areaDinamis.classList.remove('hidden');
 
             if (status === 'Hadir') {
                 labelHadir.classList.add('active-hadir');
-                
-                // Transisi Smooth antar area
                 areaIzin.classList.add('hidden');
                 areaKamera.classList.remove('hidden');
                 mulaiKamera();
             } else {
                 labelIzin.classList.add('active-izin');
-                
                 areaKamera.classList.add('hidden');
                 areaIzin.classList.remove('hidden');
                 matikanKamera();
             }
         }
 
+        // KAMERA DIATUR AGAR TIDAK MIRROR & PAKAI KAMERA DEPAN
         async function mulaiKamera() {
             const video = document.getElementById('video-kamera');
             try {
-                streamKamera = await navigator.mediaDevices.getUserMedia({ video: true });
+                // facingMode: "user" memastikan kamera depan untuk HP
+                streamKamera = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" } 
+                });
                 video.srcObject = streamKamera;
                 document.getElementById('video-kamera').classList.remove('hidden');
                 document.getElementById('canvas-kamera').classList.add('hidden');
                 document.getElementById('btn-capture').classList.remove('hidden');
                 document.getElementById('btn-retake').classList.add('hidden');
             } catch (err) {
-                Swal.fire('Error', 'Izin kamera ditolak atau perangkat tidak memiliki kamera.', 'error');
+                Swal.fire('Error', 'Gagal membuka kamera. Pastikan browser diizinkan mengakses kamera.', 'error');
             }
         }
 
@@ -618,8 +663,20 @@
             if (!hari || !mapel || !nama || !status) {
                 Swal.fire({
                     title: 'Data Belum Lengkap',
-                    text: 'Pastikan Hari, Mapel, Nama, dan Kehadiran telah diisi.',
+                    text: 'Pastikan Hari, Mapel, Nama, dan Status Kehadiran telah diisi.',
                     icon: 'warning',
+                    confirmButtonColor: '#ff007a'
+                });
+                return;
+            }
+
+            // CEK DOUBLE ABSEN (Mencegah nama, hari, dan mapel yang sama diabsen ulang)
+            const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
+            if (localStorage.getItem(cekAbsenKunci)) {
+                Swal.fire({
+                    title: 'Sudah Absen!',
+                    text: `Siswa bernama ${nama} sudah melakukan absensi untuk pelajaran ${mapel} pada hari ${hari}.`,
+                    icon: 'error',
                     confirmButtonColor: '#ff007a'
                 });
                 return;
@@ -631,17 +688,18 @@
             if (status === 'Hadir') {
                 foto = document.getElementById('foto-data').value;
                 if (!foto) {
-                    Swal.fire('Oops!', 'Jangan lupa jepret foto selfie kamu.', 'warning');
+                    Swal.fire('Oops!', 'Jangan lupa jepret foto selfie kamu (Pastikan wajah & seragam jelas).', 'warning');
                     return;
                 }
             } else if (status === 'Izin') {
                 keterangan = document.getElementById('keterangan-izin').value.trim();
                 if (keterangan.length < 5) {
-                    Swal.fire('Oops!', 'Tuliskan alasan izin minimal 5 huruf.', 'warning');
+                    Swal.fire('Oops!', 'Tuliskan alasan izin minimal 5 karakter huruf.', 'warning');
                     return;
                 }
             }
 
+            // Data final siap dikirim
             const payload = {
                 waktu: new Date().toISOString(),
                 hari: hari,
@@ -652,23 +710,16 @@
                 keterangan: keterangan
             };
 
-            // Uncomment baris di bawah saat menyambungkan ke Firebase Asli
-            /*
-            firebase.database().ref('absensi_xif7').push(payload)
-            .then(() => {
-                Swal.fire('Sukses', 'Absen terkirim!', 'success').then(() => window.location.reload());
-            })
-            .catch((error) => Swal.fire('Error', error, 'error'));
-            */
-
-            // Simulasi Sukses UI
+            // SIMULASI SUKSES UI
             Swal.fire({
                 title: 'Absen Terkirim! 🚀',
-                text: `Data kehadiran ${nama} berhasil dicatat.`,
+                text: `Data kehadiran ${nama} berhasil dicatat di sistem.`,
                 icon: 'success',
-                confirmButtonColor: '#00f3ff',
+                confirmButtonColor: '#00e5ff',
                 background: '#fff'
             }).then(() => {
+                // Simpan kunci di penyimpanan lokal browser agar tidak bisa dobel absen
+                localStorage.setItem(cekAbsenKunci, 'true');
                 window.location.reload();
             });
         }
