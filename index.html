@@ -174,9 +174,11 @@
         .btn-delete-small { background: #fee2e2; color: #ef4444; } .btn-delete-small:hover { background: #fca5a5; }
         .btn-foto-small { background: #e0f2fe; color: #0284c7; } .btn-foto-small:hover { background: #bae6fd; }
 
-        /* Tabs Filter Kehadiran */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { flex: 1; min-width: 100px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; margin: 0;}
+        /* Tabs Filter Navigasi Admin (Scrollable Horizontal) */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; }
+        .tabs-container::-webkit-scrollbar { height: 4px; }
+        .tabs-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .tab-btn { flex-shrink: 0; padding: 12px 20px; border-radius: 12px; border: 1.5px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; margin: 0;}
         .tab-btn.active { background: var(--primary-grad); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(14,165,233,0.3);}
 
         @media (max-width: 600px) {
@@ -342,56 +344,39 @@
         </div>
     </div>
 
-    <div id="modal-admin-hari" class="modal-overlay" onclick="closeModal('modal-admin-hari')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Filter Hari</h3>
-                <button class="close-btn" onclick="closeModal('modal-admin-hari')">✕</button>
-            </div>
-            <div>
-                <div class="modal-item" onclick="pilihAdminHari('Senin')">Senin</div>
-                <div class="modal-item" onclick="pilihAdminHari('Selasa')">Selasa</div>
-                <div class="modal-item" onclick="pilihAdminHari('Rabu')">Rabu</div>
-                <div class="modal-item" onclick="pilihAdminHari('Kamis')">Kamis</div>
-                <div class="modal-item" onclick="pilihAdminHari('Jumat')">Jumat</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-admin-mapel" class="modal-overlay" onclick="closeModal('modal-admin-mapel')">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Filter Mapel</h3>
-                <button class="close-btn" onclick="closeModal('modal-admin-mapel')">✕</button>
-            </div>
-            <div id="list-admin-mapel-container"></div>
-        </div>
-    </div>
-
     <div id="modal-kehadiran" class="modal-overlay" onclick="closeModal('modal-kehadiran')">
-        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px; height: 90vh; display: flex; flex-direction: column;">
-            <div class="modal-header">
-                <h3>Monitor Kehadiran Siswa</h3>
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px; height: 95vh; display: flex; flex-direction: column; padding: 25px 20px;">
+            <div class="modal-header" style="margin-bottom: 15px;">
+                <h3 style="font-size: 18px;">Monitor Kehadiran</h3>
                 <button class="close-btn" onclick="closeModal('modal-kehadiran')">✕</button>
             </div>
             
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <input type="hidden" id="filter-admin-hari-val" value="">
-                <div class="custom-select-btn" id="btn-admin-hari" onclick="openModal('modal-admin-hari')" style="flex: 1; padding: 14px;">
-                    <span id="teks-admin-hari">Pilih Hari...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
-                </div>
-
-                <input type="hidden" id="filter-admin-mapel-val" value="">
-                <div class="custom-select-btn" id="btn-admin-mapel" onclick="bukaModalAdminMapel()" style="flex: 1; padding: 14px;">
-                    <span id="teks-admin-mapel">Pilih Mapel...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">1. Pilih Hari</label>
+                <div class="tabs-container" id="admin-hari-tabs" style="margin-top: 8px;">
+                    <button class="tab-btn" onclick="pilihAdminHariInline('Senin', this)">Senin</button>
+                    <button class="tab-btn" onclick="pilihAdminHariInline('Selasa', this)">Selasa</button>
+                    <button class="tab-btn" onclick="pilihAdminHariInline('Rabu', this)">Rabu</button>
+                    <button class="tab-btn" onclick="pilihAdminHariInline('Kamis', this)">Kamis</button>
+                    <button class="tab-btn" onclick="pilihAdminHariInline('Jumat', this)">Jumat</button>
                 </div>
             </div>
 
-            <div class="tabs-container">
-                <button class="tab-btn active" id="tab-semua" onclick="setTabKehadiran('Semua')">Semua</button>
-                <button class="tab-btn" id="tab-hadir" onclick="setTabKehadiran('Hadir')">Hadir</button>
-                <button class="tab-btn" id="tab-izin" onclick="setTabKehadiran('Izin')">Izin</button>
-                <button class="tab-btn" id="tab-belum" onclick="setTabKehadiran('Belum Absen')">Belum Absen</button>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">2. Pilih Mapel</label>
+                <div class="tabs-container" id="admin-mapel-tabs" style="margin-top: 8px;">
+                    <div style="font-size: 13px; color: #94a3b8; padding: 10px 5px; font-weight: 500;">Silakan pilih hari terlebih dahulu.</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 5px;">
+                <label style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">3. Filter Status</label>
+                <div class="tabs-container" style="margin-top: 8px;">
+                    <button class="tab-btn active" id="tab-semua" onclick="setTabKehadiran('Semua')">Semua</button>
+                    <button class="tab-btn" id="tab-hadir" onclick="setTabKehadiran('Hadir')">Hadir</button>
+                    <button class="tab-btn" id="tab-izin" onclick="setTabKehadiran('Izin')">Izin</button>
+                    <button class="tab-btn" id="tab-belum" onclick="setTabKehadiran('Belum Absen')">Belum Absen</button>
+                </div>
             </div>
 
             <div class="table-responsive" style="flex: 1; margin-bottom: 0;">
@@ -404,7 +389,7 @@
                         </tr>
                     </thead>
                     <tbody id="tbody-filter-kehadiran">
-                        <tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>
+                        <tr><td colspan="3" style="text-align:center; color:#888;">Data akan tampil di sini.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -490,58 +475,62 @@
             else switchPanel('panel-absen');
         }
 
-        // --- 4. FITUR ADMIN: KEHADIRAN (FILTER MODAL CUSTOM) ---
+        // --- 4. FITUR ADMIN: KEHADIRAN (INLINE TABS) ---
+        let adminFilterHari = "";
+        let adminFilterMapel = "";
         let filterTabKehadiran = 'Semua';
 
         function bukaModalKehadiran() {
             openModal('modal-kehadiran');
-            // Reset filter ke default
-            document.getElementById('filter-admin-hari-val').value = ""; document.getElementById('teks-admin-hari').innerText = "Pilih Hari..."; document.getElementById('btn-admin-hari').classList.remove('selected');
-            document.getElementById('filter-admin-mapel-val').value = ""; document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel..."; document.getElementById('btn-admin-mapel').classList.remove('selected');
+            // Reset state
+            adminFilterHari = ""; adminFilterMapel = "";
+            
+            // Reset UI Tabs Hari
+            document.querySelectorAll('#admin-hari-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Reset UI Tabs Mapel
+            document.getElementById('admin-mapel-tabs').innerHTML = '<div style="font-size: 13px; color: #94a3b8; padding: 10px 5px; font-weight: 500;">Silakan pilih hari terlebih dahulu.</div>';
+            
             document.getElementById('tbody-filter-kehadiran').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
             setTabKehadiran('Semua');
         }
 
-        function pilihAdminHari(hari) {
-            document.getElementById('filter-admin-hari-val').value = hari;
-            document.getElementById('teks-admin-hari').innerText = hari;
-            document.getElementById('btn-admin-hari').classList.add('selected');
+        function pilihAdminHariInline(hari, element) {
+            adminFilterHari = hari;
+            adminFilterMapel = ""; // Reset mapel karena ganti hari
             
-            // Reset Mapel karena hari berubah
-            document.getElementById('filter-admin-mapel-val').value = "";
-            document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel...";
-            document.getElementById('btn-admin-mapel').classList.remove('selected');
+            // Set style active button Hari
+            document.querySelectorAll('#admin-hari-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            // Generate Mapel Buttons
+            const mapelContainer = document.getElementById('admin-mapel-tabs');
+            mapelContainer.innerHTML = "";
+            if(jadwalPelajaran[hari]) {
+                jadwalPelajaran[hari].forEach(mapel => {
+                    mapelContainer.innerHTML += `<button class="tab-btn" onclick="pilihAdminMapelInline('${mapel}', this)">${mapel}</button>`;
+                });
+            }
             
-            closeModal('modal-admin-hari');
-            generateAdminMapelList(hari);
             renderTabelKehadiran();
         }
 
-        function bukaModalAdminMapel() {
-            if(!document.getElementById('filter-admin-hari-val').value) { return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih hari terlebih dahulu.', timer: 2000, timerProgressBar: true, showConfirmButton: false}); }
-            openModal('modal-admin-mapel');
-        }
-
-        function generateAdminMapelList(hari) {
-            const container = document.getElementById('list-admin-mapel-container'); container.innerHTML = "";
-            if(jadwalPelajaran[hari]) { 
-                jadwalPelajaran[hari].forEach(mapel => { 
-                    container.innerHTML += `<div class="modal-item" onclick="pilihAdminMapel('${mapel}')">${mapel}</div>`; 
-                }); 
-            }
-        }
-
-        function pilihAdminMapel(mapel) {
-            document.getElementById('filter-admin-mapel-val').value = mapel;
-            document.getElementById('teks-admin-mapel').innerText = mapel;
-            document.getElementById('btn-admin-mapel').classList.add('selected');
-            closeModal('modal-admin-mapel');
+        function pilihAdminMapelInline(mapel, element) {
+            adminFilterMapel = mapel;
+            
+            // Set style active button Mapel
+            document.querySelectorAll('#admin-mapel-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
             renderTabelKehadiran();
         }
 
         function setTabKehadiran(tabName) {
             filterTabKehadiran = tabName;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-semua').classList.remove('active');
+            document.getElementById('tab-hadir').classList.remove('active');
+            document.getElementById('tab-izin').classList.remove('active');
+            document.getElementById('tab-belum').classList.remove('active');
+            
             if(tabName === 'Semua') document.getElementById('tab-semua').classList.add('active');
             else if(tabName === 'Hadir') document.getElementById('tab-hadir').classList.add('active');
             else if(tabName === 'Izin') document.getElementById('tab-izin').classList.add('active');
@@ -551,19 +540,17 @@
         }
 
         function renderTabelKehadiran() {
-            const hari = document.getElementById('filter-admin-hari-val').value;
-            const mapel = document.getElementById('filter-admin-mapel-val').value;
             const tbody = document.getElementById('tbody-filter-kehadiran');
             
-            if(!hari || !mapel) {
+            if(!adminFilterHari || !adminFilterMapel) {
                 tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
                 return;
             }
 
-            const dbFiltered = dbAbsensi.filter(item => item.hari === hari && item.mapel === mapel);
+            const dbFiltered = dbAbsensi.filter(item => item.hari === adminFilterHari && item.mapel === adminFilterMapel);
             let hasilAkhir = [];
 
-            // Cari siapa saja yang ada di kelas tapi belum diabsen
+            // Gabungkan dengan data asli untuk cari yang belum absen
             daftarNama.forEach(nama => {
                 let record = dbFiltered.find(item => item.nama === nama);
                 if (record) hasilAkhir.push({ nama: nama, status: record.status, keterangan: record.keterangan, foto: record.foto });
@@ -648,7 +635,7 @@
         }
 
         function resetSemuaData() {
-            // Konfirmasi reset tanpa auto-close
+            // Konfirmasi persetujuan tanpa auto-close
             Swal.fire({
                 title: 'Yakin Mereset Semua?', text: "Tindakan ini akan menghapus SELURUH data absen secara permanen!",
                 icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Reset Semua!'
@@ -729,7 +716,7 @@
             closeModal('modal-mapel'); renderNama(document.getElementById('search-nama').value);
         }
 
-        // --- 7. RENDER NAMA SISWA (DENGAN FIX BUG PENCARIAN) ---
+        // --- 7. RENDER NAMA SISWA (FIX BUG PENCARIAN & TIDAK KETEMU) ---
         function renderNama(filterText = "") {
             const listContainer = document.getElementById('list-nama');
             const hari = document.getElementById('hari').value;
@@ -742,7 +729,7 @@
             
             // Fix Bug: Jika nama tidak ditemukan saat diketik
             if(filtered.length === 0) {
-                listContainer.innerHTML = `<div class="name-item disabled" style="text-align:center; color:#94a3b8; padding: 20px;">Nama tidak ditemukan.</div>`;
+                listContainer.innerHTML = `<div class="name-item disabled" style="text-align:center; color:#94a3b8; padding: 20px;">Siswa tidak ditemukan.</div>`;
                 return;
             }
 
@@ -761,9 +748,8 @@
                     div.onclick = () => {
                         stateNamaTerpilih = nama; 
                         document.getElementById('nama-terpilih').value = nama;
-                        // Refresh input search box agar sama dengan yang diklik
-                        document.getElementById('search-nama').value = nama;
-                        renderNama(nama); // Filter langsung ke 1 nama tersebut agar jelas terpilih
+                        document.getElementById('search-nama').value = nama; // Set input otomatis
+                        renderNama(nama); // Langsung saring 1 nama
                     };
                 }
                 listContainer.appendChild(div);
