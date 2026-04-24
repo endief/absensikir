@@ -424,8 +424,8 @@
         // ======================================================================
         const supabaseUrl = 'https://brtxlwjoyheeyeqcvhfi.supabase.co';
         
-        // 👉 GANTI TULISAN DI BAWAH INI DENGAN PUBLISHABLE KEY MILIKMU
-        const supabaseKey = 'ISI_DENGAN_PUBLISHABLE_KEY_KAMU_DISINI'; 
+        // Menggunakan API Key yang telah kamu kirimkan (Tanda kutip sudah diperbaiki)
+        const supabaseKey = 'Sb_publishable_7nC7MBrXx3xGm3xtDrWxBQ_XFj5wDI2'; 
         
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -433,15 +433,19 @@
 
         // Fungsi Load Data dari Cloud Supabase
         async function loadDataDariSupabase() {
-            const { data, error } = await supabase.from('absensi_xif7').select('*').order('created_at', { ascending: false });
-            if (error) {
-                console.error("Gagal memuat data dari Supabase:", error);
-            } else {
-                dbAbsensi = data;
-                document.getElementById('sync-status-indicator').style.display = 'block'; // Tampilkan indikator online
-                renderTabelAdmin();
-                renderTabelKehadiran();
-                if(document.getElementById('hari').value) renderNama(document.getElementById('search-nama').value);
+            try {
+                const { data, error } = await supabase.from('absensi_xif7').select('*').order('created_at', { ascending: false });
+                if (error) {
+                    console.error("Gagal memuat data dari Supabase:", error);
+                } else if (data) {
+                    dbAbsensi = data;
+                    document.getElementById('sync-status-indicator').style.display = 'block'; // Tampilkan indikator online
+                    renderTabelAdmin();
+                    renderTabelKehadiran();
+                    if(document.getElementById('hari').value) renderNama(document.getElementById('search-nama').value);
+                }
+            } catch (err) {
+                console.error("Koneksi Supabase error:", err);
             }
         }
         
