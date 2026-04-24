@@ -62,7 +62,7 @@
 
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* --- MERAPIKAN HEADER & JUDUL --- */
+        /* --- HEADER & JUDUL --- */
         header { text-align: center; margin-bottom: 10px; }
         h1 { font-family: var(--font-heading); font-size: 28px; font-weight: 800; line-height: 1.2; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0; }
         h2 { font-family: var(--font-heading); font-size: 21px; font-weight: 700; text-align: center; color: var(--text-main); letter-spacing: 0.3px; margin-bottom: 4px; }
@@ -84,6 +84,8 @@
         .btn-danger:hover { box-shadow: 0 15px 35px -5px rgba(239, 68, 68, 0.5); transform: translateY(-2px); }
         .btn-text { background: transparent; color: var(--text-muted); padding: 5px; font-size: 14px; box-shadow: none;}
         .btn-text:hover { color: var(--text-main); }
+        .btn-info { background: #38bdf8; color: white; box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.4); }
+        .btn-info:hover { box-shadow: 0 15px 35px -5px rgba(56, 189, 248, 0.5); transform: translateY(-2px); }
 
         /* --- FORM & INPUT --- */
         .form-group { margin-bottom: 24px; }
@@ -128,6 +130,12 @@
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-content { background: #ffffff; width: 100%; max-width: 460px; border-radius: 32px 32px 0 0; padding: 35px 30px; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; box-shadow: 0 -20px 40px rgba(0,0,0,0.1); }
         .modal-overlay.show .modal-content { transform: translateY(0); }
+        
+        /* Modal Tengah (Untuk Preview Foto) */
+        .modal-center { align-items: center; }
+        .modal-center .modal-content { border-radius: 24px; transform: scale(0.9); padding: 20px; max-width: 400px; }
+        .modal-overlay.show .modal-center .modal-content { transform: scale(1); }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;}
         .modal-header h3 { font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: var(--text-main); }
         .close-btn { background: #f1f5f9; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; transition: 0.2s; color: var(--text-muted); font-size: 16px; }
@@ -145,8 +153,15 @@
         .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
         .badge-hadir { background: rgba(16, 185, 129, 0.1); color: #10b981; }
         .badge-izin { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
-        .btn-delete-small { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; margin: 0; width: auto;}
-        .btn-delete-small:hover { background: #fca5a5; }
+        .badge-belum { background: rgba(100, 116, 139, 0.1); color: #64748b; }
+        .btn-small { padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; margin: 0; border: none; transition: 0.2s;}
+        .btn-delete-small { background: #fee2e2; color: #ef4444; } .btn-delete-small:hover { background: #fca5a5; }
+        .btn-foto-small { background: #e0f2fe; color: #0284c7; } .btn-foto-small:hover { background: #bae6fd; }
+
+        /* Tabs Filter Kehadiran */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { flex: 1; min-width: 100px; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; margin: 0;}
+        .tab-btn.active { background: var(--neon-cyan); color: #fff; border-color: var(--neon-cyan); }
 
         @media (max-width: 600px) {
             .admin-controls { grid-template-columns: 1fr; }
@@ -186,6 +201,8 @@
             <h2>Dashboard Pengelola</h2>
             <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 20px; text-align: center;">Pemantauan Real-Time</p>
             
+            <button class="btn-info" onclick="bukaModalKehadiran()">📊 Data Kehadiran (Filter Status)</button>
+            
             <div class="admin-controls">
                 <button id="btn-toggle-absen" onclick="toggleStatusAbsensi()" style="margin-bottom: 0;">Tutup Absensi</button>
                 <button class="btn-primary" onclick="downloadExcel()" style="margin-bottom: 0;">Download Excel</button>
@@ -200,7 +217,6 @@
                             <th>Nama Siswa</th>
                             <th>Hari & Mapel</th>
                             <th>Status</th>
-                            <th>Keterangan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -213,8 +229,8 @@
         </div>
 
         <div id="panel-absen" class="panel">
-            <h2>Forum Absensi</h2>
-            <p class="form-desc">Absen cihuyy by nabil sang raja iblis</p>
+            <h2>Forum Absensi XIF7</h2>
+            <p class="form-desc">Isi dengan jujur!</p>
             
             <div class="form-group">
                 <label>Hari Absensi</label>
@@ -267,7 +283,7 @@
                     <label>Keterangan Absen (Izin/Sakit)</label>
                     <textarea id="keterangan-izin" class="input-field" rows="3" placeholder="Sertakan alasan yang jelas (Min. 5 huruf)..."></textarea>
                     
-                    <label style="margin-top: 20px;">Unggah Surat Bukti (*Wajib)</label>
+                    <label style="margin-top: 20px;">Unggah Surat Bukti (*Wajib, Max 2MB)</label>
                     <input type="file" id="surat-izin" accept="image/*" class="input-field">
                 </div>
             </div>
@@ -304,6 +320,58 @@
         </div>
     </div>
 
+    <div id="modal-kehadiran" class="modal-overlay" onclick="closeModal('modal-kehadiran')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h3>Monitor Kehadiran Siswa</h3>
+                <button class="close-btn" onclick="closeModal('modal-kehadiran')">✕</button>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <select id="filter-admin-hari" class="input-field" onchange="generateMapelAdmin()" style="padding: 10px;">
+                    <option value="" disabled selected>Pilih Hari...</option>
+                    <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
+                    <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option>
+                </select>
+                <select id="filter-admin-mapel" class="input-field" onchange="renderTabelKehadiran()" style="padding: 10px;">
+                    <option value="" disabled selected>Pilih Mapel...</option>
+                </select>
+            </div>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" id="tab-semua" onclick="setTabKehadiran('Semua')">Semua</button>
+                <button class="tab-btn" id="tab-hadir" onclick="setTabKehadiran('Hadir')">Hadir</button>
+                <button class="tab-btn" id="tab-izin" onclick="setTabKehadiran('Izin')">Izin</button>
+                <button class="tab-btn" id="tab-belum" onclick="setTabKehadiran('Belum Absen')">Belum Absen</button>
+            </div>
+
+            <div class="table-responsive" style="flex: 1; margin-bottom: 0;">
+                <table style="min-width: 500px;">
+                    <thead>
+                        <tr>
+                            <th>Nama Siswa</th>
+                            <th>Status</th>
+                            <th>Keterangan / Bukti</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-filter-kehadiran">
+                        <tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-preview-foto" class="modal-overlay modal-center" onclick="closeModal('modal-preview-foto')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header" style="margin-bottom: 15px;">
+                <h3>Preview Bukti</h3>
+                <button class="close-btn" onclick="closeModal('modal-preview-foto')">✕</button>
+            </div>
+            <img id="preview-image-src" src="" alt="Bukti Foto" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        </div>
+    </div>
+
     <script>
         // --- 1. DATA JADWAL & NAMA ---
         const jadwalPelajaran = {
@@ -330,7 +398,7 @@
         // --- 2. SISTEM DATABASE LOKAL ---
         let dbAbsensi = JSON.parse(localStorage.getItem('absensi_db_XIF7')) || [];
         
-        // --- 3. FITUR ADMIN & PENGELOLA ---
+        // --- 3. FITUR ADMIN: LOGIN & KONTROL ---
         function loginAdmin() {
             const user = document.getElementById('admin-user').value;
             const pass = document.getElementById('admin-pass').value;
@@ -343,9 +411,7 @@
                     renderTabelAdmin();
                     updateTeksTombolBukaTutup();
                 });
-            } else {
-                Swal.fire('Akses Ditolak', 'Username atau Password salah!', 'error');
-            }
+            } else { Swal.fire('Akses Ditolak', 'Username atau Password salah!', 'error'); }
         }
 
         function logoutAdmin() { switchPanel('panel-awal', false); }
@@ -365,34 +431,117 @@
         function updateTeksTombolBukaTutup() {
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
             let btn = document.getElementById('btn-toggle-absen');
-            if(isClosed) {
-                btn.innerText = "Buka Absensi"; btn.style.background = "#10b981"; btn.style.color = "#fff";
-            } else {
-                btn.innerText = "Tutup Absensi"; btn.style.background = "#f59e0b"; btn.style.color = "#fff";
-            }
+            if(isClosed) { btn.innerText = "Buka Absensi"; btn.style.background = "#10b981"; btn.style.color = "#fff"; } 
+            else { btn.innerText = "Tutup Absensi"; btn.style.background = "#f59e0b"; btn.style.color = "#fff"; }
         }
 
         function cekDanBukaAbsen() {
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
-            if(isClosed) {
-                Swal.fire('Akses Ditolak', 'Maaf, PENGELOLA telah menutup sesi absensi saat ini.', 'error');
-            } else {
-                switchPanel('panel-absen');
-            }
+            if(isClosed) Swal.fire('Akses Ditolak', 'Maaf, PENGELOLA telah menutup sesi absensi saat ini.', 'error');
+            else switchPanel('panel-absen');
         }
 
+        // --- 4. FITUR ADMIN: KEHADIRAN & BUKTI FOTO ---
+        let filterTabKehadiran = 'Semua';
+
+        function bukaModalKehadiran() {
+            openModal('modal-kehadiran');
+            // Reset dropdown & tabel
+            document.getElementById('filter-admin-hari').value = "";
+            document.getElementById('filter-admin-mapel').innerHTML = '<option value="" disabled selected>Pilih Mapel...</option>';
+            document.getElementById('tbody-filter-kehadiran').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
+            setTabKehadiran('Semua');
+        }
+
+        function generateMapelAdmin() {
+            const hari = document.getElementById('filter-admin-hari').value;
+            const selectMapel = document.getElementById('filter-admin-mapel');
+            selectMapel.innerHTML = '<option value="" disabled selected>Pilih Mapel...</option>';
+            if(jadwalPelajaran[hari]) {
+                jadwalPelajaran[hari].forEach(mapel => {
+                    selectMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
+                });
+            }
+            renderTabelKehadiran();
+        }
+
+        function setTabKehadiran(tabName) {
+            filterTabKehadiran = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(tabName === 'Semua') document.getElementById('tab-semua').classList.add('active');
+            else if(tabName === 'Hadir') document.getElementById('tab-hadir').classList.add('active');
+            else if(tabName === 'Izin') document.getElementById('tab-izin').classList.add('active');
+            else if(tabName === 'Belum Absen') document.getElementById('tab-belum').classList.add('active');
+            
+            renderTabelKehadiran();
+        }
+
+        function renderTabelKehadiran() {
+            const hari = document.getElementById('filter-admin-hari').value;
+            const mapel = document.getElementById('filter-admin-mapel').value;
+            const tbody = document.getElementById('tbody-filter-kehadiran');
+            
+            if(!hari || !mapel) return; // Tunggu admin pilih keduanya
+
+            const dbFiltered = dbAbsensi.filter(item => item.hari === hari && item.mapel === mapel);
+            let hasilAkhir = [];
+
+            // Gabungkan data Siswa dengan DB (Cari yg belum absen)
+            daftarNama.forEach(nama => {
+                let record = dbFiltered.find(item => item.nama === nama);
+                if (record) {
+                    hasilAkhir.push({ nama: nama, status: record.status, keterangan: record.keterangan, foto: record.foto });
+                } else {
+                    hasilAkhir.push({ nama: nama, status: 'Belum Absen', keterangan: '-', foto: null });
+                }
+            });
+
+            // Terapkan Filter Tab
+            if (filterTabKehadiran !== 'Semua') {
+                hasilAkhir = hasilAkhir.filter(item => item.status === filterTabKehadiran);
+            }
+
+            tbody.innerHTML = "";
+            if(hasilAkhir.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Tidak ada data pada kategori ini.</td></tr>`;
+                return;
+            }
+
+            hasilAkhir.forEach(item => {
+                let badgeClass = item.status === 'Hadir' ? 'badge-hadir' : (item.status === 'Izin' ? 'badge-izin' : 'badge-belum');
+                let btnFoto = item.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${item.foto}')">📸 Lihat Foto</button>` : '-';
+                let infoKet = item.keterangan !== "-" ? `<div style="font-size:12px; color:#666; margin-top:5px;">${item.keterangan}</div>` : '';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${item.nama}</strong></td>
+                        <td><span class="status-badge ${badgeClass}">${item.status}</span></td>
+                        <td>${btnFoto} ${infoKet}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fungsi Global untuk melihat foto/surat (Digunakan di tabel rekap & kehadiran)
+        function lihatFotoPreview(base64Data) {
+            document.getElementById('preview-image-src').src = base64Data;
+            openModal('modal-preview-foto');
+        }
+
+        // --- 5. FITUR ADMIN: HAPUS & RESET ---
         function renderTabelAdmin() {
             const tbody = document.getElementById('tbody-rekap');
             tbody.innerHTML = "";
             
             if(dbAbsensi.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada data absensi yang masuk.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada data absensi yang masuk.</td></tr>`;
                 return;
             }
 
             [...dbAbsensi].reverse().forEach(data => {
                 let badgeClass = data.status === 'Hadir' ? 'badge-hadir' : 'badge-izin';
-                let btnHapus = `<button class="btn-delete-small" onclick="hapusDataIndividu('${data.id}', '${data.lockKey}')">Hapus</button>`;
+                let btnHapus = `<button class="btn-small btn-delete-small" onclick="hapusDataIndividu('${data.id}', '${data.lockKey}')">Hapus</button>`;
+                let btnFoto = `<button class="btn-small btn-foto-small" style="margin-left:5px;" onclick="lihatFotoPreview('${data.foto}')">Foto</button>`;
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -400,8 +549,7 @@
                     <td><strong>${data.nama}</strong></td>
                     <td>${data.hari} <br> <span style="font-size:11px; color:#888;">${data.mapel}</span></td>
                     <td><span class="status-badge ${badgeClass}">${data.status}</span></td>
-                    <td>${data.keterangan !== "-" ? data.keterangan : "Bukti Selfie"}</td>
-                    <td>${btnHapus}</td>
+                    <td>${btnHapus} ${btnFoto}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -415,11 +563,10 @@
                 if (result.isConfirmed) {
                     dbAbsensi = dbAbsensi.filter(item => item.id !== id);
                     localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
-                    localStorage.removeItem(lockKey); // Buka gembok siswa
+                    localStorage.removeItem(lockKey); 
                     
                     Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
-                    renderTabelAdmin();
-                    renderNama(document.getElementById('search-nama').value); // Refresh DOM List Nama
+                    renderTabelAdmin(); renderNama(document.getElementById('search-nama').value);
                 }
             });
         }
@@ -430,7 +577,6 @@
                 icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Reset Semua!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Hapus semua lock key di localStorage
                     const keysToRemove = [];
                     for (let i = 0; i < localStorage.length; i++) {
                         let key = localStorage.key(i);
@@ -438,61 +584,43 @@
                     }
                     keysToRemove.forEach(k => localStorage.removeItem(k));
 
-                    dbAbsensi = [];
-                    localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
+                    dbAbsensi = []; localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
                     
                     Swal.fire('Direset!', 'Seluruh data absensi telah kembali kosong.', 'success');
                     renderTabelAdmin();
                     
-                    // Reset pilihan form absen ke awal agar bersih
                     document.getElementById('hari').value = ""; document.getElementById('teks-hari').innerText = "Pilih hari kehadiran...";
                     document.getElementById('btn-pilih-hari').classList.remove('selected');
                     document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran...";
                     document.getElementById('btn-pilih-mapel').classList.remove('selected');
-                    stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
-                    document.getElementById('search-nama').value = "";
-                    
-                    renderNama(); // Refresh DOM List Nama
+                    stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = ""; document.getElementById('search-nama').value = "";
+                    renderNama(); 
                 }
             });
         }
 
         function downloadExcel() {
             if(dbAbsensi.length === 0) return Swal.fire('Kosong', 'Belum ada data untuk di-download.', 'info');
-
             const dataToExport = dbAbsensi.map(item => ({
-                "Tanggal & Jam": item.waktuStr,
-                "Nama Siswa": item.nama,
-                "Status Kehadiran": item.status,
-                "Alasan / Surat Bukti": item.keterangan || "Hadir (Selfie)",
-                "Hari": item.hari,
-                "Mata Pelajaran": item.mapel
+                "Tanggal & Jam": item.waktuStr, "Nama Siswa": item.nama, "Status": item.status, 
+                "Alasan Izin": item.keterangan || "Hadir", "Hari": item.hari, "Mata Pelajaran": item.mapel
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absen");
+            const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absen");
             XLSX.writeFile(workbook, "Rekap_Absensi_XIF7.xlsx");
         }
 
-        // --- 4. NAVIGASI UI & MODAL ---
+        // --- 6. NAVIGASI UMUM & MODAL ABSEN ---
         function switchPanel(panelId, isAdminPanel = false) {
             const currentActive = document.querySelector('.panel.active');
             const mainContainer = document.getElementById('main-container');
-            
-            if(isAdminPanel) mainContainer.classList.add('admin-mode');
-            else mainContainer.classList.remove('admin-mode');
-
+            if(isAdminPanel) mainContainer.classList.add('admin-mode'); else mainContainer.classList.remove('admin-mode');
             if(currentActive) {
-                currentActive.style.opacity = 0;
-                currentActive.style.transform = 'scale(0.97) translateY(15px)';
+                currentActive.style.opacity = 0; currentActive.style.transform = 'scale(0.97) translateY(15px)';
                 setTimeout(() => {
-                    currentActive.classList.remove('active');
-                    const nextPanel = document.getElementById(panelId);
-                    nextPanel.classList.add('active');
-                    void nextPanel.offsetWidth;
-                    nextPanel.style.opacity = 1;
-                    nextPanel.style.transform = 'scale(1) translateY(0)';
+                    currentActive.classList.remove('active'); document.getElementById(panelId).classList.add('active');
+                    void document.getElementById(panelId).offsetWidth;
+                    document.getElementById(panelId).style.opacity = 1; document.getElementById(panelId).style.transform = 'scale(1) translateY(0)';
                 }, 400);
             }
             if(panelId === 'panel-awal') matikanKamera(); 
@@ -502,121 +630,82 @@
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
         function pilihHari(hari) {
-            document.getElementById('hari').value = hari; document.getElementById('teks-hari').innerText = hari;
-            document.getElementById('btn-pilih-hari').classList.add('selected');
-            document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran...";
-            document.getElementById('btn-pilih-mapel').classList.remove('selected');
+            document.getElementById('hari').value = hari; document.getElementById('teks-hari').innerText = hari; document.getElementById('btn-pilih-hari').classList.add('selected');
+            document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran..."; document.getElementById('btn-pilih-mapel').classList.remove('selected');
             stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
             closeModal('modal-hari'); generateListMapel(hari); renderNama(document.getElementById('search-nama').value);
         }
 
         function bukaModalMapel() {
-            if(!document.getElementById('hari').value) { return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Silakan pilih jadwal hari terlebih dahulu.', confirmButtonColor: '#0ea5e9'}); }
+            if(!document.getElementById('hari').value) return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih jadwal hari terlebih dahulu.', confirmButtonColor: '#0ea5e9'});
             openModal('modal-mapel');
         }
 
         function generateListMapel(hari) {
             const container = document.getElementById('list-mapel-container'); container.innerHTML = "";
-            if(jadwalPelajaran[hari]) {
-                jadwalPelajaran[hari].forEach(mapel => {
-                    let div = document.createElement('div'); div.className = 'modal-item'; div.innerText = mapel;
-                    div.onclick = () => pilihMapel(mapel); container.appendChild(div);
-                });
-            }
+            if(jadwalPelajaran[hari]) { jadwalPelajaran[hari].forEach(mapel => { container.innerHTML += `<div class="modal-item" onclick="pilihMapel('${mapel}')">${mapel}</div>`; }); }
         }
 
         function pilihMapel(mapel) {
-            document.getElementById('mapel').value = mapel; document.getElementById('teks-mapel').innerText = mapel;
-            document.getElementById('btn-pilih-mapel').classList.add('selected');
+            document.getElementById('mapel').value = mapel; document.getElementById('teks-mapel').innerText = mapel; document.getElementById('btn-pilih-mapel').classList.add('selected');
             stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
             closeModal('modal-mapel'); renderNama(document.getElementById('search-nama').value);
         }
 
-        // --- 5. RENDER NAMA SISWA ---
-        function renderNama(filterText = "") {
-            const listContainer = document.getElementById('list-nama');
-            const hari = document.getElementById('hari').value;
-            const mapel = document.getElementById('mapel').value;
-            
-            listContainer.innerHTML = "";
-            const filtered = daftarNama.filter(nama => nama.toLowerCase().includes(filterText.toLowerCase()));
-            
-            filtered.forEach(nama => {
-                let div = document.createElement('div'); div.className = 'name-item';
-                
-                const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
-                const sudahAbsen = (hari && mapel && localStorage.getItem(cekAbsenKunci));
-
-                if (sudahAbsen) {
-                    div.innerHTML = `${nama} <span style="float:right; color:#10b981; font-weight:700;">✓ Tercatat</span>`;
-                    div.classList.add('disabled');
-                } else {
-                    div.innerText = nama;
-                    if(nama === stateNamaTerpilih) div.classList.add('terpilih');
-                    div.onclick = () => {
-                        stateNamaTerpilih = nama; document.getElementById('nama-terpilih').value = nama;
-                        renderNama(document.getElementById('search-nama').value);
-                    };
-                }
-                listContainer.appendChild(div);
-            });
-        }
-        renderNama(); 
-        function filterNama() { renderNama(document.getElementById('search-nama').value); }
-
-        // --- 6. KAMERA & STATUS ---
+        // --- 7. KAMERA & STATUS ---
         function ubahStatus(status) {
-            const areaDinamis = document.getElementById('area-dinamis');
-            const areaKamera = document.getElementById('area-kamera');
-            const areaIzin = document.getElementById('area-izin');
-            const labelHadir = document.getElementById('label-hadir');
-            const labelIzin = document.getElementById('label-izin');
-
-            labelHadir.classList.remove('active-hadir'); labelIzin.classList.remove('active-izin');
-            areaDinamis.classList.remove('hidden');
+            document.getElementById('label-hadir').classList.remove('active-hadir'); document.getElementById('label-izin').classList.remove('active-izin');
+            document.getElementById('area-dinamis').classList.remove('hidden');
 
             if (status === 'Hadir') {
-                labelHadir.classList.add('active-hadir');
-                areaIzin.classList.add('hidden'); areaKamera.classList.remove('hidden');
+                document.getElementById('label-hadir').classList.add('active-hadir');
+                document.getElementById('area-izin').classList.add('hidden'); document.getElementById('area-kamera').classList.remove('hidden');
                 mulaiKamera();
             } else {
-                labelIzin.classList.add('active-izin');
-                areaKamera.classList.add('hidden'); areaIzin.classList.remove('hidden');
+                document.getElementById('label-izin').classList.add('active-izin');
+                document.getElementById('area-kamera').classList.add('hidden'); document.getElementById('area-izin').classList.remove('hidden');
                 matikanKamera();
             }
         }
 
         async function mulaiKamera() {
-            const video = document.getElementById('video-kamera');
             try {
                 streamKamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                video.srcObject = streamKamera;
-                document.getElementById('video-kamera').classList.remove('hidden');
-                document.getElementById('canvas-kamera').classList.add('hidden');
-                document.getElementById('btn-capture').classList.remove('hidden');
-                document.getElementById('btn-retake').classList.add('hidden');
+                document.getElementById('video-kamera').srcObject = streamKamera;
+                document.getElementById('video-kamera').classList.remove('hidden'); document.getElementById('canvas-kamera').classList.add('hidden');
+                document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
             } catch (err) { Swal.fire('Akses Ditolak', 'Izinkan browser menggunakan kamera untuk verifikasi.', 'error'); }
         }
 
         function matikanKamera() { if (streamKamera) streamKamera.getTracks().forEach(track => track.stop()); }
 
         function takeSnapshot() {
-            const video = document.getElementById('video-kamera'); const canvas = document.getElementById('canvas-kamera');
-            const context = canvas.getContext('2d'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            context.translate(canvas.width, 0); context.scale(-1, 1); context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            document.getElementById('foto-data').value = canvas.toDataURL('image/png');
+            const video = document.getElementById('video-kamera'); const canvas = document.getElementById('canvas-kamera'); const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            ctx.translate(canvas.width, 0); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            // Convert to JPEG untuk menghemat memori LocalStorage
+            document.getElementById('foto-data').value = canvas.toDataURL('image/jpeg', 0.8);
             video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden'); document.getElementById('btn-retake').classList.remove('hidden');
         }
 
         function retakePhoto() {
-            document.getElementById('foto-data').value = ""; document.getElementById('video-kamera').classList.remove('hidden');
-            document.getElementById('canvas-kamera').classList.add('hidden'); document.getElementById('btn-capture').classList.remove('hidden');
-            document.getElementById('btn-retake').classList.add('hidden');
+            document.getElementById('foto-data').value = ""; document.getElementById('video-kamera').classList.remove('hidden'); document.getElementById('canvas-kamera').classList.add('hidden');
+            document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
         }
 
-        // --- 7. PENGIRIMAN DATA KE DATABASE LOKAL ---
-        function kirimAbsen() {
+        // Fungsi konversi file unggahan menjadi Base64 Gambar
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // --- 8. PENGIRIMAN DATA ---
+        async function kirimAbsen() {
             const hari = document.getElementById('hari').value;
             const mapel = document.getElementById('mapel').value;
             const nama = document.getElementById('nama-terpilih').value;
@@ -625,11 +714,12 @@
 
             if (!hari || !mapel || !nama || !status) return Swal.fire('Pendaftaran Gagal', 'Lengkapi Jadwal, Nama, dan Status Kehadiran.', 'warning');
 
-            let foto = ""; let keterangan = "-"; let namaFileSurat = ""; 
+            let fotoSimpan = ""; let keterangan = "-";
 
+            // Validasi & Ambil Base64 Foto
             if (status === 'Hadir') {
-                foto = document.getElementById('foto-data').value;
-                if (!foto) return Swal.fire('Bukti Diperlukan', 'Harap jepret Bukti Hadir.', 'warning'); 
+                fotoSimpan = document.getElementById('foto-data').value;
+                if (!fotoSimpan) return Swal.fire('Bukti Diperlukan', 'Harap jepret Bukti Hadir.', 'warning'); 
             } else if (status === 'Izin') {
                 keterangan = document.getElementById('keterangan-izin').value.trim();
                 const fileSurat = document.getElementById('surat-izin').files;
@@ -637,8 +727,8 @@
                 if (keterangan.length < 5) return Swal.fire('Alasan Ditolak', 'Keterangan izin harus jelas (min 5 huruf).', 'warning'); 
                 if (fileSurat.length === 0) return Swal.fire('Surat Diperlukan', 'Unggah foto bukti surat izin.', 'warning'); 
                 
-                namaFileSurat = "Lampiran: " + fileSurat[0].name;
-                keterangan = keterangan + " (" + namaFileSurat + ")";
+                // Konversi surat ke base64 agar admin bisa melihat gambarnya
+                fotoSimpan = await getBase64(fileSurat[0]);
             }
 
             const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
@@ -648,28 +738,20 @@
                 id: "ID_" + timeNow.getTime(),
                 lockKey: cekAbsenKunci,
                 waktuStr: timeNow.toLocaleString('id-ID'),
-                hari: hari,
-                mapel: mapel,
-                nama: nama,
-                status: status,
-                keterangan: keterangan,
-                foto: foto
+                hari: hari, mapel: mapel, nama: nama, status: status,
+                keterangan: keterangan, foto: fotoSimpan
             };
 
             dbAbsensi.push(payload);
             localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
-            localStorage.setItem(cekAbsenKunci, 'true'); // Kunci form untuk siswa tersebut
+            localStorage.setItem(cekAbsenKunci, 'true');
 
             Swal.fire({ title: 'Data Diterima!', text: `Absensi ${nama} sukses diverifikasi.`, icon: 'success', confirmButtonColor: '#0ea5e9'})
             .then(() => {
-                // Reset Form
                 document.getElementById('nama-terpilih').value = ""; stateNamaTerpilih = "";
                 document.querySelector('input[name="status"]:checked').checked = false;
-                document.getElementById('area-dinamis').classList.add('hidden');
-                document.getElementById('label-hadir').classList.remove('active-hadir');
-                document.getElementById('label-izin').classList.remove('active-izin');
-                document.getElementById('surat-izin').value = ""; 
-                matikanKamera(); renderNama();
+                document.getElementById('area-dinamis').classList.add('hidden'); document.getElementById('label-hadir').classList.remove('active-hadir'); document.getElementById('label-izin').classList.remove('active-izin');
+                document.getElementById('surat-izin').value = ""; matikanKamera(); renderNama();
             });
         }
     </script>
