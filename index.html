@@ -5,22 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Absensi Digital Kelas XIF7</title>
     
-    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Supabase CDN (Stabil) -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* [SALIN SEMUA STYLE DARI KODE ASLI ANDA - Tidak diubah] */
         :root {
             --bg-color: #f8fafc;
             --card-bg: rgba(255, 255, 255, 0.85);
@@ -30,6 +23,7 @@
             --neon-cyan: #0ea5e9;
             --neon-pink: #ec4899;
             --border-light: rgba(203, 213, 225, 0.6);
+            
             --font-heading: 'Outfit', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
         }
@@ -70,11 +64,13 @@
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         header { text-align: center; margin-bottom: 30px; }
+        
         .portal-title { 
             font-family: var(--font-heading); font-size: 26px; font-weight: 800; line-height: 1.3; 
             background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
             margin-bottom: 35px; letter-spacing: -0.5px;
         }
+        
         .instansi-box { margin-bottom: 40px; }
         .instansi-main { font-family: var(--font-heading); font-size: 19px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; margin-bottom: 4px; }
         .instansi-sub { font-family: var(--font-body); color: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 2.5px; }
@@ -163,8 +159,6 @@
         .btn-delete-small { background: #fee2e2; color: #ef4444; } .btn-delete-small:hover { background: #fca5a5; }
         .btn-foto-small { background: #e0f2fe; color: #0284c7; } .btn-foto-small:hover { background: #bae6fd; }
 
-        .sync-status { text-align: center; font-size: 12px; font-weight: 600; color: #10b981; margin-bottom: 15px; display: none; }
-
         @media (max-width: 600px) {
             .admin-controls { grid-template-columns: 1fr; }
         }
@@ -179,13 +173,14 @@
             <header>
                 <h1 class="portal-title">ABSENSI DIGITAL<br>KELAS XIF7</h1>
             </header>
+            
             <div class="instansi-box" style="text-align: center;">
                 <div class="instansi-main">SMA NEGERI 1 LEMAHABANG</div>
                 <div class="instansi-sub">KABUPATEN CIREBON</div>
             </div>
+
             <button class="btn-primary" onclick="cekDanBukaAbsen()">ABSENSI</button>
             <button class="btn-secondary" onclick="switchPanel('panel-pengelola')">Akses Pengelola</button>
-            <div id="sync-status-indicator" class="sync-status">🟢 Terhubung dengan Cloud</div>
         </div>
 
         <div id="panel-pengelola" class="panel">
@@ -206,53 +201,74 @@
         <div id="panel-dashboard-admin" class="panel">
             <h2 class="panel-title">Dashboard Pengelola</h2>
             <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 25px; text-align: center;">Pemantauan Real-Time</p>
+            
             <button class="btn-info" onclick="bukaModalKehadiran()">📊 Data Kehadiran (Filter Status)</button>
+            
             <div class="admin-controls">
-                <button id="btn-toggle-absen" onclick="toggleStatusAbsensi()" style="margin-bottom: 0;">Tutup Absensi</button>
+                <button id="btn-toggle-absen" onclick="toggleStatusAbsensi()" class="btn-secondary" style="margin-bottom: 0;">Tutup Absensi</button>
                 <button class="btn-primary" onclick="downloadExcel()" style="margin-bottom: 0;">Download Excel</button>
             </div>
             <button class="btn-danger" onclick="resetSemuaData()">Reset Seluruh Data</button>
+
             <div class="table-responsive">
                 <table>
                     <thead>
-                        <tr><th>Nama Siswa</th><th>Hari & Mapel</th><th>Status</th><th>Bukti</th><th>Waktu & Tanggal</th><th style="text-align: right;">Hapus</th></tr>
+                        <tr>
+                            <th>Nama Siswa</th>
+                            <th>Hari & Mapel</th>
+                            <th>Status</th>
+                            <th>Bukti</th>
+                            <th>Waktu & Tanggal</th>
+                            <th style="text-align: right;">Hapus</th>
+                        </tr>
                     </thead>
-                    <tbody id="tbody-rekap"><tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr></tbody>
+                    <tbody id="tbody-rekap">
+                    </tbody>
                 </table>
             </div>
+
             <button class="btn-secondary" onclick="logoutAdmin()">Log Out (Keluar)</button>
         </div>
 
         <div id="panel-absen" class="panel">
             <h2 class="panel-title">Forum Absensi XIF7</h2>
             <p class="form-desc">Isi dengan jujur!</p>
+            
             <div class="form-group">
                 <label>Hari Absensi</label>
                 <input type="hidden" id="hari" value="">
                 <div class="custom-select-btn" id="btn-pilih-hari" onclick="openModal('modal-hari')">
-                    <span id="teks-hari">Pilih hari kehadiran...</span> <span style="font-size:12px;">▼</span>
+                    <span id="teks-hari">Pilih hari kehadiran...</span> <span style="font-size: 12px; color: #94a3b8;">▼</span>
                 </div>
             </div>
+
             <div class="form-group">
                 <label>Mata Pelajaran</label>
                 <input type="hidden" id="mapel" value="">
                 <div class="custom-select-btn" id="btn-pilih-mapel" onclick="bukaModalMapel()">
-                    <span id="teks-mapel">Pilih mata pelajaran...</span> <span>▼</span>
+                    <span id="teks-mapel">Pilih mata pelajaran...</span> <span style="font-size: 12px; color: #94a3b8;">▼</span>
                 </div>
             </div>
+
             <div class="form-group">
                 <label>Identitas Siswa</label>
                 <input type="text" id="search-nama" class="input-field search-box" placeholder="🔍 Ketik nama kamu..." oninput="filterNama()">
                 <div id="list-nama" class="name-list"></div>
                 <input type="hidden" id="nama-terpilih" value="">
             </div>
+
             <div class="form-group">
                 <label>Status Kehadiran</label>
                 <div class="radio-group">
-                    <label class="radio-btn" id="label-hadir"><input type="radio" name="status" value="Hadir" onchange="ubahStatus('Hadir')"> HADIR</label>
-                    <label class="radio-btn" id="label-izin"><input type="radio" name="status" value="Izin" onchange="ubahStatus('Izin')"> IZIN</label>
+                    <label class="radio-btn" id="label-hadir">
+                        <input type="radio" name="status" value="Hadir" onchange="ubahStatus('Hadir')"> HADIR
+                    </label>
+                    <label class="radio-btn" id="label-izin">
+                        <input type="radio" name="status" value="Izin" onchange="ubahStatus('Izin')"> IZIN
+                    </label>
                 </div>
             </div>
+
             <div id="area-dinamis" class="hidden">
                 <div id="area-kamera" class="hidden">
                     <label>Bukti Hadir</label>
@@ -260,277 +276,126 @@
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
                     </div>
-                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()">📸 Ambil Foto Selfie</button>
-                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()">🔄 Ulangi Pengambilan</button>
+                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()" style="margin-bottom: 0;">📸 Ambil Foto Selfie</button>
+                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()" style="margin-bottom: 0;">🔄 Ulangi Pengambilan</button>
                     <input type="hidden" id="foto-data" value="">
                 </div>
+
                 <div id="area-izin" class="hidden">
                     <label>Keterangan Absen (Izin/Sakit)</label>
                     <textarea id="keterangan-izin" class="input-field" rows="3" placeholder="Sertakan alasan yang jelas (Min. 5 huruf)..."></textarea>
-                    <label style="margin-top:20px;">Unggah Surat Bukti (*Wajib)</label>
+                    
+                    <label style="margin-top: 20px;">Unggah Surat Bukti (*Wajib, Max 2MB)</label>
                     <input type="file" id="surat-izin" accept="image/*" class="input-field">
                 </div>
             </div>
+
             <br>
-            <button class="btn-primary" onclick="kirimAbsen()">Kirim Data Kehadiran</button>
+            <button class="btn-primary" onclick="kirimAbsen()" style="margin-top: 10px;">Kirim Data Kehadiran</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Batalkan Proses</button>
         </div>
     </div>
 
-    <!-- Semua Modal (sama persis) -->
-    <div id="modal-hari" class="modal-overlay" onclick="closeModal('modal-hari')"><div class="modal-content" onclick="event.stopPropagation()"><div class="modal-header"><h3>Jadwal Hari Ini</h3><button class="close-btn" onclick="closeModal('modal-hari')">✕</button></div><div><div class="modal-item" onclick="pilihHari('Senin')">Senin</div><div class="modal-item" onclick="pilihHari('Selasa')">Selasa</div><div class="modal-item" onclick="pilihHari('Rabu')">Rabu</div><div class="modal-item" onclick="pilihHari('Kamis')">Kamis</div><div class="modal-item" onclick="pilihHari('Jumat')">Jumat</div></div></div></div>
-    <div id="modal-mapel" class="modal-overlay" onclick="closeModal('modal-mapel')"><div class="modal-content" onclick="event.stopPropagation()"><div class="modal-header"><h3>Daftar Pelajaran</h3><button class="close-btn" onclick="closeModal('modal-mapel')">✕</button></div><div id="list-mapel-container"></div></div></div>
-    <div id="modal-kehadiran" class="modal-overlay" onclick="closeModal('modal-kehadiran')"><div class="modal-content" onclick="event.stopPropagation()" style="max-width:800px;height:95vh;display:flex;flex-direction:column;padding:25px 20px;"><div class="modal-header" style="margin-bottom:15px;"><h3>Monitor Kehadiran</h3><button class="close-btn" onclick="closeModal('modal-kehadiran')">✕</button></div><div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;"><div style="flex:1;"><div class="custom-select-btn" onclick="openModal('modal-admin-hari')" id="btn-admin-hari" style="padding:14px;"><span id="teks-admin-hari">Pilih Hari...</span> ▼</div></div><div style="flex:1;"><div class="custom-select-btn" onclick="bukaModalAdminMapel()" id="btn-admin-mapel" style="padding:14px;"><span id="teks-admin-mapel">Pilih Mapel...</span> ▼</div></div><div style="flex:1;"><div class="custom-select-btn" onclick="openModal('modal-admin-status')" id="btn-admin-status" style="padding:14px;"><span id="teks-admin-status">Semua</span> ▼</div></div></div><div class="table-responsive" style="flex:1;"><table style="min-width:500px;"><thead><tr><th>Nama Siswa</th><th>Status</th><th>Bukti / Keterangan</th></tr></thead><tbody id="tbody-filter-kehadiran"><tr><td colspan="3">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr></tbody></table></div></div></div>
-    <div id="modal-admin-hari" class="modal-overlay" onclick="closeModal('modal-admin-hari')"><div class="modal-content"><div class="modal-header"><h3>Filter Hari</h3><button class="close-btn" onclick="closeModal('modal-admin-hari')">✕</button></div><div><div class="modal-item" onclick="pilihAdminHari('Senin')">Senin</div><div class="modal-item" onclick="pilihAdminHari('Selasa')">Selasa</div><div class="modal-item" onclick="pilihAdminHari('Rabu')">Rabu</div><div class="modal-item" onclick="pilihAdminHari('Kamis')">Kamis</div><div class="modal-item" onclick="pilihAdminHari('Jumat')">Jumat</div></div></div></div>
-    <div id="modal-admin-mapel" class="modal-overlay" onclick="closeModal('modal-admin-mapel')"><div class="modal-content"><div class="modal-header"><h3>Filter Mapel</h3><button class="close-btn" onclick="closeModal('modal-admin-mapel')">✕</button></div><div id="list-admin-mapel-container"></div></div></div>
-    <div id="modal-admin-status" class="modal-overlay" onclick="closeModal('modal-admin-status')"><div class="modal-content"><div class="modal-header"><h3>Filter Status</h3><button class="close-btn" onclick="closeModal('modal-admin-status')">✕</button></div><div><div class="modal-item" onclick="pilihAdminStatus('Semua')">Semua</div><div class="modal-item" onclick="pilihAdminStatus('Hadir')">Hadir</div><div class="modal-item" onclick="pilihAdminStatus('Izin')">Izin</div><div class="modal-item" onclick="pilihAdminStatus('Belum Absen')">Belum Absen</div></div></div></div>
-    <div id="modal-preview-foto" class="modal-overlay modal-center" onclick="closeModal('modal-preview-foto')"><div class="modal-content"><div class="modal-header"><h3>Preview Bukti</h3><button class="close-btn" onclick="closeModal('modal-preview-foto')">✕</button></div><img id="preview-image-src" src="" alt="Bukti Foto" style="width:100%; border-radius:16px;"></div></div>
+    <div id="modal-hari" class="modal-overlay" onclick="closeModal('modal-hari')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Jadwal Hari Ini</h3>
+                <button class="close-btn" onclick="closeModal('modal-hari')">✕</button>
+            </div>
+            <div id="list-hari-container">
+                <div class="modal-item" onclick="pilihHari('Senin')">Senin</div>
+                <div class="modal-item" onclick="pilihHari('Selasa')">Selasa</div>
+                <div class="modal-item" onclick="pilihHari('Rabu')">Rabu</div>
+                <div class="modal-item" onclick="pilihHari('Kamis')">Kamis</div>
+                <div class="modal-item" onclick="pilihHari('Jumat')">Jumat</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-mapel" class="modal-overlay" onclick="closeModal('modal-mapel')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Daftar Pelajaran</h3>
+                <button class="close-btn" onclick="closeModal('modal-mapel')">✕</button>
+            </div>
+            <div id="list-mapel-container"></div>
+        </div>
+    </div>
+
+    <div id="modal-preview-foto" class="modal-overlay modal-center" onclick="closeModal('modal-preview-foto')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header" style="margin-bottom: 15px;">
+                <h3 style="font-size: 18px;">Bukti Foto</h3>
+                <button class="close-btn" onclick="closeModal('modal-preview-foto')">✕</button>
+            </div>
+            <img id="preview-image-src" src="" style="width: 100%; border-radius: 12px;">
+        </div>
+    </div>
 
     <script>
-        // ==================== KONFIGURASI SUPABASE ====================
+        // ==========================================
+        // 1. INISIALISASI SUPABASE DATABASE
+        // ==========================================
         const SUPABASE_URL = 'https://brtxlwjoyheeyeqcvhfi.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydHhsd2pveWhlZXllcWN2aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMzg5OTYsImV4cCI6MjA5MjYxNDk5Nn0.dSTRkB3Np4Rhmb0yfjNZ_CksO_QGYVXodW3b1mBtnOQ';
-        
-        let supabaseClient = null;
-        let dbAbsensi = [];      // cache data dari Supabase
-        
-        // Inisialisasi hanya jika library tersedia
-        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            document.getElementById('sync-status-indicator').style.display = 'block';
-            // Load data awal
-            loadDataDariSupabase();
-        } else {
-            console.error('Supabase library gagal dimuat!');
-            document.getElementById('sync-status-indicator').style.display = 'block';
-            document.getElementById('sync-status-indicator').innerHTML = '🔴 Gagal koneksi cloud (refresh halaman)';
-            document.getElementById('sync-status-indicator').style.color = '#ef4444';
-            Swal.fire('Peringatan', 'Library Supabase tidak dapat dimuat. Periksa koneksi internet Anda.', 'warning');
-        }
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydHhsd2pveWhlZXllcWN2aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMzg5OTYsImV4cCI6MjA5MjYxNDk5Nn0.dSTRkB3Np4Rhmb0yfjNZ_CksO_QGYVXodW3b1mBtnOQ';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fungsi mengambil semua data absensi dari Supabase
-        async function loadDataDariSupabase() {
-            if (!supabaseClient) return;
-            try {
-                const { data, error } = await supabaseClient.from('absensi_xif7').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-                dbAbsensi = data || [];
-                renderTabelAdmin();
-                // Jika sedang dalam mode filter pada modal kehadiran, refresh juga
-                renderTabelKehadiran();
-                // Refresh daftar nama siswa (update status sudah absen)
-                renderNama(document.getElementById('search-nama').value);
-            } catch (err) {
-                console.error('Gagal load data:', err);
-                Swal.fire('Error', 'Gagal mengambil data dari server.', 'error');
-            }
-        }
+        let dbAbsensi = []; 
+        let statusAbsensiDitutup = localStorage.getItem('status_absen_XIF7') === 'ditutup';
+        let streamKamera = null;
+        let fotoSimpan = "";
 
-        // ==================== DATA JADWAL & NAMA ====================
+        // ==========================================
+        // 2. DATA JADWAL DAN NAMA SISWA
+        // ==========================================
         const jadwalPelajaran = {
-            "Senin": ["PKWU (07.10 - 08.30)", "BIOLOGI (08.30 - 09.50)", "BAHASA SUNDA (10.10 - 11.30)", "MATEMATIKA (11.30 - 13.40)", "BAHASA INDONESIA (13.40 - 15.00)"],
-            "Selasa": ["SEJARAH (06.30 - 08.00)", "PJOK (08.00 - 10.30)", "EKONOMI (10.30 - 13.30)", "MATEMATIKA (13.30 - 15.00)"],
-            "Rabu": ["SENI BUDAYA (06.30 - 08.00)", "FISIKA (08.00 - 09.30)", "BAHASA INGGRIS (09.45 - 12.00)", "INFORMATIKA (12.45 - 15.00)"],
+            "Senin": ["UPACARA (07.00 - 08.00)", "MATEMATIKA (08.00 - 10.00)"],
+            "Selasa": ["BAHASA INGGRIS (07.10 - 09.10)", "SEJARAH (09.30 - 11.30)"],
+            "Rabu": ["INFORMATIKA (12.45 - 15.00)"],
             "Kamis": ["BIOLOGI (07.10 - 09.10)", "PKN (09.10 - 10.50)", "BAHASA INDONESIA (10.50 - 12.10)", "PAI (13.00 - 15.00)"],
             "Jumat": ["INFORMATIKA (06.45 - 08.05)", "EKONOMI (08.05 - 09.25)", "FISIKA (09.45 - 11.50)"]
         };
 
         const daftarNama = [
-            "AHMAD EKA R", "AISY HALAWAH", "ALYA ZALIANTI Z", "ANI MULYANI", "ANISA NUR A",
-            "DENNIS SEPTIANO", "DITA BELLA A", "EZRA FAIQ", "HABLY ALFATIHIN", "IFTITA ARIQOH",
-            "IIM QORIMAH", "JA'FAR SODIQ", "KAMILAH NURIL HS", "KESYA EKA ASTALITA", "KEYLA EDDYA W",
-            "MARWAH", "MUHAMMAD LUTHFI", "MUH RIZKY N", "MYISHA FARRAS A", "NABIL DARUL FARIS",
-            "NANANG SUMANTRI", "NAZWA AULIA", "NURUL FATIN A", "NURUL FIKRIYAH ZAK", "PUTRA DANU W",
-            "QUINAISHA LAILA K", "REVAND Z LP", "SATRIO NADA", "SELPIA NOVITA SARI", "SITI MAESAROH",
-            "SITI NURI MAULIDYA", "SURYA AJI SAPUTRA", "SYAFIRA SULISTIANTI", "SYAHLAA BAITI",
-            "TRI SETYO NINGRUM", "ULVIANA K", "ZELKHA SAID", "NUR HAFIZHOH"
+            "AHMAD EKA R", "AISY HALAWAH", "ALYA ZALIANTI Z", "ANI MULYANI", "ANISA NUR A", 
+            "DENNIS SEPTIANO", "DITA BELLA A", "EZRA FAIQ", "HABLY ALFATIHIN", "IFTITA ARIQOH", 
+            "IIM QORIMAH", "JA'FAR SODIQ", "KAMILAH NURIL HS", "KESYA EKA ASTALITA", "KEYLA EDDYA W", 
+            "MARWAH", "MUHAMMAD LUTHFI", "MUH RIZKY N", "MYISHA FARRAS A", "NABIL DARUL FARIS", 
+            "NANANG SUMANTRI", "NAZWA", "NENG SITI Z", "NUR ALYA", "NURUL H", "RAFA", "RAFI", 
+            "RAHMA", "RIZKY", "SALSABILA", "SITI", "SYIFA", "ZASKIA"
         ];
 
-        let stateNamaTerpilih = "";
-        let streamKamera = null;
+        // ==========================================
+        // 3. FUNGSI FETCH DARI SUPABASE
+        // ==========================================
+        async function loadDataFromSupabase() {
+            const { data, error } = await supabase
+                .from('absensi')
+                .select('*')
+                .order('id', { ascending: false });
 
-        // ==================== ADMIN LOGIN & SESSION ====================
-        function loginAdmin() {
-            const user = document.getElementById('admin-user').value;
-            const pass = document.getElementById('admin-pass').value;
-            if(user === 'admin' && pass === 'admin123') {
-                Swal.fire({ title: 'Otorisasi Berhasil', text: 'Selamat datang di Panel Admin.', icon: 'success', timer: 2000, showConfirmButton: false })
-                .then(() => {
-                    document.getElementById('admin-user').value = '';
-                    document.getElementById('admin-pass').value = '';
-                    switchPanel('panel-dashboard-admin', true);
-                    loadDataDariSupabase();  // refresh data
-                    updateTeksTombolBukaTutup();
-                });
+            if (!error && data) {
+                dbAbsensi = data;
             } else {
-                Swal.fire({title: 'Akses Ditolak', text: 'Username atau Password salah!', icon: 'error', timer: 2500, showConfirmButton: false});
+                console.error("Error fetching data:", error);
+                dbAbsensi = [];
             }
         }
 
-        function logoutAdmin() { switchPanel('panel-awal', false); }
-
-        function toggleStatusAbsensi() {
-            let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
-            if(isClosed) {
-                localStorage.setItem('status_absen_XIF7', 'dibuka');
-                Swal.fire({title: 'Absensi Dibuka', text: 'Siswa sekarang dapat melakukan absensi.', icon: 'success', timer: 2500, showConfirmButton: false});
-            } else {
-                localStorage.setItem('status_absen_XIF7', 'ditutup');
-                Swal.fire({title: 'Absensi Ditutup', text: 'Siswa tidak bisa absen lagi.', icon: 'warning', timer: 2500, showConfirmButton: false});
-            }
-            updateTeksTombolBukaTutup();
-        }
-
-        function updateTeksTombolBukaTutup() {
-            let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
-            let btn = document.getElementById('btn-toggle-absen');
-            if(isClosed) { btn.innerText = "Buka Absensi"; btn.style.background = "#10b981"; btn.style.color = "#fff"; }
-            else { btn.innerText = "Tutup Absensi"; btn.style.background = "#f59e0b"; btn.style.color = "#fff"; }
-        }
-
-        function cekDanBukaAbsen() {
-            let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
-            if(isClosed) Swal.fire({title:'Akses Ditolak', text:'Maaf, PENGELOLA telah menutup sesi absensi saat ini.', icon:'error', timer: 3000, showConfirmButton: false});
-            else switchPanel('panel-absen');
-        }
-
-        // ==================== RENDER TABEL ADMIN ====================
-        function renderTabelAdmin() {
-            const tbody = document.getElementById('tbody-rekap');
-            if(!supabaseClient) {
-                tbody.innerHTML = '<tr><td colspan="6">Mode offline - tidak terhubung cloud</td></tr>';
-                return;
-            }
-            if(dbAbsensi.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada data absensi.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = '';
-            dbAbsensi.slice().reverse().forEach(data => {
-                const badgeClass = data.status === 'Hadir' ? 'badge-hadir' : 'badge-izin';
-                const btnFoto = data.foto_url ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${data.foto_url}')">Lihat</button>` : '-';
-                const btnHapus = `<button class="btn-small btn-delete-small" onclick="hapusDataIndividu('${data.id}')">Hapus</button>`;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${data.nama}</strong></td>
-                    <td>${data.hari} <br><span style="font-size:11px;">${data.mapel}</span></td>
-                    <td><span class="status-badge ${badgeClass}">${data.status}</span></td>
-                    <td>${btnFoto}</td>
-                    <td><span style="font-size:12px;">${data.waktu_str}</span></td>
-                    <td style="text-align:right;">${btnHapus}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        async function hapusDataIndividu(id) {
-            if(!supabaseClient) return Swal.fire('Error', 'Tidak terhubung ke cloud.', 'error');
-            const result = await Swal.fire({
-                title: 'Hapus Data?', text: "Data absensi ini akan dihapus dari server.", icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus!'
-            });
-            if(result.isConfirmed) {
-                Swal.fire({title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-                const { error } = await supabaseClient.from('absensi_xif7').delete().eq('id', id);
-                if(error) return Swal.fire('Gagal', error.message, 'error');
-                Swal.fire({title:'Terhapus!', text:'Data berhasil dihapus.', icon:'success', timer:2000, showConfirmButton: false});
-                await loadDataDariSupabase();
-            }
-        }
-
-        async function resetSemuaData() {
-            if(!supabaseClient) return Swal.fire('Error', 'Tidak terhubung ke cloud.', 'error');
-            const confirm = await Swal.fire({
-                title: 'Yakin Mereset Semua?', text: "Tindakan ini akan menghapus SELURUH data absen secara PERMANEN dari Server!",
-                icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Reset Semua!'
-            });
-            if(confirm.isConfirmed) {
-                Swal.fire({title: 'Mereset...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-                const { error } = await supabaseClient.from('absensi_xif7').delete().neq('id', '0'); // hapus semua
-                if(error) return Swal.fire('Gagal', error.message, 'error');
-                Swal.fire({title:'Direset!', text:'Seluruh data absen dikosongkan.', icon:'success', timer:2500, showConfirmButton: false});
-                await loadDataDariSupabase();
-                // reset form absensi
-                document.getElementById('hari').value = ""; document.getElementById('teks-hari').innerText = "Pilih hari kehadiran...";
-                document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran...";
-                stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = ""; document.getElementById('search-nama').value = "";
-                renderNama();
-            }
-        }
-
-        function downloadExcel() {
-            if(dbAbsensi.length === 0) return Swal.fire({title:'Kosong', text:'Belum ada data untuk di-download.', icon:'info', timer:2500, showConfirmButton:false});
-            const dataToExport = dbAbsensi.map(item => ({
-                "Nama Siswa": item.nama, "Hari": item.hari, "Mata Pelajaran": item.mapel,
-                "Status": item.status, "Alasan / Lampiran": item.keterangan || "Hadir (Selfie)", "Tanggal & Jam": item.waktu_str
-            }));
-            const ws = XLSX.utils.json_to_sheet(dataToExport);
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Rekap Absen");
-            XLSX.writeFile(wb, "Rekap_Absensi_XIF7.xlsx");
-        }
-
-        // ==================== ADMIN FILTER MODAL (Sama persis dengan logika asli) ====================
-        function bukaModalKehadiran() { openModal('modal-kehadiran'); resetFilterUI(); renderTabelKehadiran(); }
-        function resetFilterUI() {
-            document.getElementById('filter-admin-hari-val').value = ""; document.getElementById('teks-admin-hari').innerText = "Pilih Hari...";
-            document.getElementById('filter-admin-mapel-val').value = ""; document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel...";
-            document.getElementById('filter-admin-status-val').value = "Semua"; document.getElementById('teks-admin-status').innerText = "Semua";
-            document.getElementById('tbody-filter-kehadiran').innerHTML = '<tr><td colspan="3">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
-        }
-        function pilihAdminHari(hari) {
-            document.getElementById('filter-admin-hari-val').value = hari; document.getElementById('teks-admin-hari').innerText = hari;
-            closeModal('modal-admin-hari');
-            generateAdminMapelList(hari);
-            renderTabelKehadiran();
-        }
-        function bukaModalAdminMapel() {
-            if(!document.getElementById('filter-admin-hari-val').value) return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih hari terlebih dahulu.', timer:2000, showConfirmButton:false});
-            openModal('modal-admin-mapel');
-        }
-        function generateAdminMapelList(hari) {
-            const container = document.getElementById('list-admin-mapel-container'); container.innerHTML = "";
-            if(jadwalPelajaran[hari]) jadwalPelajaran[hari].forEach(mapel => { container.innerHTML += `<div class="modal-item" onclick="pilihAdminMapel('${mapel}')">${mapel}</div>`; });
-        }
-        function pilihAdminMapel(mapel) {
-            document.getElementById('filter-admin-mapel-val').value = mapel; document.getElementById('teks-admin-mapel').innerText = mapel;
-            closeModal('modal-admin-mapel'); renderTabelKehadiran();
-        }
-        function pilihAdminStatus(status) {
-            document.getElementById('filter-admin-status-val').value = status; document.getElementById('teks-admin-status').innerText = status;
-            closeModal('modal-admin-status'); renderTabelKehadiran();
-        }
-        function renderTabelKehadiran() {
-            const hari = document.getElementById('filter-admin-hari-val').value;
-            const mapel = document.getElementById('filter-admin-mapel-val').value;
-            const statusFilter = document.getElementById('filter-admin-status-val').value;
-            const tbody = document.getElementById('tbody-filter-kehadiran');
-            if(!hari || !mapel) { tbody.innerHTML = '<tr><td colspan="3">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>'; return; }
-            const filteredAbsen = dbAbsensi.filter(item => item.hari === hari && item.mapel === mapel);
-            let hasil = daftarNama.map(nama => {
-                const found = filteredAbsen.find(a => a.nama === nama);
-                return found ? { nama, status: found.status, keterangan: found.keterangan, foto: found.foto_url } : { nama, status: 'Belum Absen', keterangan: '-', foto: null };
-            });
-            if(statusFilter !== 'Semua') hasil = hasil.filter(item => item.status === statusFilter);
-            if(hasil.length === 0) { tbody.innerHTML = '<tr><td colspan="3">Tidak ada data pada kategori ini.</td></tr>'; return; }
-            tbody.innerHTML = '';
-            hasil.forEach(item => {
-                const badgeClass = item.status === 'Hadir' ? 'badge-hadir' : (item.status === 'Izin' ? 'badge-izin' : 'badge-belum');
-                const btnFoto = item.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${item.foto}')">📸 Lihat Bukti</button>` : '-';
-                const infoKet = item.keterangan !== "-" ? `<div style="font-size:12px;">${item.keterangan}</div>` : '';
-                tbody.innerHTML += `<tr><td><strong>${item.nama}</strong></td><td><span class="status-badge ${badgeClass}">${item.status}</span></td><td>${btnFoto} ${infoKet}</td></tr>`;
-            });
-        }
-        function lihatFotoPreview(url) { document.getElementById('preview-image-src').src = url; openModal('modal-preview-foto'); }
-
-        // ==================== NAVIGASI & MODAL SISWA ====================
+        // ==========================================
+        // 4. NAVIGASI PANEL & MODAL
+        // ==========================================
         function switchPanel(panelId, isAdminPanel = false) {
-            const current = document.querySelector('.panel.active');
-            const main = document.getElementById('main-container');
-            if(isAdminPanel) main.classList.add('admin-mode'); else main.classList.remove('admin-mode');
-            if(current) {
-                current.style.opacity = 0; current.style.transform = 'scale(0.97) translateY(15px)';
+            const currentActive = document.querySelector('.panel.active');
+            const mainContainer = document.getElementById('main-container');
+            if(isAdminPanel) mainContainer.classList.add('admin-mode');
+            else mainContainer.classList.remove('admin-mode');
+
+            if(currentActive) {
+                currentActive.style.opacity = 0;
+                currentActive.style.transform = 'scale(0.97) translateY(15px)';
                 setTimeout(() => {
-                    current.classList.remove('active');
+                    currentActive.classList.remove('active');
                     document.getElementById(panelId).classList.add('active');
                     void document.getElementById(panelId).offsetWidth;
                     document.getElementById(panelId).style.opacity = 1;
@@ -539,161 +404,351 @@
             }
             if(panelId === 'panel-awal') matikanKamera();
         }
+
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-        function pilihHari(hari) {
-            document.getElementById('hari').value = hari; document.getElementById('teks-hari').innerText = hari; document.getElementById('btn-pilih-hari').classList.add('selected');
-            document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran..."; document.getElementById('btn-pilih-mapel').classList.remove('selected');
-            stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
-            closeModal('modal-hari'); generateListMapel(hari); renderNama(document.getElementById('search-nama').value);
-        }
-        function bukaModalMapel() {
-            if(!document.getElementById('hari').value) return Swal.fire({icon:'warning', title:'Data Kurang', text:'Pilih jadwal hari terlebih dahulu.', timer:2000, showConfirmButton:false});
-            openModal('modal-mapel');
-        }
-        function generateListMapel(hari) {
-            const container = document.getElementById('list-mapel-container'); container.innerHTML = "";
-            if(jadwalPelajaran[hari]) jadwalPelajaran[hari].forEach(mapel => { container.innerHTML += `<div class="modal-item" onclick="pilihMapel('${mapel}')">${mapel}</div>`; });
-        }
-        function pilihMapel(mapel) {
-            document.getElementById('mapel').value = mapel; document.getElementById('teks-mapel').innerText = mapel; document.getElementById('btn-pilih-mapel').classList.add('selected');
-            stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
-            closeModal('modal-mapel'); renderNama(document.getElementById('search-nama').value);
+        // ==========================================
+        // 5. INTERAKSI FORM (SISWA)
+        // ==========================================
+        function cekDanBukaAbsen() {
+            if(statusAbsensiDitutup) Swal.fire({title: 'Ditutup!', text: 'Sesi absensi sedang ditutup oleh Admin.', icon: 'warning', showConfirmButton: false});
+            else switchPanel('panel-absen');
         }
 
-        // ==================== RENDER NAMA SISWA (CEK SUDAH ABSEN DI DB) ====================
-        function renderNama(filterText = "") {
-            const container = document.getElementById('list-nama');
+        function pilihHari(hari) {
+            document.getElementById('hari').value = hari;
+            document.getElementById('teks-hari').innerText = hari;
+            document.getElementById('btn-pilih-hari').classList.add('selected');
+            document.getElementById('mapel').value = "";
+            document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran...";
+            document.getElementById('btn-pilih-mapel').classList.remove('selected');
+            closeModal('modal-hari');
+        }
+
+        function bukaModalMapel() {
             const hari = document.getElementById('hari').value;
-            const mapel = document.getElementById('mapel').value;
+            if(!hari) return Swal.fire('Peringatan', 'Silakan pilih hari terlebih dahulu!', 'warning');
+            const container = document.getElementById('list-mapel-container');
             container.innerHTML = "";
-            const filtered = daftarNama.filter(n => n.toLowerCase().includes(filterText.toLowerCase()));
-            if(filtered.length === 0) { container.innerHTML = '<div class="name-item disabled" style="text-align:center;">Siswa tidak ditemukan.</div>'; return; }
-            filtered.forEach(nama => {
-                const div = document.createElement('div'); div.className = 'name-item';
-                const sudahAbsen = dbAbsensi.some(a => a.nama === nama && a.hari === hari && a.mapel === mapel);
-                if(sudahAbsen) {
-                    div.innerHTML = `${nama} <span style="float:right;color:#10b981;">✓ Tercatat</span>`;
+            jadwalPelajaran[hari].forEach(m => {
+                let div = document.createElement('div');
+                div.className = 'modal-item'; div.innerText = m;
+                div.onclick = () => {
+                    document.getElementById('mapel').value = m;
+                    document.getElementById('teks-mapel').innerText = m;
+                    document.getElementById('btn-pilih-mapel').classList.add('selected');
+                    closeModal('modal-mapel');
+                };
+                container.appendChild(div);
+            });
+            openModal('modal-mapel');
+        }
+
+        function renderNama() {
+            const container = document.getElementById('list-nama');
+            container.innerHTML = "";
+            const search = document.getElementById('search-nama').value.toLowerCase();
+            const mapelTerpilih = document.getElementById('mapel').value;
+            const hariTerpilih = document.getElementById('hari').value;
+
+            daftarNama.filter(n => n.toLowerCase().includes(search)).forEach(nama => {
+                let div = document.createElement('div');
+                div.className = 'name-item'; div.innerText = nama;
+                
+                // Pengecekan Cache Supabase (Optional) atau LocalStorage untuk disable UI
+                const cekAbsenKunci = `absen_XIF7_${nama}_${hariTerpilih}_${mapelTerpilih}`;
+                if (localStorage.getItem(cekAbsenKunci)) {
                     div.classList.add('disabled');
-                } else {
-                    div.innerText = nama;
-                    if(nama === stateNamaTerpilih) div.classList.add('terpilih');
-                    div.onclick = () => { stateNamaTerpilih = nama; document.getElementById('nama-terpilih').value = nama; document.getElementById('search-nama').value = nama; renderNama(nama); };
+                    div.innerText += " (Sudah Absen)";
                 }
+
+                if(document.getElementById('nama-terpilih').value === nama) div.classList.add('terpilih');
+                div.onclick = () => {
+                    if(div.classList.contains('disabled')) return;
+                    document.getElementById('nama-terpilih').value = nama;
+                    document.getElementById('search-nama').value = nama;
+                    renderNama();
+                };
                 container.appendChild(div);
             });
         }
-        function filterNama() { renderNama(document.getElementById('search-nama').value); }
+        
+        function filterNama() { renderNama(); }
 
-        // ==================== KAMERA & STATUS ====================
         function ubahStatus(status) {
-            document.getElementById('label-hadir').classList.remove('active-hadir'); document.getElementById('label-izin').classList.remove('active-izin');
             document.getElementById('area-dinamis').classList.remove('hidden');
             if(status === 'Hadir') {
                 document.getElementById('label-hadir').classList.add('active-hadir');
-                document.getElementById('area-izin').classList.add('hidden'); document.getElementById('area-kamera').classList.remove('hidden');
+                document.getElementById('label-izin').classList.remove('active-izin');
+                document.getElementById('area-kamera').classList.remove('hidden');
+                document.getElementById('area-izin').classList.add('hidden');
                 mulaiKamera();
             } else {
+                document.getElementById('label-hadir').classList.remove('active-hadir');
                 document.getElementById('label-izin').classList.add('active-izin');
-                document.getElementById('area-kamera').classList.add('hidden'); document.getElementById('area-izin').classList.remove('hidden');
+                document.getElementById('area-kamera').classList.add('hidden');
+                document.getElementById('area-izin').classList.remove('hidden');
                 matikanKamera();
             }
         }
+
+        // ==========================================
+        // 6. KAMERA & UPLOAD FOTO
+        // ==========================================
         async function mulaiKamera() {
             try {
                 streamKamera = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 document.getElementById('video-kamera').srcObject = streamKamera;
-                document.getElementById('video-kamera').classList.remove('hidden'); document.getElementById('canvas-kamera').classList.add('hidden');
-                document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
-            } catch(err) { Swal.fire({title:'Akses Ditolak', text:'Izinkan browser menggunakan kamera.', icon:'error', timer:3000, showConfirmButton:false}); }
+                document.getElementById('video-kamera').classList.remove('hidden');
+                document.getElementById('canvas-kamera').classList.add('hidden');
+                document.getElementById('btn-capture').classList.remove('hidden');
+                document.getElementById('btn-retake').classList.add('hidden');
+            } catch (err) {
+                Swal.fire({title:'Akses Ditolak', text:'Izinkan browser mengakses kamera Anda.', icon:'error'});
+            }
         }
-        function matikanKamera() { if(streamKamera) streamKamera.getTracks().forEach(t => t.stop()); }
+
+        function matikanKamera() {
+            if(streamKamera) { streamKamera.getTracks().forEach(track => track.stop()); streamKamera = null; }
+        }
+
         function takeSnapshot() {
-            const video = document.getElementById('video-kamera'); const canvas = document.getElementById('canvas-kamera'); const ctx = canvas.getContext('2d');
+            const video = document.getElementById('video-kamera');
+            const canvas = document.getElementById('canvas-kamera');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            ctx.translate(canvas.width, 0); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            document.getElementById('foto-data').value = canvas.toDataURL('image/jpeg', 0.8);
+            const context = canvas.getContext('2d');
+            
+            // Flip gambar
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            fotoSimpan = canvas.toDataURL('image/jpeg', 0.6); // Kompres kualitas
+            
             video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden'); document.getElementById('btn-retake').classList.remove('hidden');
         }
-        function retakePhoto() {
-            document.getElementById('foto-data').value = ""; document.getElementById('video-kamera').classList.remove('hidden'); document.getElementById('canvas-kamera').classList.add('hidden');
-            document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
-        }
-        function getBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = reject; }); }
 
-        // ==================== PENGIRIMAN ABSEN KE SUPABASE (DENGAN UPLOAD FILE) ====================
+        function retakePhoto() {
+            fotoSimpan = "";
+            document.getElementById('video-kamera').classList.remove('hidden');
+            document.getElementById('canvas-kamera').classList.add('hidden');
+            document.getElementById('btn-capture').classList.remove('hidden');
+            document.getElementById('btn-retake').classList.add('hidden');
+        }
+
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // ==========================================
+        // 7. KIRIM DATA KE SUPABASE
+        // ==========================================
         async function kirimAbsen() {
-            if(!supabaseClient) return Swal.fire('Error', 'Tidak terhubung ke cloud.', 'error');
             const hari = document.getElementById('hari').value;
             const mapel = document.getElementById('mapel').value;
             const nama = document.getElementById('nama-terpilih').value;
-            const statusEl = document.querySelector('input[name="status"]:checked');
-            const status = statusEl ? statusEl.value : null;
-            if(!hari || !mapel || !nama || !status) return Swal.fire({title:'Gagal', text:'Lengkapi semua data.', icon:'warning', timer:2500, showConfirmButton:false});
+            const status = document.querySelector('input[name="status"]:checked')?.value;
             
-            let fotoUrl = '';
-            let keterangan = '-';
-            let fileToUpload = null;
-            let fileExt = 'jpg';
+            if(!hari || !mapel || !nama || !status) return Swal.fire('Error', 'Semua form wajib diisi!', 'error');
 
-            Swal.fire({title: 'Memproses...', text: 'Mengirim data ke server.', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-
-            if(status === 'Hadir') {
-                const base64Foto = document.getElementById('foto-data').value;
-                if(!base64Foto) { Swal.close(); return Swal.fire('Bukti Diperlukan', 'Harap ambil foto selfie.', 'warning'); }
-                fileToUpload = dataURLtoBlob(base64Foto, 'image/jpeg');
-                fileExt = 'jpg';
-            } else {
-                keterangan = document.getElementById('keterangan-izin').value.trim();
-                const fileSurat = document.getElementById('surat-izin').files[0];
-                if(keterangan.length < 5) { Swal.close(); return Swal.fire('Ditolak', 'Keterangan izin minimal 5 huruf.', 'warning'); }
-                if(!fileSurat) { Swal.close(); return Swal.fire('Surat Diperlukan', 'Unggah bukti surat izin.', 'warning'); }
-                fileToUpload = fileSurat;
-                fileExt = fileSurat.name.split('.').pop();
+            let keterangan = "-";
+            if(status === 'Hadir' && !fotoSimpan) return Swal.fire('Error', 'Wajib ambil foto selfie bukti hadir!', 'error');
+            
+            if(status === 'Izin') {
+                keterangan = document.getElementById('keterangan-izin').value;
+                if(keterangan.length < 5) return Swal.fire('Error', 'Alasan izin terlalu singkat!', 'error');
+                
+                const fileSurat = document.getElementById('surat-izin').files;
+                if(fileSurat.length === 0) return Swal.fire('Error', 'Wajib unggah surat bukti!', 'error');
+                
+                if(fileSurat[0].size > 2 * 1024 * 1024) return Swal.fire('Error', 'Ukuran foto maksimal 2MB!', 'error');
+                
+                Swal.fire({title: 'Memproses Gambar...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                fotoSimpan = await getBase64(fileSurat[0]);
             }
 
-            // Upload ke bucket 'bukti_absen'
-            const fileName = `${nama.replace(/\s/g, '_')}_${Date.now()}.${fileExt}`;
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('bukti_absen').upload(fileName, fileToUpload);
-            if(uploadError) { Swal.close(); return Swal.fire('Gagal Upload', uploadError.message, 'error'); }
-            const { data: publicUrlData } = supabaseClient.storage.from('bukti_absen').getPublicUrl(fileName);
-            fotoUrl = publicUrlData.publicUrl;
+            const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
+            const timeNow = new Date();
+            
+            // Validasi DB Server
+            Swal.fire({title: 'Menyimpan Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            
+            const { data: existingData } = await supabase
+                .from('absensi')
+                .select('id')
+                .eq('lockKey', cekAbsenKunci);
 
-            // Insert record
-            const waktuStr = new Date().toLocaleString('id-ID');
-            const { error: insertError } = await supabaseClient.from('absensi_xif7').insert([{
-                waktu_str: waktuStr, hari, mapel, nama, status, keterangan, foto_url: fotoUrl
-            }]);
-            if(insertError) { Swal.close(); return Swal.fire('Gagal Simpan', insertError.message, 'error'); }
+            if (existingData && existingData.length > 0) {
+                Swal.fire({ title: 'Gagal!', text: 'Kamu sudah mengisi absen untuk mapel ini di hari tersebut!', icon: 'error' });
+                return;
+            }
 
-            Swal.fire({title: 'Sukses!', text: `Absensi ${nama} tersimpan.`, icon: 'success', timer: 2500, showConfirmButton: false});
-            await loadDataDariSupabase(); // refresh cache dan tampilan
-            // Reset form absensi
-            document.getElementById('nama-terpilih').value = ""; stateNamaTerpilih = ""; document.getElementById('search-nama').value = "";
-            const radioChecked = document.querySelector('input[name="status"]:checked');
-            if(radioChecked) radioChecked.checked = false;
-            document.getElementById('area-dinamis').classList.add('hidden');
-            document.getElementById('label-hadir').classList.remove('active-hadir');
-            document.getElementById('label-izin').classList.remove('active-izin');
-            document.getElementById('surat-izin').value = "";
-            matikanKamera();
-            renderNama();
+            const payload = {
+                id: "ID_" + timeNow.getTime(), 
+                lockKey: cekAbsenKunci, 
+                waktuStr: timeNow.toLocaleString('id-ID'),
+                hari: hari, 
+                mapel: mapel, 
+                nama: nama, 
+                status: status, 
+                keterangan: keterangan, 
+                foto: fotoSimpan
+            };
+
+            const { error } = await supabase.from('absensi').insert([payload]);
+
+            if (error) {
+                Swal.fire({ title: 'Error!', text: 'Gagal menyimpan data ke server.', icon: 'error' });
+                console.error(error);
+                return;
+            }
+
+            localStorage.setItem(cekAbsenKunci, 'true');
+
+            Swal.fire({ title: 'Data Diterima!', text: `Absensi ${nama} sukses diverifikasi.`, icon: 'success', timer:2500, timerProgressBar:true, showConfirmButton:false})
+            .then(() => {
+                document.getElementById('nama-terpilih').value = ""; document.getElementById('search-nama').value = "";
+                document.querySelector('input[name="status"]:checked').checked = false;
+                document.getElementById('area-dinamis').classList.add('hidden'); 
+                document.getElementById('label-hadir').classList.remove('active-hadir'); 
+                document.getElementById('label-izin').classList.remove('active-izin');
+                document.getElementById('surat-izin').value = ""; 
+                matikanKamera(); renderNama();
+            });
         }
 
-        function dataURLtoBlob(dataURL, mimeType) {
-            const byteString = atob(dataURL.split(',')[1]);
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for(let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            return new Blob([ab], {type: mimeType});
+        // ==========================================
+        // 8. FUNGSI ADMIN & TABEL
+        // ==========================================
+        function loginAdmin() {
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+            if(user === 'admin' && pass === 'admin123') { // Ganti jika password mau diubah
+                switchPanel('panel-dashboard-admin', true);
+                renderTabelAdmin();
+            } else {
+                Swal.fire('Akses Ditolak', 'Username atau Password salah!', 'error');
+            }
         }
 
-        // Inisialisasi tambahan
+        function logoutAdmin() {
+            document.getElementById('admin-user').value = "";
+            document.getElementById('admin-pass').value = "";
+            switchPanel('panel-awal');
+        }
+
+        function toggleStatusAbsensi() {
+            statusAbsensiDitutup = !statusAbsensiDitutup;
+            localStorage.setItem('status_absen_XIF7', statusAbsensiDitutup ? 'ditutup' : 'buka');
+            document.getElementById('btn-toggle-absen').innerText = statusAbsensiDitutup ? 'Buka Absensi' : 'Tutup Absensi';
+            Swal.fire('Info', `Absensi sekarang ${statusAbsensiDitutup ? 'DITUTUP' : 'DIBUKA'}.`, 'info');
+        }
+
+        async function renderTabelAdmin() {
+            Swal.fire({title: 'Memuat Data Server...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            await loadDataFromSupabase();
+            Swal.close();
+
+            const tbody = document.getElementById('tbody-rekap');
+            tbody.innerHTML = "";
+            if(dbAbsensi.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada data absensi yang masuk.</td></tr>`;
+                return;
+            }
+
+            dbAbsensi.forEach(data => {
+                let badgeClass = data.status === 'Hadir' ? 'badge-hadir' : 'badge-izin';
+                let btnFoto = data.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${data.foto}')">Lihat</button>` : '-';
+                let btnHapus = `<button class="btn-small btn-delete-small" onclick="hapusDataIndividu('${data.id}', '${data.lockKey}')">Hapus</button>`;
+                
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${data.nama}</strong></td>
+                    <td>${data.hari} <br> <span style="font-size:11px; color:#888;">${data.mapel}</span></td>
+                    <td><span class="status-badge ${badgeClass}">${data.status}</span></td>
+                    <td>${btnFoto}</td>
+                    <td>${data.waktuStr}</td>
+                    <td style="text-align: right;">${btnHapus}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function lihatFotoPreview(base64Data) {
+            document.getElementById('preview-image-src').src = base64Data;
+            openModal('modal-preview-foto');
+        }
+
+        async function hapusDataIndividu(idData, lockKeyData) {
+            Swal.fire({
+                title: 'Hapus Data?', text: "Data ini akan dihapus secara permanen dari database!",
+                icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, hapus!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                    
+                    const { error } = await supabase.from('absensi').delete().eq('id', idData);
+
+                    if (!error) {
+                        localStorage.removeItem(lockKeyData); 
+                        renderTabelAdmin(); 
+                        Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
+                    } else {
+                        Swal.fire('Error!', 'Gagal menghapus data.', 'error');
+                    }
+                }
+            });
+        }
+
+        async function resetSemuaData() {
+            Swal.fire({
+                title: 'RESET TOTAL?', text: "Semua data absensi di database akan dihapus permanen!",
+                icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'RESET SEMUA'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({title: 'Resetting...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                    
+                    const { error } = await supabase.from('absensi').delete().neq('id', '0');
+
+                    if (!error) {
+                        Object.keys(localStorage).forEach(key => {
+                            if (key.startsWith('absen_XIF7_')) localStorage.removeItem(key);
+                        });
+                        renderTabelAdmin();
+                        Swal.fire('Reset Berhasil', 'Seluruh data absensi telah dikosongkan.', 'success');
+                    } else {
+                        Swal.fire('Error!', 'Gagal mereset data.', 'error');
+                    }
+                }
+            });
+        }
+
+        function downloadExcel() {
+            if(dbAbsensi.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk didownload.', 'info');
+            const dataToExport = dbAbsensi.map(item => ({
+                "Nama": item.nama,
+                "Hari": item.hari,
+                "Mapel": item.mapel,
+                "Status": item.status,
+                "Keterangan": item.keterangan,
+                "Tgl & Jam": item.waktuStr
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absen");
+            XLSX.writeFile(workbook, "Rekap_Absensi_XIF7.xlsx");
+        }
+        
+        // Panggil render nama pertama kali saat web diload
         renderNama();
-        if(localStorage.getItem('status_absen_XIF7') === null) localStorage.setItem('status_absen_XIF7', 'dibuka');
-        updateTeksTombolBukaTutup();
+        
     </script>
 </body>
 </html>
