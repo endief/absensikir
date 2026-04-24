@@ -11,62 +11,77 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #f4f7f9;
+            --bg-color: #f8fafc;
             --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --primary-grad: linear-gradient(135deg, #0ea5e9, #3b82f6, #8b5cf6);
+            --primary-grad: linear-gradient(135deg, #0ea5e9, #3b82f6, #6366f1);
             --neon-cyan: #0ea5e9;
             --neon-pink: #ec4899;
-            --border-light: rgba(226, 232, 240, 0.8);
+            --border-light: rgba(203, 213, 225, 0.6);
             
             --font-heading: 'Outfit', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
         }
 
-        * {
-            box-sizing: border-box; margin: 0; padding: 0;
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+        /* --- BACKGROUND BINTIK MEWAH --- */
         body {
             background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
-            background-attachment: fixed; color: var(--text-main);
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            background-attachment: fixed; 
+            color: var(--text-main);
             font-family: var(--font-body); display: flex;
             justify-content: center; align-items: flex-start;
             min-height: 100vh; padding: 20px; overflow-x: hidden;
         }
 
-        /* --- CONTAINER KACA --- */
-        .app-container {
-            background: var(--card-bg); backdrop-filter: blur(20px);
-            width: 100%; max-width: 480px; border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 40px rgba(14, 165, 233, 0.15);
-            overflow: hidden; padding: 40px 30px; position: relative; margin-top: 15px; margin-bottom: 30px;
+        /* Soft Glow di belakang container */
+        .glow-bg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 600px; height: 600px; background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%);
+            z-index: -1; pointer-events: none;
         }
 
-        .app-container.admin-mode { max-width: 800px; }
+        /* --- CONTAINER KACA GLASSMORPHISM --- */
+        .app-container {
+            background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            width: 100%; max-width: 480px; border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.08), 0 0 40px rgba(14, 165, 233, 0.1);
+            overflow: hidden; padding: 45px 35px; position: relative; margin-top: 15px; margin-bottom: 30px;
+        }
 
+        .app-container.admin-mode { max-width: 900px; padding: 45px 30px; }
+
+        /* Garis Gradasi Hidup di atas Container */
         .app-container::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
             background: var(--primary-grad); background-size: 200% auto; animation: gradientMove 4s linear infinite;
         }
-
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* --- HEADER & JUDUL --- */
-        header { text-align: center; margin-bottom: 10px; }
-        h1 { font-family: var(--font-heading); font-size: 28px; font-weight: 800; line-height: 1.2; background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0; }
-        h2 { font-family: var(--font-heading); font-size: 21px; font-weight: 700; text-align: center; color: var(--text-main); letter-spacing: 0.3px; margin-bottom: 4px; }
-        p.instansi-sub { text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 30px; }
+        /* --- MERAPIKAN HEADER & JUDUL UTAMA --- */
+        header { text-align: center; margin-bottom: 30px; }
+        
+        .portal-title { 
+            font-family: var(--font-heading); font-size: 26px; font-weight: 800; line-height: 1.3; 
+            background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            margin-bottom: 35px; letter-spacing: -0.5px;
+        }
+        
+        /* Elegan Instansi */
+        .instansi-box { margin-bottom: 40px; }
+        .instansi-main { font-family: var(--font-heading); font-size: 19px; font-weight: 700; color: var(--text-main); letter-spacing: 0.5px; margin-bottom: 4px; }
+        .instansi-sub { font-family: var(--font-body); color: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 2.5px; }
+        
+        h2.panel-title { font-family: var(--font-heading); font-size: 22px; font-weight: 700; text-align: center; color: var(--text-main); margin-bottom: 5px; }
         p.form-desc { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 25px; font-weight: 500; }
 
         /* --- PANEL TRANSITION --- */
@@ -78,14 +93,14 @@
         button:active { transform: scale(0.96); }
         .btn-primary { background: var(--primary-grad); color: white; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); background-size: 200% auto; }
         .btn-primary:hover { box-shadow: 0 15px 35px -5px rgba(59, 130, 246, 0.5); transform: translateY(-2px); background-position: right center; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.6); color: var(--text-main); border: 1.5px solid var(--border-light); backdrop-filter: blur(10px); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.7); color: var(--text-main); border: 1.5px solid var(--border-light); }
         .btn-secondary:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); background: #fff;}
-        .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: white; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4); }
-        .btn-danger:hover { box-shadow: 0 15px 35px -5px rgba(239, 68, 68, 0.5); transform: translateY(-2px); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #be123c); color: white; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { transform: translateY(-2px); }
         .btn-text { background: transparent; color: var(--text-muted); padding: 5px; font-size: 14px; box-shadow: none;}
         .btn-text:hover { color: var(--text-main); }
-        .btn-info { background: #38bdf8; color: white; box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.4); }
-        .btn-info:hover { box-shadow: 0 15px 35px -5px rgba(56, 189, 248, 0.5); transform: translateY(-2px); }
+        .btn-info { background: #0ea5e9; color: white; box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4); }
+        .btn-info:hover { box-shadow: 0 15px 35px -5px rgba(14, 165, 233, 0.5); transform: translateY(-2px); }
 
         /* --- FORM & INPUT --- */
         .form-group { margin-bottom: 24px; }
@@ -96,7 +111,7 @@
         input[type="file"]::file-selector-button { font-family: var(--font-body); font-weight: 600; background: var(--bg-color); border: 1px solid var(--border-light); padding: 8px 16px; border-radius: 10px; color: var(--text-main); cursor: pointer; margin-right: 15px; transition: all 0.2s; }
         input[type="file"]::file-selector-button:hover { background: var(--neon-cyan); color: white; border-color: var(--neon-cyan); }
         .custom-select-btn { display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: var(--text-muted); }
-        .custom-select-btn:hover { border-color: #cbd5e1; }
+        .custom-select-btn:hover { border-color: #94a3b8; }
         .custom-select-btn.selected { color: var(--text-main); font-weight: 700; border-color: var(--neon-cyan); }
 
         /* --- LIST NAMA --- */
@@ -113,7 +128,7 @@
 
         /* --- RADIO BUTTON --- */
         .radio-group { display: flex; gap: 15px; }
-        .radio-btn { flex: 1; text-align: center; padding: 16px; border: 1.5px solid var(--border-light); background: #ffffff; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 700; font-size: 14px; color: var(--text-muted); box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .radio-btn { flex: 1; text-align: center; padding: 16px; border: 1.5px solid var(--border-light); background: #ffffff; border-radius: 16px; cursor: pointer; transition: all 0.3s; font-weight: 700; font-size: 14px; color: var(--text-muted); box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
         .radio-btn input { display: none; }
         .radio-btn.active-hadir { border-color: var(--neon-cyan); background: rgba(14, 165, 233, 0.05); color: var(--neon-cyan); box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.2); transform: translateY(-2px); }
         .radio-btn.active-izin { border-color: var(--neon-pink); background: rgba(236, 72, 153, 0.05); color: var(--neon-pink); box-shadow: 0 10px 20px -5px rgba(236, 72, 153, 0.2); transform: translateY(-2px); }
@@ -126,9 +141,9 @@
         .hidden { display: none !important; }
 
         /* --- MODAL BAWAH --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: flex-end; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: flex-end; opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-content { background: #ffffff; width: 100%; max-width: 460px; border-radius: 32px 32px 0 0; padding: 35px 30px; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; box-shadow: 0 -20px 40px rgba(0,0,0,0.1); }
+        .modal-content { background: #ffffff; width: 100%; max-width: 480px; border-radius: 32px 32px 0 0; padding: 35px 30px; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); max-height: 85vh; overflow-y: auto; box-shadow: 0 -20px 40px rgba(0,0,0,0.1); }
         .modal-overlay.show .modal-content { transform: translateY(0); }
         
         /* Modal Tengah (Untuk Preview Foto) */
@@ -142,26 +157,27 @@
         .close-btn:hover { background: #e2e8f0; color: var(--text-main); transform: scale(1.05);}
         .modal-item { padding: 18px; border: 1.5px solid var(--border-light); border-radius: 16px; margin-bottom: 12px; cursor: pointer; font-weight: 600; text-align: center; background: #fff; color: var(--text-main); transition: all 0.2s; }
         .modal-item:active { transform: scale(0.97); }
-        .modal-item:hover { border-color: var(--neon-cyan); background: rgba(14, 165, 233, 0.05); color: var(--neon-cyan); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1); }
+        .modal-item:hover { border-color: var(--neon-cyan); background: rgba(14, 165, 233, 0.05); color: var(--neon-cyan); }
 
         /* --- DASHBOARD ADMIN STYLES --- */
-        .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .table-responsive { width: 100%; overflow-x: auto; background: #fff; border-radius: 16px; border: 1.5px solid var(--border-light); margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; text-align: left; }
-        th { background: #f8fafc; padding: 16px; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border-light); }
-        td { padding: 16px; font-size: 14px; border-bottom: 1px solid var(--border-light); color: var(--text-main); font-weight: 500; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
+        th { background: #f8fafc; padding: 16px; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border-light); letter-spacing: 0.5px;}
+        td { padding: 16px; font-size: 14px; border-bottom: 1px solid var(--border-light); color: var(--text-main); font-weight: 500; vertical-align: middle;}
         .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
         .badge-hadir { background: rgba(16, 185, 129, 0.1); color: #10b981; }
         .badge-izin { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
         .badge-belum { background: rgba(100, 116, 139, 0.1); color: #64748b; }
-        .btn-small { padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; margin: 0; border: none; transition: 0.2s;}
+        
+        .btn-small { padding: 8px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; margin: 0; border: none; transition: 0.2s;}
         .btn-delete-small { background: #fee2e2; color: #ef4444; } .btn-delete-small:hover { background: #fca5a5; }
         .btn-foto-small { background: #e0f2fe; color: #0284c7; } .btn-foto-small:hover { background: #bae6fd; }
 
         /* Tabs Filter Kehadiran */
         .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { flex: 1; min-width: 100px; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s; margin: 0;}
-        .tab-btn.active { background: var(--neon-cyan); color: #fff; border-color: var(--neon-cyan); }
+        .tab-btn { flex: 1; min-width: 100px; padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; margin: 0;}
+        .tab-btn.active { background: var(--primary-grad); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(14,165,233,0.3);}
 
         @media (max-width: 600px) {
             .admin-controls { grid-template-columns: 1fr; }
@@ -170,36 +186,41 @@
 </head>
 <body>
 
-    <div class="app-container" id="main-container">
-        <header>
-            <h1>ABSENSI DIGITAL KELAS XIF7</h1>
-        </header>
+    <div class="glow-bg"></div>
 
+    <div class="app-container" id="main-container">
         <div id="panel-awal" class="panel active">
-            <h2>SMA NEGERI 1 LEMAHABANG</h2>
-            <p class="instansi-sub">KABUPATEN CIREBON</p>
+            <header>
+                <h1 class="portal-title">ABSENSI DIGITAL<br>KELAS XIF7</h1>
+            </header>
+            
+            <div class="instansi-box" style="text-align: center;">
+                <div class="instansi-main">SMA NEGERI 1 LEMAHABANG</div>
+                <div class="instansi-sub">KABUPATEN CIREBON</div>
+            </div>
+
             <button class="btn-primary" onclick="cekDanBukaAbsen()">ABSENSI</button>
             <button class="btn-secondary" onclick="switchPanel('panel-pengelola')">Akses Pengelola</button>
         </div>
 
         <div id="panel-pengelola" class="panel">
-            <h2>Panel Admin</h2>
+            <h2 class="panel-title">Panel Admin</h2>
             <p class="form-desc">Masukkan kredensial keamanan</p>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="admin-user" placeholder="Username (admin)" class="input-field">
+                <input type="text" id="admin-user" placeholder="Ketik username..." class="input-field">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="admin-pass" placeholder="Password (admin123)" class="input-field">
+                <input type="password" id="admin-pass" placeholder="Ketik password..." class="input-field">
             </div>
             <button class="btn-primary" onclick="loginAdmin()">Otorisasi Masuk</button>
             <button class="btn-text" onclick="switchPanel('panel-awal')">Kembali ke Beranda</button>
         </div>
 
         <div id="panel-dashboard-admin" class="panel">
-            <h2>Dashboard Pengelola</h2>
-            <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 20px; text-align: center;">Pemantauan Real-Time</p>
+            <h2 class="panel-title">Dashboard Pengelola</h2>
+            <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 25px; text-align: center;">Pemantauan Real-Time</p>
             
             <button class="btn-info" onclick="bukaModalKehadiran()">📊 Data Kehadiran (Filter Status)</button>
             
@@ -213,11 +234,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Waktu & Tanggal</th>
                             <th>Nama Siswa</th>
                             <th>Hari & Mapel</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Bukti</th>
+                            <th>Waktu & Tanggal</th>
+                            <th style="text-align: right;">Hapus</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-rekap">
@@ -229,14 +251,14 @@
         </div>
 
         <div id="panel-absen" class="panel">
-            <h2>Forum Absensi XIF7</h2>
+            <h2 class="panel-title">Forum Absensi XIF7</h2>
             <p class="form-desc">Isi dengan jujur!</p>
             
             <div class="form-group">
                 <label>Hari Absensi</label>
                 <input type="hidden" id="hari" value="">
                 <div class="custom-select-btn" id="btn-pilih-hari" onclick="openModal('modal-hari')">
-                    <span id="teks-hari">Pilih hari kehadiran...</span> <span style="font-size: 12px;">▼</span>
+                    <span id="teks-hari">Pilih hari kehadiran...</span> <span style="font-size: 12px; color: #94a3b8;">▼</span>
                 </div>
             </div>
 
@@ -244,7 +266,7 @@
                 <label>Mata Pelajaran</label>
                 <input type="hidden" id="mapel" value="">
                 <div class="custom-select-btn" id="btn-pilih-mapel" onclick="bukaModalMapel()">
-                    <span id="teks-mapel">Pilih mata pelajaran...</span> <span style="font-size: 12px;">▼</span>
+                    <span id="teks-mapel">Pilih mata pelajaran...</span> <span style="font-size: 12px; color: #94a3b8;">▼</span>
                 </div>
             </div>
 
@@ -274,8 +296,8 @@
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
                     </div>
-                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()" style="margin-bottom: 0;">Ambil Foto Selfie</button>
-                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()" style="margin-bottom: 0;">Ulangi Pengambilan</button>
+                    <button class="btn-primary" id="btn-capture" onclick="takeSnapshot()" style="margin-bottom: 0;">📸 Ambil Foto Selfie</button>
+                    <button class="btn-secondary hidden" id="btn-retake" onclick="retakePhoto()" style="margin-bottom: 0;">🔄 Ulangi Pengambilan</button>
                     <input type="hidden" id="foto-data" value="">
                 </div>
 
@@ -320,6 +342,32 @@
         </div>
     </div>
 
+    <div id="modal-admin-hari" class="modal-overlay" onclick="closeModal('modal-admin-hari')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Filter Hari</h3>
+                <button class="close-btn" onclick="closeModal('modal-admin-hari')">✕</button>
+            </div>
+            <div>
+                <div class="modal-item" onclick="pilihAdminHari('Senin')">Senin</div>
+                <div class="modal-item" onclick="pilihAdminHari('Selasa')">Selasa</div>
+                <div class="modal-item" onclick="pilihAdminHari('Rabu')">Rabu</div>
+                <div class="modal-item" onclick="pilihAdminHari('Kamis')">Kamis</div>
+                <div class="modal-item" onclick="pilihAdminHari('Jumat')">Jumat</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-admin-mapel" class="modal-overlay" onclick="closeModal('modal-admin-mapel')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Filter Mapel</h3>
+                <button class="close-btn" onclick="closeModal('modal-admin-mapel')">✕</button>
+            </div>
+            <div id="list-admin-mapel-container"></div>
+        </div>
+    </div>
+
     <div id="modal-kehadiran" class="modal-overlay" onclick="closeModal('modal-kehadiran')">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 800px; height: 90vh; display: flex; flex-direction: column;">
             <div class="modal-header">
@@ -327,15 +375,16 @@
                 <button class="close-btn" onclick="closeModal('modal-kehadiran')">✕</button>
             </div>
             
-            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <select id="filter-admin-hari" class="input-field" onchange="generateMapelAdmin()" style="padding: 10px;">
-                    <option value="" disabled selected>Pilih Hari...</option>
-                    <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
-                    <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option><option value="Jumat">Jumat</option>
-                </select>
-                <select id="filter-admin-mapel" class="input-field" onchange="renderTabelKehadiran()" style="padding: 10px;">
-                    <option value="" disabled selected>Pilih Mapel...</option>
-                </select>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <input type="hidden" id="filter-admin-hari-val" value="">
+                <div class="custom-select-btn" id="btn-admin-hari" onclick="openModal('modal-admin-hari')" style="flex: 1; padding: 14px;">
+                    <span id="teks-admin-hari">Pilih Hari...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
+                </div>
+
+                <input type="hidden" id="filter-admin-mapel-val" value="">
+                <div class="custom-select-btn" id="btn-admin-mapel" onclick="bukaModalAdminMapel()" style="flex: 1; padding: 14px;">
+                    <span id="teks-admin-mapel">Pilih Mapel...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
+                </div>
             </div>
 
             <div class="tabs-container">
@@ -351,7 +400,7 @@
                         <tr>
                             <th>Nama Siswa</th>
                             <th>Status</th>
-                            <th>Keterangan / Bukti</th>
+                            <th>Bukti / Keterangan</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-filter-kehadiran">
@@ -368,7 +417,7 @@
                 <h3>Preview Bukti</h3>
                 <button class="close-btn" onclick="closeModal('modal-preview-foto')">✕</button>
             </div>
-            <img id="preview-image-src" src="" alt="Bukti Foto" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <img id="preview-image-src" src="" alt="Bukti Foto" style="width: 100%; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
         </div>
     </div>
 
@@ -404,14 +453,14 @@
             const pass = document.getElementById('admin-pass').value;
 
             if(user === 'admin' && pass === 'admin123') {
-                Swal.fire({ title: 'Otorisasi Berhasil', text: 'Selamat datang di Panel Admin.', icon: 'success', confirmButtonColor: '#0ea5e9' })
+                Swal.fire({ title: 'Otorisasi Berhasil', text: 'Selamat datang di Panel Admin.', icon: 'success', timer: 2000, timerProgressBar: true, showConfirmButton: false })
                 .then(() => {
                     document.getElementById('admin-user').value = ''; document.getElementById('admin-pass').value = '';
                     switchPanel('panel-dashboard-admin', true);
                     renderTabelAdmin();
                     updateTeksTombolBukaTutup();
                 });
-            } else { Swal.fire('Akses Ditolak', 'Username atau Password salah!', 'error'); }
+            } else { Swal.fire({title: 'Akses Ditolak', text: 'Username atau Password salah!', icon: 'error', timer: 2500, timerProgressBar: true, showConfirmButton: false}); }
         }
 
         function logoutAdmin() { switchPanel('panel-awal', false); }
@@ -420,10 +469,10 @@
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
             if(isClosed) {
                 localStorage.setItem('status_absen_XIF7', 'dibuka');
-                Swal.fire('Informasi', 'Absensi telah DIBUKA untuk siswa.', 'success');
+                Swal.fire({title: 'Absensi Dibuka', text: 'Siswa sekarang dapat melakukan absensi.', icon: 'success', timer: 2500, timerProgressBar: true, showConfirmButton: false});
             } else {
                 localStorage.setItem('status_absen_XIF7', 'ditutup');
-                Swal.fire('Informasi', 'Absensi telah DITUTUP. Siswa tidak bisa absen lagi.', 'warning');
+                Swal.fire({title: 'Absensi Ditutup', text: 'Siswa tidak bisa absen lagi.', icon: 'warning', timer: 2500, timerProgressBar: true, showConfirmButton: false});
             }
             updateTeksTombolBukaTutup();
         }
@@ -437,31 +486,56 @@
 
         function cekDanBukaAbsen() {
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
-            if(isClosed) Swal.fire('Akses Ditolak', 'Maaf, PENGELOLA telah menutup sesi absensi saat ini.', 'error');
+            if(isClosed) Swal.fire({title:'Akses Ditolak', text:'Maaf, PENGELOLA telah menutup sesi absensi saat ini.', icon:'error', timer: 3000, timerProgressBar: true, showConfirmButton: false});
             else switchPanel('panel-absen');
         }
 
-        // --- 4. FITUR ADMIN: KEHADIRAN & BUKTI FOTO ---
+        // --- 4. FITUR ADMIN: KEHADIRAN (FILTER MODAL CUSTOM) ---
         let filterTabKehadiran = 'Semua';
 
         function bukaModalKehadiran() {
             openModal('modal-kehadiran');
-            // Reset dropdown & tabel
-            document.getElementById('filter-admin-hari').value = "";
-            document.getElementById('filter-admin-mapel').innerHTML = '<option value="" disabled selected>Pilih Mapel...</option>';
+            // Reset filter ke default
+            document.getElementById('filter-admin-hari-val').value = ""; document.getElementById('teks-admin-hari').innerText = "Pilih Hari..."; document.getElementById('btn-admin-hari').classList.remove('selected');
+            document.getElementById('filter-admin-mapel-val').value = ""; document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel..."; document.getElementById('btn-admin-mapel').classList.remove('selected');
             document.getElementById('tbody-filter-kehadiran').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
             setTabKehadiran('Semua');
         }
 
-        function generateMapelAdmin() {
-            const hari = document.getElementById('filter-admin-hari').value;
-            const selectMapel = document.getElementById('filter-admin-mapel');
-            selectMapel.innerHTML = '<option value="" disabled selected>Pilih Mapel...</option>';
-            if(jadwalPelajaran[hari]) {
-                jadwalPelajaran[hari].forEach(mapel => {
-                    selectMapel.innerHTML += `<option value="${mapel}">${mapel}</option>`;
-                });
+        function pilihAdminHari(hari) {
+            document.getElementById('filter-admin-hari-val').value = hari;
+            document.getElementById('teks-admin-hari').innerText = hari;
+            document.getElementById('btn-admin-hari').classList.add('selected');
+            
+            // Reset Mapel karena hari berubah
+            document.getElementById('filter-admin-mapel-val').value = "";
+            document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel...";
+            document.getElementById('btn-admin-mapel').classList.remove('selected');
+            
+            closeModal('modal-admin-hari');
+            generateAdminMapelList(hari);
+            renderTabelKehadiran();
+        }
+
+        function bukaModalAdminMapel() {
+            if(!document.getElementById('filter-admin-hari-val').value) { return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih hari terlebih dahulu.', timer: 2000, timerProgressBar: true, showConfirmButton: false}); }
+            openModal('modal-admin-mapel');
+        }
+
+        function generateAdminMapelList(hari) {
+            const container = document.getElementById('list-admin-mapel-container'); container.innerHTML = "";
+            if(jadwalPelajaran[hari]) { 
+                jadwalPelajaran[hari].forEach(mapel => { 
+                    container.innerHTML += `<div class="modal-item" onclick="pilihAdminMapel('${mapel}')">${mapel}</div>`; 
+                }); 
             }
+        }
+
+        function pilihAdminMapel(mapel) {
+            document.getElementById('filter-admin-mapel-val').value = mapel;
+            document.getElementById('teks-admin-mapel').innerText = mapel;
+            document.getElementById('btn-admin-mapel').classList.add('selected');
+            closeModal('modal-admin-mapel');
             renderTabelKehadiran();
         }
 
@@ -477,23 +551,23 @@
         }
 
         function renderTabelKehadiran() {
-            const hari = document.getElementById('filter-admin-hari').value;
-            const mapel = document.getElementById('filter-admin-mapel').value;
+            const hari = document.getElementById('filter-admin-hari-val').value;
+            const mapel = document.getElementById('filter-admin-mapel-val').value;
             const tbody = document.getElementById('tbody-filter-kehadiran');
             
-            if(!hari || !mapel) return; // Tunggu admin pilih keduanya
+            if(!hari || !mapel) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
+                return;
+            }
 
             const dbFiltered = dbAbsensi.filter(item => item.hari === hari && item.mapel === mapel);
             let hasilAkhir = [];
 
-            // Gabungkan data Siswa dengan DB (Cari yg belum absen)
+            // Cari siapa saja yang ada di kelas tapi belum diabsen
             daftarNama.forEach(nama => {
                 let record = dbFiltered.find(item => item.nama === nama);
-                if (record) {
-                    hasilAkhir.push({ nama: nama, status: record.status, keterangan: record.keterangan, foto: record.foto });
-                } else {
-                    hasilAkhir.push({ nama: nama, status: 'Belum Absen', keterangan: '-', foto: null });
-                }
+                if (record) hasilAkhir.push({ nama: nama, status: record.status, keterangan: record.keterangan, foto: record.foto });
+                else hasilAkhir.push({ nama: nama, status: 'Belum Absen', keterangan: '-', foto: null });
             });
 
             // Terapkan Filter Tab
@@ -509,8 +583,8 @@
 
             hasilAkhir.forEach(item => {
                 let badgeClass = item.status === 'Hadir' ? 'badge-hadir' : (item.status === 'Izin' ? 'badge-izin' : 'badge-belum');
-                let btnFoto = item.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${item.foto}')">📸 Lihat Foto</button>` : '-';
-                let infoKet = item.keterangan !== "-" ? `<div style="font-size:12px; color:#666; margin-top:5px;">${item.keterangan}</div>` : '';
+                let btnFoto = item.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${item.foto}')">📸 Lihat Bukti</button>` : '-';
+                let infoKet = item.keterangan !== "-" ? `<div style="font-size:12px; color:#666; margin-top:5px; font-weight:500;">${item.keterangan}</div>` : '';
                 
                 tbody.innerHTML += `
                     <tr>
@@ -522,42 +596,44 @@
             });
         }
 
-        // Fungsi Global untuk melihat foto/surat (Digunakan di tabel rekap & kehadiran)
         function lihatFotoPreview(base64Data) {
             document.getElementById('preview-image-src').src = base64Data;
             openModal('modal-preview-foto');
         }
 
-        // --- 5. FITUR ADMIN: HAPUS & RESET ---
+        // --- 5. FITUR ADMIN: TABEL REKAP UTAMA & HAPUS ---
         function renderTabelAdmin() {
             const tbody = document.getElementById('tbody-rekap');
             tbody.innerHTML = "";
             
             if(dbAbsensi.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#999;">Belum ada data absensi yang masuk.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Belum ada data absensi yang masuk.</td></tr>`;
                 return;
             }
 
+            // Susunan Kolom: Nama | Hari & Mapel | Status | Bukti | Waktu & Tanggal | Hapus (Aksi)
             [...dbAbsensi].reverse().forEach(data => {
                 let badgeClass = data.status === 'Hadir' ? 'badge-hadir' : 'badge-izin';
+                let btnFoto = data.foto ? `<button class="btn-small btn-foto-small" onclick="lihatFotoPreview('${data.foto}')">Lihat</button>` : '-';
                 let btnHapus = `<button class="btn-small btn-delete-small" onclick="hapusDataIndividu('${data.id}', '${data.lockKey}')">Hapus</button>`;
-                let btnFoto = `<button class="btn-small btn-foto-small" style="margin-left:5px;" onclick="lihatFotoPreview('${data.foto}')">Foto</button>`;
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${data.waktuStr}</td>
                     <td><strong>${data.nama}</strong></td>
                     <td>${data.hari} <br> <span style="font-size:11px; color:#888;">${data.mapel}</span></td>
                     <td><span class="status-badge ${badgeClass}">${data.status}</span></td>
-                    <td>${btnHapus} ${btnFoto}</td>
+                    <td>${btnFoto}</td>
+                    <td><span style="font-size:12px; color:#64748b; font-weight:600;">${data.waktuStr}</span></td>
+                    <td style="text-align: right;">${btnHapus}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function hapusDataIndividu(id, lockKey) {
+            // Ini menggunakan konfirmasi persetujuan, jadi TIDAK pakai auto-close timer.
             Swal.fire({
-                title: 'Hapus Data?', text: "Data absensi siswa ini akan dihapus dan ia bisa absen kembali.",
+                title: 'Hapus Data?', text: "Data absensi ini akan dihapus dan ia bisa absen kembali.",
                 icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Hapus!'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -565,13 +641,14 @@
                     localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
                     localStorage.removeItem(lockKey); 
                     
-                    Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
+                    Swal.fire({title:'Terhapus!', text:'Data berhasil dihapus.', icon:'success', timer: 2000, timerProgressBar: true, showConfirmButton: false});
                     renderTabelAdmin(); renderNama(document.getElementById('search-nama').value);
                 }
             });
         }
 
         function resetSemuaData() {
+            // Konfirmasi reset tanpa auto-close
             Swal.fire({
                 title: 'Yakin Mereset Semua?', text: "Tindakan ini akan menghapus SELURUH data absen secara permanen!",
                 icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Reset Semua!'
@@ -586,7 +663,7 @@
 
                     dbAbsensi = []; localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
                     
-                    Swal.fire('Direset!', 'Seluruh data absensi telah kembali kosong.', 'success');
+                    Swal.fire({title:'Direset!', text:'Seluruh data absen dikosongkan.', icon:'success', timer: 2500, timerProgressBar: true, showConfirmButton: false});
                     renderTabelAdmin();
                     
                     document.getElementById('hari').value = ""; document.getElementById('teks-hari').innerText = "Pilih hari kehadiran...";
@@ -600,17 +677,17 @@
         }
 
         function downloadExcel() {
-            if(dbAbsensi.length === 0) return Swal.fire('Kosong', 'Belum ada data untuk di-download.', 'info');
+            if(dbAbsensi.length === 0) return Swal.fire({title:'Kosong', text:'Belum ada data untuk di-download.', icon:'info', timer: 2500, timerProgressBar: true, showConfirmButton: false});
             const dataToExport = dbAbsensi.map(item => ({
-                "Tanggal & Jam": item.waktuStr, "Nama Siswa": item.nama, "Status": item.status, 
-                "Alasan Izin": item.keterangan || "Hadir", "Hari": item.hari, "Mata Pelajaran": item.mapel
+                "Nama Siswa": item.nama, "Hari": item.hari, "Mata Pelajaran": item.mapel,
+                "Status": item.status, "Alasan / Lampiran": item.keterangan || "Hadir (Selfie)", "Tanggal & Jam": item.waktuStr
             }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absen");
             XLSX.writeFile(workbook, "Rekap_Absensi_XIF7.xlsx");
         }
 
-        // --- 6. NAVIGASI UMUM & MODAL ABSEN ---
+        // --- 6. NAVIGASI UMUM & MODAL ABSEN (SISWA) ---
         function switchPanel(panelId, isAdminPanel = false) {
             const currentActive = document.querySelector('.panel.active');
             const mainContainer = document.getElementById('main-container');
@@ -637,7 +714,7 @@
         }
 
         function bukaModalMapel() {
-            if(!document.getElementById('hari').value) return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih jadwal hari terlebih dahulu.', confirmButtonColor: '#0ea5e9'});
+            if(!document.getElementById('hari').value) return Swal.fire({icon: 'warning', title: 'Data Kurang', text: 'Pilih jadwal hari terlebih dahulu.', timer: 2000, timerProgressBar: true, showConfirmButton: false});
             openModal('modal-mapel');
         }
 
@@ -652,7 +729,50 @@
             closeModal('modal-mapel'); renderNama(document.getElementById('search-nama').value);
         }
 
-        // --- 7. KAMERA & STATUS ---
+        // --- 7. RENDER NAMA SISWA (DENGAN FIX BUG PENCARIAN) ---
+        function renderNama(filterText = "") {
+            const listContainer = document.getElementById('list-nama');
+            const hari = document.getElementById('hari').value;
+            const mapel = document.getElementById('mapel').value;
+            
+            listContainer.innerHTML = "";
+            
+            // Pencarian nama yang aman dan tidak case-sensitive
+            const filtered = daftarNama.filter(nama => nama.toLowerCase().includes(filterText.toLowerCase()));
+            
+            // Fix Bug: Jika nama tidak ditemukan saat diketik
+            if(filtered.length === 0) {
+                listContainer.innerHTML = `<div class="name-item disabled" style="text-align:center; color:#94a3b8; padding: 20px;">Nama tidak ditemukan.</div>`;
+                return;
+            }
+
+            filtered.forEach(nama => {
+                let div = document.createElement('div'); div.className = 'name-item';
+                
+                const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
+                const sudahAbsen = (hari && mapel && localStorage.getItem(cekAbsenKunci));
+
+                if (sudahAbsen) {
+                    div.innerHTML = `${nama} <span style="float:right; color:#10b981; font-weight:700;">✓ Tercatat</span>`;
+                    div.classList.add('disabled');
+                } else {
+                    div.innerText = nama;
+                    if(nama === stateNamaTerpilih) div.classList.add('terpilih');
+                    div.onclick = () => {
+                        stateNamaTerpilih = nama; 
+                        document.getElementById('nama-terpilih').value = nama;
+                        // Refresh input search box agar sama dengan yang diklik
+                        document.getElementById('search-nama').value = nama;
+                        renderNama(nama); // Filter langsung ke 1 nama tersebut agar jelas terpilih
+                    };
+                }
+                listContainer.appendChild(div);
+            });
+        }
+        renderNama(); 
+        function filterNama() { renderNama(document.getElementById('search-nama').value); }
+
+        // --- 8. KAMERA & STATUS ---
         function ubahStatus(status) {
             document.getElementById('label-hadir').classList.remove('active-hadir'); document.getElementById('label-izin').classList.remove('active-izin');
             document.getElementById('area-dinamis').classList.remove('hidden');
@@ -674,7 +794,7 @@
                 document.getElementById('video-kamera').srcObject = streamKamera;
                 document.getElementById('video-kamera').classList.remove('hidden'); document.getElementById('canvas-kamera').classList.add('hidden');
                 document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
-            } catch (err) { Swal.fire('Akses Ditolak', 'Izinkan browser menggunakan kamera untuk verifikasi.', 'error'); }
+            } catch (err) { Swal.fire({title:'Akses Ditolak', text:'Izinkan browser menggunakan kamera untuk verifikasi.', icon:'error', timer: 3000, timerProgressBar:true, showConfirmButton:false}); }
         }
 
         function matikanKamera() { if (streamKamera) streamKamera.getTracks().forEach(track => track.stop()); }
@@ -683,7 +803,7 @@
             const video = document.getElementById('video-kamera'); const canvas = document.getElementById('canvas-kamera'); const ctx = canvas.getContext('2d');
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             ctx.translate(canvas.width, 0); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            // Convert to JPEG untuk menghemat memori LocalStorage
+            // Convert to JPEG
             document.getElementById('foto-data').value = canvas.toDataURL('image/jpeg', 0.8);
             video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden'); document.getElementById('btn-retake').classList.remove('hidden');
@@ -694,7 +814,6 @@
             document.getElementById('btn-capture').classList.remove('hidden'); document.getElementById('btn-retake').classList.add('hidden');
         }
 
-        // Fungsi konversi file unggahan menjadi Base64 Gambar
         function getBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -704,7 +823,7 @@
             });
         }
 
-        // --- 8. PENGIRIMAN DATA ---
+        // --- 9. PENGIRIMAN DATA ---
         async function kirimAbsen() {
             const hari = document.getElementById('hari').value;
             const mapel = document.getElementById('mapel').value;
@@ -712,22 +831,20 @@
             const statusEl = document.querySelector('input[name="status"]:checked');
             const status = statusEl ? statusEl.value : null;
 
-            if (!hari || !mapel || !nama || !status) return Swal.fire('Pendaftaran Gagal', 'Lengkapi Jadwal, Nama, dan Status Kehadiran.', 'warning');
+            if (!hari || !mapel || !nama || !status) return Swal.fire({title:'Pendaftaran Gagal', text:'Lengkapi Jadwal, Nama, dan Status Kehadiran.', icon:'warning', timer: 2500, timerProgressBar:true, showConfirmButton:false});
 
             let fotoSimpan = ""; let keterangan = "-";
 
-            // Validasi & Ambil Base64 Foto
             if (status === 'Hadir') {
                 fotoSimpan = document.getElementById('foto-data').value;
-                if (!fotoSimpan) return Swal.fire('Bukti Diperlukan', 'Harap jepret Bukti Hadir.', 'warning'); 
+                if (!fotoSimpan) return Swal.fire({title:'Bukti Diperlukan', text:'Harap jepret Bukti Hadir.', icon:'warning', timer:2500, timerProgressBar:true, showConfirmButton:false}); 
             } else if (status === 'Izin') {
                 keterangan = document.getElementById('keterangan-izin').value.trim();
                 const fileSurat = document.getElementById('surat-izin').files;
                 
-                if (keterangan.length < 5) return Swal.fire('Alasan Ditolak', 'Keterangan izin harus jelas (min 5 huruf).', 'warning'); 
-                if (fileSurat.length === 0) return Swal.fire('Surat Diperlukan', 'Unggah foto bukti surat izin.', 'warning'); 
+                if (keterangan.length < 5) return Swal.fire({title:'Ditolak', text:'Keterangan izin harus jelas (min 5 huruf).', icon:'warning', timer:2500, timerProgressBar:true, showConfirmButton:false}); 
+                if (fileSurat.length === 0) return Swal.fire({title:'Surat Diperlukan', text:'Unggah foto bukti surat izin.', icon:'warning', timer:2500, timerProgressBar:true, showConfirmButton:false}); 
                 
-                // Konversi surat ke base64 agar admin bisa melihat gambarnya
                 fotoSimpan = await getBase64(fileSurat[0]);
             }
 
@@ -735,20 +852,17 @@
             const timeNow = new Date();
             
             const payload = {
-                id: "ID_" + timeNow.getTime(),
-                lockKey: cekAbsenKunci,
-                waktuStr: timeNow.toLocaleString('id-ID'),
-                hari: hari, mapel: mapel, nama: nama, status: status,
-                keterangan: keterangan, foto: fotoSimpan
+                id: "ID_" + timeNow.getTime(), lockKey: cekAbsenKunci, waktuStr: timeNow.toLocaleString('id-ID'),
+                hari: hari, mapel: mapel, nama: nama, status: status, keterangan: keterangan, foto: fotoSimpan
             };
 
             dbAbsensi.push(payload);
             localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
             localStorage.setItem(cekAbsenKunci, 'true');
 
-            Swal.fire({ title: 'Data Diterima!', text: `Absensi ${nama} sukses diverifikasi.`, icon: 'success', confirmButtonColor: '#0ea5e9'})
+            Swal.fire({ title: 'Data Diterima!', text: `Absensi ${nama} sukses diverifikasi.`, icon: 'success', timer:2500, timerProgressBar:true, showConfirmButton:false})
             .then(() => {
-                document.getElementById('nama-terpilih').value = ""; stateNamaTerpilih = "";
+                document.getElementById('nama-terpilih').value = ""; stateNamaTerpilih = ""; document.getElementById('search-nama').value = "";
                 document.querySelector('input[name="status"]:checked').checked = false;
                 document.getElementById('area-dinamis').classList.add('hidden'); document.getElementById('label-hadir').classList.remove('active-hadir'); document.getElementById('label-izin').classList.remove('active-izin');
                 document.getElementById('surat-izin').value = ""; matikanKamera(); renderNama();
