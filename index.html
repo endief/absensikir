@@ -593,7 +593,7 @@
                 document.getElementById('btn-capture').classList.remove('hidden');
                 document.getElementById('btn-retake').classList.add('hidden');
             } catch (err) {
-                Swal.fire('Akses Ditolak', 'Izinkan browser menggunakan kamera untuk melakukan verifikasi wajah.', 'error');
+                Swal.fire('Kamera tidak bisa dibuka.', 'error');
             }
         }
 
