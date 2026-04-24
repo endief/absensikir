@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Kelas XIF7 Eksklusif</title>
+    <title>Absensi Digital Kelas XIF7</title>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
@@ -86,7 +86,7 @@
 
         h1 { 
             font-family: var(--font-heading);
-            font-size: 32px; 
+            font-size: 26px; /* Dikecilkan sedikit agar muat di HP */
             font-weight: 800;
             background: var(--primary-grad);
             -webkit-background-clip: text;
@@ -282,13 +282,13 @@
 
     <div class="app-container">
         <header>
-            <h1>XIF7 ABSENTIA</h1>
+            <h1>ABSENSI DIGITAL KELAS XIF7</h1>
         </header>
 
         <div id="panel-awal" class="panel active">
-            <h2>Portal Kehadiran</h2>
-            <p>Sistem Absensi Digital Eksklusif</p>
-            <button class="btn-primary" onclick="switchPanel('panel-absen')">Mulai Absensi Wajah</button>
+            <h2>SMA NEGERI 1 LEMAHABANG</h2>
+            <p>KABUPATEN CIREBON</p>
+            <button class="btn-primary" onclick="switchPanel('panel-absen')">ABSENSI</button>
             <button class="btn-secondary" onclick="switchPanel('panel-pengelola')">Akses Pengelola</button>
         </div>
 
@@ -315,8 +315,8 @@
         </div>
 
         <div id="panel-absen" class="panel">
-            <h2>Form Kehadiran</h2>
-            <p style="margin-bottom: 25px;">Lengkapi data dengan teliti</p>
+            <h2>Forum Absensi XIF7</h2>
+            <p style="margin-bottom: 25px;">Isi dengan jujur!</p>
             
             <div class="form-group">
                 <label>Hari Absensi</label>
@@ -342,7 +342,7 @@
             </div>
 
             <div class="form-group">
-                <label>Deklarasi Kehadiran</label>
+                <label>Status Kehadiran</label>
                 <div class="radio-group">
                     <label class="radio-btn" id="label-hadir">
                         <input type="radio" name="status" value="Hadir" onchange="ubahStatus('Hadir')"> HADIR
@@ -355,7 +355,7 @@
 
             <div id="area-dinamis" class="hidden">
                 <div id="area-kamera" class="hidden">
-                    <label>Verifikasi Biometrik Wajah</label>
+                    <label>Bukti Hadir</label>
                     <div class="camera-wrapper">
                         <video id="video-kamera" autoplay playsinline></video>
                         <canvas id="canvas-kamera" class="hidden"></canvas>
@@ -635,18 +635,18 @@
             const status = statusEl ? statusEl.value : null;
 
             if (!hari || !mapel || !nama || !status) {
-                Swal.fire({ title: 'Pendaftaran Gagal', text: 'Mohon lengkapi Jadwal, Nama, dan Deklarasi Kehadiran.', icon: 'warning', confirmButtonColor: '#ec4899', confirmButtonText: 'Periksa Kembali' });
+                Swal.fire({ title: 'Pendaftaran Gagal', text: 'Mohon lengkapi Jadwal, Nama, dan Status Kehadiran.', icon: 'warning', confirmButtonColor: '#ec4899', confirmButtonText: 'Periksa Kembali' });
                 return;
             }
 
             let foto = ""; 
             let keterangan = "";
-            let dataSurat = null; // Menampung data file surat
+            let dataSurat = null; 
 
             if (status === 'Hadir') {
                 foto = document.getElementById('foto-data').value;
                 if (!foto) { 
-                    Swal.fire('Foto Diperlukan', 'Harap lakukan verifikasi foto wajah terlebih dahulu.', 'warning'); 
+                    Swal.fire('Foto Diperlukan', 'Harap lakukan pengambilan Bukti Hadir terlebih dahulu.', 'warning'); 
                     return; 
                 }
             } else if (status === 'Izin') {
@@ -654,7 +654,7 @@
                 const fileSurat = document.getElementById('surat-izin').files;
                 
                 if (keterangan.length < 5) { 
-                    Swal.fire('Alasan Ditolak', 'Keterangan izin harus jelas dan lebih dari 5 huruf.', 'warning'); 
+                    Swal.fire('Alasan Ditolak', 'Keterangan absen harus jelas dan lebih dari 5 huruf.', 'warning'); 
                     return; 
                 }
                 if (fileSurat.length === 0) {
@@ -662,7 +662,6 @@
                     return; 
                 }
                 
-                // Menyimpan nama file sebagai bukti (bisa dikonversi ke base64 jika butuh upload firebase)
                 dataSurat = fileSurat[0].name;
             }
 
@@ -680,7 +679,7 @@
                 document.getElementById('area-dinamis').classList.add('hidden');
                 document.getElementById('label-hadir').classList.remove('active-hadir');
                 document.getElementById('label-izin').classList.remove('active-izin');
-                document.getElementById('surat-izin').value = ""; // Reset File input
+                document.getElementById('surat-izin').value = ""; 
                 
                 matikanKamera(); renderNama();
             });
