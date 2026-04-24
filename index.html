@@ -174,13 +174,6 @@
         .btn-delete-small { background: #fee2e2; color: #ef4444; } .btn-delete-small:hover { background: #fca5a5; }
         .btn-foto-small { background: #e0f2fe; color: #0284c7; } .btn-foto-small:hover { background: #bae6fd; }
 
-        /* Tabs Filter Navigasi Admin */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; }
-        .tabs-container::-webkit-scrollbar { height: 4px; }
-        .tabs-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .tab-btn { flex-shrink: 0; padding: 12px 20px; border-radius: 12px; border: 1.5px solid var(--border-light); background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; margin: 0;}
-        .tab-btn.active { background: var(--primary-grad); color: #fff; border-color: transparent; box-shadow: 0 4px 10px rgba(14,165,233,0.3);}
-
         @media (max-width: 600px) {
             .admin-controls { grid-template-columns: 1fr; }
         }
@@ -351,29 +344,26 @@
                 <button class="close-btn" onclick="closeModal('modal-kehadiran')">✕</button>
             </div>
             
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <div style="flex: 1;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1; min-width: 150px;">
                     <input type="hidden" id="filter-admin-hari-val" value="">
                     <div class="custom-select-btn" id="btn-admin-hari" onclick="openModal('modal-admin-hari')" style="padding: 14px;">
                         <span id="teks-admin-hari">Pilih Hari...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
                     </div>
                 </div>
 
-                <div style="flex: 1;">
+                <div style="flex: 1; min-width: 150px;">
                     <input type="hidden" id="filter-admin-mapel-val" value="">
                     <div class="custom-select-btn" id="btn-admin-mapel" onclick="bukaModalAdminMapel()" style="padding: 14px;">
                         <span id="teks-admin-mapel">Pilih Mapel...</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
                     </div>
                 </div>
-            </div>
 
-            <div style="margin-bottom: 5px;">
-                <label style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Filter Status</label>
-                <div class="tabs-container" style="margin-top: 8px;">
-                    <button class="tab-btn active" id="tab-semua" onclick="setTabKehadiran('Semua')">Semua</button>
-                    <button class="tab-btn" id="tab-hadir" onclick="setTabKehadiran('Hadir')">Hadir</button>
-                    <button class="tab-btn" id="tab-izin" onclick="setTabKehadiran('Izin')">Izin</button>
-                    <button class="tab-btn" id="tab-belum" onclick="setTabKehadiran('Belum Absen')">Belum Absen</button>
+                <div style="flex: 1; min-width: 150px;">
+                    <input type="hidden" id="filter-admin-status-val" value="Semua">
+                    <div class="custom-select-btn" id="btn-admin-status" onclick="openModal('modal-admin-status')" style="padding: 14px;">
+                        <span id="teks-admin-status">Semua</span> <span style="font-size: 10px; color:#94a3b8;">▼</span>
+                    </div>
                 </div>
             </div>
 
@@ -417,6 +407,21 @@
                 <button class="close-btn" onclick="closeModal('modal-admin-mapel')">✕</button>
             </div>
             <div id="list-admin-mapel-container"></div>
+        </div>
+    </div>
+
+    <div id="modal-admin-status" class="modal-overlay" style="z-index: 1050;" onclick="closeModal('modal-admin-status')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Filter Status</h3>
+                <button class="close-btn" onclick="closeModal('modal-admin-status')">✕</button>
+            </div>
+            <div>
+                <div class="modal-item" onclick="pilihAdminStatus('Semua')">Semua</div>
+                <div class="modal-item" onclick="pilihAdminStatus('Hadir')">Hadir</div>
+                <div class="modal-item" onclick="pilihAdminStatus('Izin')">Izin</div>
+                <div class="modal-item" onclick="pilihAdminStatus('Belum Absen')">Belum Absen</div>
+            </div>
         </div>
     </div>
 
@@ -499,12 +504,10 @@
             else switchPanel('panel-absen');
         }
 
-        // --- 4. FITUR ADMIN: KEHADIRAN (MODAL NUMPUK RAPI) ---
-        let filterTabKehadiran = 'Semua';
-
+        // --- 4. FITUR ADMIN: KEHADIRAN (MODAL NUMPUK RAPI - KONSISTEN) ---
         function bukaModalKehadiran() {
             openModal('modal-kehadiran');
-            // Reset state
+            // Reset Semua Input Filter
             document.getElementById('filter-admin-hari-val').value = "";
             document.getElementById('teks-admin-hari').innerText = "Pilih Hari...";
             document.getElementById('btn-admin-hari').classList.remove('selected');
@@ -512,9 +515,12 @@
             document.getElementById('filter-admin-mapel-val').value = "";
             document.getElementById('teks-admin-mapel').innerText = "Pilih Mapel...";
             document.getElementById('btn-admin-mapel').classList.remove('selected');
+
+            document.getElementById('filter-admin-status-val').value = "Semua";
+            document.getElementById('teks-admin-status').innerText = "Semua";
+            document.getElementById('btn-admin-status').classList.remove('selected');
             
             document.getElementById('tbody-filter-kehadiran').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Silakan pilih Hari dan Mata Pelajaran di atas.</td></tr>';
-            setTabKehadiran('Semua');
         }
 
         function pilihAdminHari(hari) {
@@ -557,24 +563,18 @@
             renderTabelKehadiran();
         }
 
-        function setTabKehadiran(tabName) {
-            filterTabKehadiran = tabName;
-            document.getElementById('tab-semua').classList.remove('active');
-            document.getElementById('tab-hadir').classList.remove('active');
-            document.getElementById('tab-izin').classList.remove('active');
-            document.getElementById('tab-belum').classList.remove('active');
-            
-            if(tabName === 'Semua') document.getElementById('tab-semua').classList.add('active');
-            else if(tabName === 'Hadir') document.getElementById('tab-hadir').classList.add('active');
-            else if(tabName === 'Izin') document.getElementById('tab-izin').classList.add('active');
-            else if(tabName === 'Belum Absen') document.getElementById('tab-belum').classList.add('active');
-            
+        function pilihAdminStatus(status) {
+            document.getElementById('filter-admin-status-val').value = status;
+            document.getElementById('teks-admin-status').innerText = status;
+            document.getElementById('btn-admin-status').classList.add('selected');
+            closeModal('modal-admin-status');
             renderTabelKehadiran();
         }
 
         function renderTabelKehadiran() {
             const adminFilterHari = document.getElementById('filter-admin-hari-val').value;
             const adminFilterMapel = document.getElementById('filter-admin-mapel-val').value;
+            const adminFilterStatus = document.getElementById('filter-admin-status-val').value;
             const tbody = document.getElementById('tbody-filter-kehadiran');
             
             if(!adminFilterHari || !adminFilterMapel) {
@@ -592,9 +592,9 @@
                 else hasilAkhir.push({ nama: nama, status: 'Belum Absen', keterangan: '-', foto: null });
             });
 
-            // Terapkan Filter Tab
-            if (filterTabKehadiran !== 'Semua') {
-                hasilAkhir = hasilAkhir.filter(item => item.status === filterTabKehadiran);
+            // Terapkan Filter Tab Dropdown
+            if (adminFilterStatus !== 'Semua') {
+                hasilAkhir = hasilAkhir.filter(item => item.status === adminFilterStatus);
             }
 
             tbody.innerHTML = "";
