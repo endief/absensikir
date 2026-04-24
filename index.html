@@ -202,8 +202,6 @@
             <h2 class="panel-title">Dashboard Pengelola</h2>
             <p style="color: var(--neon-cyan); font-weight: 700; margin-bottom: 25px; text-align: center;">Pemantauan Real-Time</p>
             
-            <button class="btn-info" onclick="bukaModalKehadiran()">📊 Data Kehadiran (Filter Status)</button>
-            
             <div class="admin-controls">
                 <button id="btn-toggle-absen" onclick="toggleStatusAbsensi()" class="btn-secondary" style="margin-bottom: 0;">Tutup Absensi</button>
                 <button class="btn-primary" onclick="downloadExcel()" style="margin-bottom: 0;">Download Excel</button>
@@ -338,7 +336,9 @@
         // ==========================================
         const SUPABASE_URL = 'https://brtxlwjoyheeyeqcvhfi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJydHhsd2pveWhlZXllcWN2aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMzg5OTYsImV4cCI6MjA5MjYxNDk5Nn0.dSTRkB3Np4Rhmb0yfjNZ_CksO_QGYVXodW3b1mBtnOQ';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // PERBAIKAN: Variabel Supabase diganti menjadi supabaseClient agar tidak error
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let dbAbsensi = []; 
         let statusAbsensiDitutup = localStorage.getItem('status_absen_XIF7') === 'ditutup';
@@ -369,7 +369,7 @@
         // 3. FUNGSI FETCH DARI SUPABASE
         // ==========================================
         async function loadDataFromSupabase() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('absensi')
                 .select('*')
                 .order('id', { ascending: false });
@@ -456,7 +456,7 @@
                 let div = document.createElement('div');
                 div.className = 'name-item'; div.innerText = nama;
                 
-                // Pengecekan Cache Supabase (Optional) atau LocalStorage untuk disable UI
+                // Disable jika sudah absen di localStorage cache device
                 const cekAbsenKunci = `absen_XIF7_${nama}_${hariTerpilih}_${mapelTerpilih}`;
                 if (localStorage.getItem(cekAbsenKunci)) {
                     div.classList.add('disabled');
@@ -519,12 +519,11 @@
             canvas.width = video.videoWidth; canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             
-            // Flip gambar
             context.translate(canvas.width, 0);
             context.scale(-1, 1);
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            fotoSimpan = canvas.toDataURL('image/jpeg', 0.6); // Kompres kualitas
+            fotoSimpan = canvas.toDataURL('image/jpeg', 0.6); 
             
             video.classList.add('hidden'); canvas.classList.remove('hidden');
             document.getElementById('btn-capture').classList.add('hidden'); document.getElementById('btn-retake').classList.remove('hidden');
@@ -580,7 +579,7 @@
             // Validasi DB Server
             Swal.fire({title: 'Menyimpan Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             
-            const { data: existingData } = await supabase
+            const { data: existingData } = await supabaseClient
                 .from('absensi')
                 .select('id')
                 .eq('lockKey', cekAbsenKunci);
@@ -602,7 +601,7 @@
                 foto: fotoSimpan
             };
 
-            const { error } = await supabase.from('absensi').insert([payload]);
+            const { error } = await supabaseClient.from('absensi').insert([payload]);
 
             if (error) {
                 Swal.fire({ title: 'Error!', text: 'Gagal menyimpan data ke server.', icon: 'error' });
@@ -630,7 +629,7 @@
         function loginAdmin() {
             const user = document.getElementById('admin-user').value;
             const pass = document.getElementById('admin-pass').value;
-            if(user === 'admin' && pass === 'admin123') { // Ganti jika password mau diubah
+            if(user === 'admin' && pass === 'admin123') { 
                 switchPanel('panel-dashboard-admin', true);
                 renderTabelAdmin();
             } else {
@@ -694,7 +693,7 @@
                 if (result.isConfirmed) {
                     Swal.fire({title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                     
-                    const { error } = await supabase.from('absensi').delete().eq('id', idData);
+                    const { error } = await supabaseClient.from('absensi').delete().eq('id', idData);
 
                     if (!error) {
                         localStorage.removeItem(lockKeyData); 
@@ -715,7 +714,7 @@
                 if (result.isConfirmed) {
                     Swal.fire({title: 'Resetting...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
                     
-                    const { error } = await supabase.from('absensi').delete().neq('id', '0');
+                    const { error } = await supabaseClient.from('absensi').delete().neq('id', '0');
 
                     if (!error) {
                         Object.keys(localStorage).forEach(key => {
