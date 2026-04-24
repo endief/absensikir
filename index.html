@@ -53,7 +53,6 @@
             overflow: hidden; padding: 40px 30px; position: relative; margin-top: 15px; margin-bottom: 30px;
         }
 
-        /* Untuk Dashboard Pengelola Biar Lebih Lebar di Desktop */
         .app-container.admin-mode { max-width: 800px; }
 
         .app-container::before {
@@ -328,8 +327,7 @@
 
         let stateNamaTerpilih = "";
 
-        // --- 2. SISTEM DATABASE LOKAL (SIMULASI FIREBASE) ---
-        // Array untuk menyimpan semua data absensi agar bisa diload ke tabel admin & excel
+        // --- 2. SISTEM DATABASE LOKAL ---
         let dbAbsensi = JSON.parse(localStorage.getItem('absensi_db_XIF7')) || [];
         
         // --- 3. FITUR ADMIN & PENGELOLA ---
@@ -352,7 +350,6 @@
 
         function logoutAdmin() { switchPanel('panel-awal', false); }
 
-        // Buka/Tutup Absen Lock
         function toggleStatusAbsensi() {
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
             if(isClosed) {
@@ -369,13 +366,9 @@
             let isClosed = localStorage.getItem('status_absen_XIF7') === 'ditutup';
             let btn = document.getElementById('btn-toggle-absen');
             if(isClosed) {
-                btn.innerText = "Buka Absensi";
-                btn.style.background = "#10b981"; // Hijau
-                btn.style.color = "#fff";
+                btn.innerText = "Buka Absensi"; btn.style.background = "#10b981"; btn.style.color = "#fff";
             } else {
-                btn.innerText = "Tutup Absensi";
-                btn.style.background = "#f59e0b"; // Oren
-                btn.style.color = "#fff";
+                btn.innerText = "Tutup Absensi"; btn.style.background = "#f59e0b"; btn.style.color = "#fff";
             }
         }
 
@@ -388,7 +381,6 @@
             }
         }
 
-        // Render Tabel Dashboard Admin
         function renderTabelAdmin() {
             const tbody = document.getElementById('tbody-rekap');
             tbody.innerHTML = "";
@@ -398,7 +390,6 @@
                 return;
             }
 
-            // Loop dari belakang (yang terbaru di atas)
             [...dbAbsensi].reverse().forEach(data => {
                 let badgeClass = data.status === 'Hadir' ? 'badge-hadir' : 'badge-izin';
                 let btnHapus = `<button class="btn-delete-small" onclick="hapusDataIndividu('${data.id}', '${data.lockKey}')">Hapus</button>`;
@@ -416,33 +407,30 @@
             });
         }
 
-        // Hapus Absen Seseorang
         function hapusDataIndividu(id, lockKey) {
             Swal.fire({
                 title: 'Hapus Data?', text: "Data absensi siswa ini akan dihapus dan ia bisa absen kembali.",
                 icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Hapus!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Hapus dari Array DB
                     dbAbsensi = dbAbsensi.filter(item => item.id !== id);
                     localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
-                    // Buka gembok siswa agar bisa absen ulang
-                    localStorage.removeItem(lockKey);
+                    localStorage.removeItem(lockKey); // Buka gembok siswa
                     
                     Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
                     renderTabelAdmin();
+                    renderNama(document.getElementById('search-nama').value); // Refresh DOM List Nama
                 }
             });
         }
 
-        // Hapus Seluruh Absen
         function resetSemuaData() {
             Swal.fire({
                 title: 'Yakin Mereset Semua?', text: "Tindakan ini akan menghapus SELURUH data absen secara permanen!",
                 icon: 'error', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Reset Semua!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Hapus semua lock key di localStorage yang diawali 'absen_XIF7_'
+                    // Hapus semua lock key di localStorage
                     const keysToRemove = [];
                     for (let i = 0; i < localStorage.length; i++) {
                         let key = localStorage.key(i);
@@ -450,23 +438,28 @@
                     }
                     keysToRemove.forEach(k => localStorage.removeItem(k));
 
-                    // Kosongkan array DB
                     dbAbsensi = [];
                     localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
                     
                     Swal.fire('Direset!', 'Seluruh data absensi telah kembali kosong.', 'success');
                     renderTabelAdmin();
+                    
+                    // Reset pilihan form absen ke awal agar bersih
+                    document.getElementById('hari').value = ""; document.getElementById('teks-hari').innerText = "Pilih hari kehadiran...";
+                    document.getElementById('btn-pilih-hari').classList.remove('selected');
+                    document.getElementById('mapel').value = ""; document.getElementById('teks-mapel').innerText = "Pilih mata pelajaran...";
+                    document.getElementById('btn-pilih-mapel').classList.remove('selected');
+                    stateNamaTerpilih = ""; document.getElementById('nama-terpilih').value = "";
+                    document.getElementById('search-nama').value = "";
+                    
+                    renderNama(); // Refresh DOM List Nama
                 }
             });
         }
 
-        // Download Excel menggunakan SheetJS
         function downloadExcel() {
-            if(dbAbsensi.length === 0) {
-                return Swal.fire('Kosong', 'Belum ada data untuk di-download.', 'info');
-            }
+            if(dbAbsensi.length === 0) return Swal.fire('Kosong', 'Belum ada data untuk di-download.', 'info');
 
-            // Mapping data agar header excel bahasa indonesia dan rapi
             const dataToExport = dbAbsensi.map(item => ({
                 "Tanggal & Jam": item.waktuStr,
                 "Nama Siswa": item.nama,
@@ -479,11 +472,8 @@
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Absen");
-            
-            // Nama File
             XLSX.writeFile(workbook, "Rekap_Absensi_XIF7.xlsx");
         }
-
 
         // --- 4. NAVIGASI UI & MODAL ---
         function switchPanel(panelId, isAdminPanel = false) {
@@ -651,7 +641,6 @@
                 keterangan = keterangan + " (" + namaFileSurat + ")";
             }
 
-            // SIMPAN KE DATABASE ARRAY (SIMULASI FIREBASE)
             const cekAbsenKunci = `absen_XIF7_${nama}_${hari}_${mapel}`;
             const timeNow = new Date();
             
@@ -669,7 +658,7 @@
 
             dbAbsensi.push(payload);
             localStorage.setItem('absensi_db_XIF7', JSON.stringify(dbAbsensi));
-            localStorage.setItem(cekAbsenKunci, 'true'); // Gembok siswa ini
+            localStorage.setItem(cekAbsenKunci, 'true'); // Kunci form untuk siswa tersebut
 
             Swal.fire({ title: 'Data Diterima!', text: `Absensi ${nama} sukses diverifikasi.`, icon: 'success', confirmButtonColor: '#0ea5e9'})
             .then(() => {
